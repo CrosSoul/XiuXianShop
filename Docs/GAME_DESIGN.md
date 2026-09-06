@@ -25,10 +25,10 @@
 
 ## 当前状态
 
-- 仅完成工程检查、开发规则、文档与目录整理。
-- 当前场景仍为模板 SampleScene，包含 Main Camera、Directional Light、Global Volume。
+- 已完成基础整理与 URP 2D 项目基线转换。
+- 当前 SampleScene 仅包含正交 Main Camera，使用 URP Renderer2D 和默认 Unlit Sprite 材质。
 - Inventory、Customer、Trading、加工、日期和睡觉等玩法均未实现。
-- 固定视角、2D 场景和可交互 UI 尚未搭建。
+- 已有最小 2D 相机基线；店铺背景、角色、商品和可交互 UI 尚未搭建。
 
 ## 本阶段边界
 

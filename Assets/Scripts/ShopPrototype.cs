@@ -93,7 +93,7 @@ namespace XiuXianShop
             CreateGrid(ContainerId.Display,758,181,394,328,781,238,58,"今日展示柜");
             CreateGrid(ContainerId.Counter,1172,181,404,328,1224,238,58,"谈判柜台");
             selection=Label(content,"Selection",52,700,658,96,"",17,textColor);
-            displaySummary=Label(content,"DisplaySummary",775,478,360,24,"",14,muted);
+            displaySummary=Label(content,"DisplaySummary",775,474,360,32,"",13,muted);
             Label(content,"OwnershipLegend",1191,478,365,24,"己 = 你的物品    客 = 顾客物品",14,muted);
 
             Card("CustomerCard",758,528,818,224,panel);
@@ -101,8 +101,9 @@ namespace XiuXianShop
             Label(content,"Portrait",796,567,54,60,"客",38,gold);
             Label(content,"PortraitFoot",790,625,68,28,"来客",13,muted);
             customerTitle=Label(content,"CustomerTitle",885,545,660,35,"",23,gold);
-            customerDetails=Label(content,"CustomerDetails",885,589,660,80,"",17,textColor);
-            stageButton=MakeButton("StageSale",781,689,234,43,"将指定商品摆上柜台",()=>Run(()=>Session.StageSale()));
+            customerDetails=Label(content,"CustomerDetails",885,589,660,92,"",16,textColor);
+            customerDetails.resizeTextForBestFit=true;customerDetails.resizeTextMinSize=12;customerDetails.resizeTextMaxSize=16;
+            stageButton=MakeButton("StageSale",781,689,234,43,"摆入一件同类商品",()=>Run(()=>Session.StageSale()));
             acceptButton=MakeButton("AcceptTrade",1027,689,246,43,"确认交易",()=>Run(()=>Session.AcceptTrade()),true);
             rejectButton=MakeButton("RejectTrade",1285,689,264,43,"拒绝 / 不成交",()=>Run(()=>Session.RejectTrade()));
 
@@ -171,7 +172,7 @@ namespace XiuXianShop
                 view.anchoredPosition=new Vector2(item.X*cellSizes[item.Container],-item.Y*cellSizes[item.Container]); itemViews[item.Id]=view;
             }
             header.text=$"第 {Session.Day} 天    |    灵石 {Session.Money}";
-            phaseText.text=Session.Phase==DayPhase.Preparation?"营业前 · 配置展示":Session.Phase==DayPhase.Open?"营业中 · 展示锁定":"已闭店 · 整理 / 炼丹";
+            phaseText.text=Session.Phase==DayPhase.Preparation?"营业前 · 配置展示":Session.Phase==DayPhase.Open?"营业中 · 客源已确定":"已闭店 · 整理 / 炼丹";
             rent.text=$"下次房租：第 {Session.NextRentDay} 天夜间 / {Session.Rent} 灵石\n待付房租 {Session.RentDebt}  ·  每 7 天结算，下期约涨 5%";
             foreach(var pair in gridTitles)
             {
@@ -180,32 +181,35 @@ namespace XiuXianShop
             }
             var selected=Session.Find(selectedId);
             selection.text=selected==null?"点击物品查看名称、价格与形状。\n先把紫色「收购牌」与金色「回气丹」拖进展示柜。\n同一格子规则适用于背包、展示柜和柜台。":$"选中：{selected.Definition.title} · {(selected.Owner==ItemOwner.Player?"你的物品":"顾客所有")} · 占 {selected.Cells.Length} 格\n{selected.Definition.description}\n收购 {selected.Definition.purchasePrice} / 出售 {selected.Definition.salePrice} 灵石";
-            int goods=Session.In(ContainerId.Display).Count(i=>!i.Definition.procurementSign);
-            bool sign=Session.In(ContainerId.Display).Any(i=>i.Definition.procurementSign);
-            displaySummary.text=$"{(sign?"招牌：4 次供货":"无招牌：无供货")}  ·  {goods} 件待售";
+            if(selected!=null) selection.text+=$" · 类别：{ShopCatalog.CategoryName(selected.Definition.category)}";
+            var attraction=Session.Phase==DayPhase.Preparation?Session.PreviewAttraction():Session.TodayAttraction;
+            string preferredCategory=attraction.BuyerCategory==ItemCategory.Unclassified?"随机类别":ShopCatalog.CategoryName(attraction.BuyerCategory);
+            displaySummary.text=Session.Phase==DayPhase.Preparation?$"每日 5 位 · 买家 {1-attraction.SupplierChance:P0} / 卖家 {attraction.SupplierChance:P0}\n买家：{preferredCategory} · 资金 {attraction.MinimumBuyerBudget}–{attraction.MaximumBuyerBudget}":$"今日 5 位：买家 {Session.BuyersToday} / 卖家 {Session.SuppliersToday}\n已离场 {Session.ServedToday} · 待到访 {Session.RemainingCustomers} · 客源已确定";
             var offer=Session.Offer;
+            bool canAccept=Session.CanAcceptTrade(out int total,out string tradeReason);
             if(offer==null)
             {
                 customerTitle.text=Session.Phase==DayPhase.Open?"客人已离开":"等待开门";
-                customerDetails.text=Session.Phase==DayPhase.Open?$"今天已接待 {Session.ServedToday} 位，剩余 {Session.RemainingCustomers} 位。\n点击「下一位顾客」，或结束营业。":"收购牌吸引原料供货；展示商品吸引买家。\n只放丹药：顾客买丹。加上收购牌：同时有人卖原料。";
+                customerDetails.text=Session.Phase==DayPhase.Open?$"今天已接待 {Session.ServedToday} 位，剩余 {Session.RemainingCustomers} 位。\n点击「下一位顾客」，或结束营业。":$"每日固定 5 位，各自随机决定买卖方向；空展示柜也有客人。\n买家偏好：{preferredCategory} · 展示价值 {attraction.DisplayValue} · 档位 ≥{attraction.BudgetTierMinimum}\n资金范围 {attraction.MinimumBuyerBudget}–{attraction.MaximumBuyerBudget}；卖家供货：{attraction.SupplierDescription}。\n仅在开门时生成当天客源，之后可自由整理。";
             }
             else
             {
                 var item=Session.Find(offer.ItemId);
                 bool buying=offer.Direction==TradeDirection.CustomerSells;
                 customerTitle.text=$"{offer.CustomerName}  /  {(buying?"向你出售":"向你购买")}";
-                customerDetails.text=buying?$"{item.Definition.title} × 1  ·  顾客报价 {offer.Price} 灵石\n你支付 {offer.Price}，获得柜台上的实物。收进背包才完成交易。":$"指定商品：{item.Definition.title} × 1  ·  你将获得 {offer.Price} 灵石\n{(item.Container==ContainerId.Counter?"商品已在柜台，可以确认出售。":"请从展示柜拖到柜台，或点击下方摆放按钮。")}";
+                customerDetails.text=buying?$"{item.Definition.title} × 1  ·  顾客报价 {offer.Price} 灵石\n{tradeReason}\n付款后收入背包；柜台上的自有物品保持不变。":$"想要：{ShopCatalog.CategoryName(offer.RequestedCategory)}  ·  剩余资金：{offer.RemainingBudget}  ·  总价值：{total} 灵石\n{tradeReason}\n{Session.CounterSaleSummary}";
             }
-            SetButtonTitle(acceptButton,offer!=null && offer.Direction==TradeDirection.CustomerSells?$"确认收购  −{offer.Price}":offer!=null?$"确认出售  +{offer.Price}":"确认交易");
+            SetButtonTitle(acceptButton,offer!=null && offer.Direction==TradeDirection.CustomerSells?$"确认收购  −{offer.Price}":offer!=null?$"确认出售  +{total}":"确认交易");
             int cost=catalog.Find(catalog.herbId).purchasePrice+catalog.Find(catalog.dewId).purchasePrice;
             furnaceText.text=$"背包原料：凝气草 {Count(catalog.herbId)} / 灵露 {Count(catalog.dewId)}\n1 草 + 1 露 → 1 丹 · 成本 {cost} / 售价 {catalog.Find(catalog.productId).salePrice}";
             notice.text=localNotice??Session.Message;
             beginButton.interactable=Session.Phase==DayPhase.Preparation;
-            nextButton.interactable=Session.Phase==DayPhase.Open && offer==null && Session.RemainingCustomers>0;
+            nextButton.interactable=Session.Phase==DayPhase.Open && (offer!=null || Session.RemainingCustomers>0);
             endButton.interactable=Session.Phase==DayPhase.Open;
             sleepButton.interactable=Session.Phase==DayPhase.Closed;
-            stageButton.interactable=offer!=null && offer.Direction==TradeDirection.CustomerBuys && Session.Find(offer.ItemId)?.Container!=ContainerId.Counter;
-            acceptButton.interactable=rejectButton.interactable=offer!=null;
+            stageButton.interactable=offer!=null && offer.Direction==TradeDirection.CustomerBuys;
+            acceptButton.interactable=canAccept;
+            rejectButton.interactable=offer!=null;
             rotateButton.interactable=flipButton.interactable=selected!=null;
             cancelButton.interactable=IsDragging;
         }

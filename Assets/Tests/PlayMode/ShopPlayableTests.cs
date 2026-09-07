@@ -17,8 +17,19 @@ namespace XiuXianShop.Tests
         ShopPrototype shop;
         Mouse mouse;
         Keyboard keyboard;
+        ShopCatalog testCatalog;
+        InputSettings.BackgroundBehavior originalBackgroundBehavior;
+        InputSettings.EditorInputBehaviorInPlayMode originalEditorInputBehavior;
+        bool inputSettingsCaptured;
         [UnitySetUp] public IEnumerator Setup()
         {
+            // MCP may run tests with Game View unfocused. Route queued input to UGUI
+            // for this test only; restore both values below and never save an input asset.
+            originalBackgroundBehavior=InputSystem.settings.backgroundBehavior;
+            originalEditorInputBehavior=InputSystem.settings.editorInputBehaviorInPlayMode;
+            inputSettingsCaptured=true;
+            InputSystem.settings.backgroundBehavior=InputSettings.BackgroundBehavior.IgnoreFocus;
+            InputSystem.settings.editorInputBehaviorInPlayMode=InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
             EditorSceneManager.LoadSceneInPlayMode("Assets/Scenes/ShopPrototype.unity",new LoadSceneParameters(LoadSceneMode.Single));
             yield return null;yield return null;
             shop=Object.FindFirstObjectByType<ShopPrototype>();
@@ -31,6 +42,13 @@ namespace XiuXianShop.Tests
         {
             if(mouse!=null)InputSystem.RemoveDevice(mouse);
             if(keyboard!=null)InputSystem.RemoveDevice(keyboard);
+            if(inputSettingsCaptured)
+            {
+                InputSystem.settings.backgroundBehavior=originalBackgroundBehavior;
+                InputSystem.settings.editorInputBehaviorInPlayMode=originalEditorInputBehavior;
+                inputSettingsCaptured=false;
+            }
+            if(testCatalog!=null) {Object.Destroy(shop.gameObject);Object.Destroy(testCatalog);}
             yield return null;
         }
         IEnumerator MouseAt(Vector2 position,bool held)
@@ -98,30 +116,44 @@ namespace XiuXianShop.Tests
             LogAssert.NoUnexpectedReceived();
         }
 
-        [UnityTest] public IEnumerator ActualButtonsAndDragsRunTwoDaysWithSupplyCraftAndSales()
+        [UnityTest] public IEnumerator ActualButtonsRunFiveRandomVisitorsAcrossTwoDays()
         {
             var s=shop.Session;
             yield return Drag(s.Items.First(i=>i.Definition.id=="sign"),ContainerId.Display,0,0);
             yield return Drag(s.Items.First(i=>i.Definition.id=="pill"),ContainerId.Display,2,0);
-            yield return Click("BeginBusiness");Assert.That(s.Offer.Direction,Is.EqualTo(TradeDirection.CustomerSells));
-            var offered=s.Find(s.Offer.ItemId);int initialMoney=s.Money;
-            yield return Drag(offered,ContainerId.Storage,6,4);
-            Assert.That(offered.Owner,Is.EqualTo(ItemOwner.Customer));Assert.That(offered.Container,Is.EqualTo(ContainerId.Counter));Assert.That(s.Money,Is.EqualTo(initialMoney));
-            for(int n=0;n<4;n++){yield return Click("AcceptTrade");yield return Click("NextCustomer");}
-            Assert.That(s.Money,Is.EqualTo(106));Assert.That(s.Offer.Direction,Is.EqualTo(TradeDirection.CustomerBuys));
-            yield return Drag(s.Find(s.Offer.ItemId),ContainerId.Counter,0,0);
-            yield return Click("AcceptTrade");Assert.That(s.Money,Is.EqualTo(124));Assert.That(s.Sales,Is.EqualTo(1));
-            yield return Click("EndBusiness");
-            for(int n=0;n<3;n++)yield return Click("Craft");
-            Assert.That(s.Crafted,Is.EqualTo(3));yield return Click("Sleep");Assert.That(s.Day,Is.EqualTo(2));
-            var pills=s.Items.Where(i=>i.Definition.id=="pill").ToArray();Assert.That(pills.Length,Is.EqualTo(3));
-            yield return Drag(pills[0],ContainerId.Display,2,0);yield return Drag(pills[1],ContainerId.Display,4,0);yield return Drag(pills[2],ContainerId.Display,2,2);
-            yield return Click("BeginBusiness");
-            for(int n=0;n<4;n++){yield return Click("RejectTrade");yield return Click("NextCustomer");}
-            for(int n=0;n<3;n++)
-            {yield return Click("StageSale");yield return Click("AcceptTrade");if(n<2)yield return Click("NextCustomer");}
-            Assert.That(s.Money,Is.EqualTo(178));Assert.That(s.Sales,Is.EqualTo(4));Assert.That(s.Purchases,Is.EqualTo(4));
-            yield return Click("EndBusiness");yield return Click("Sleep");Assert.That(s.Day,Is.EqualTo(3));
+            int expectedMoney=120;
+            for(int day=1;day<=2;day++)
+            {
+                yield return Click("BeginBusiness");Assert.That(s.BuyersToday+s.SuppliersToday,Is.EqualTo(5));
+                for(int n=0;n<5;n++)
+                {
+                    Assert.That(s.Offer,Is.Not.Null);
+                    if(s.Offer.Direction==TradeDirection.CustomerSells)
+                    {
+                        var offered=s.Find(s.Offer.ItemId);
+                        yield return Drag(offered,ContainerId.Storage,6,4);
+                        Assert.That(offered.Owner,Is.EqualTo(ItemOwner.Customer));Assert.That(offered.Container,Is.EqualTo(ContainerId.Counter));
+                        if(shop.FindButton("AcceptTrade").interactable) {expectedMoney-=s.Offer.Price;yield return Click("AcceptTrade");}
+                    }
+                    else
+                    {
+                        var item=s.Items.FirstOrDefault(i=>i.Owner==ItemOwner.Player && !i.Definition.procurementSign && i.Definition.category==s.Offer.RequestedCategory);
+                        if(item!=null)
+                        {
+                            Assert.That(s.FindSpace(item,ContainerId.Counter,out int x,out int y));yield return Drag(item,ContainerId.Counter,x,y);
+                            if(s.CanAcceptTrade(out int price,out _)) {expectedMoney+=price;yield return Click("AcceptTrade");}
+                            else {Assert.That(s.FindSpace(item,ContainerId.Storage,out x,out y));yield return Drag(item,ContainerId.Storage,x,y);}
+                        }
+                    }
+                    Assert.That(s.Money,Is.EqualTo(expectedMoney));
+                    if(n<4 || s.Offer!=null)yield return Click("NextCustomer");
+                }
+                Assert.That(s.Offer,Is.Null);Assert.That(s.ServedToday,Is.EqualTo(5));Assert.That(shop.FindButton("NextCustomer").interactable,Is.False);
+                yield return Click("EndBusiness");
+                while(s.In(ContainerId.Storage).Any(i=>i.Definition.id=="herb") && s.In(ContainerId.Storage).Any(i=>i.Definition.id=="dew"))
+                {int previous=s.Crafted;yield return Click("Craft");if(previous==s.Crafted)break;}
+                yield return Click("Sleep");Assert.That(s.Day,Is.EqualTo(day+1));
+            }
             Assert.That(s.HasFurnace);Assert.That(s.RemainingCustomers,Is.Zero);Assert.That(s.Offer,Is.Null);Assert.That(s.ValidateState(),Is.Null);
             LogAssert.NoUnexpectedReceived();
         }
@@ -135,6 +167,101 @@ namespace XiuXianShop.Tests
                 {Assert.That(p.x,Is.InRange(0,Screen.width));Assert.That(p.y,Is.InRange(0,Screen.height));} }
             foreach(string button in new[]{"BeginBusiness","Craft","Rotate","Flip","Sleep","AcceptTrade"})Assert.That(shop.FindButton(button),Is.Not.Null);
             yield return null;LogAssert.NoUnexpectedReceived();
+        }
+
+        string CustomerText=>shop.GetComponentsInChildren<UnityEngine.UI.Text>().First(t=>t.name=="CustomerDetails").text;
+        IEnumerator RestartWithTestCatalog(System.Action<ShopCatalog> configure)
+        {
+            testCatalog=Object.Instantiate(shop.Catalog);configure(testCatalog);
+            Object.Destroy(shop.gameObject);yield return null;
+            shop=new GameObject("Test Shop Prototype").AddComponent<ShopPrototype>();shop.Catalog=testCatalog;
+            yield return null;yield return null;Canvas.ForceUpdateCanvases();
+        }
+        IEnumerator PrepareThreePillsAndBuyer(int budget)
+        {
+            yield return RestartWithTestCatalog(c=>
+            {
+                c.startingItems=c.startingItems.Concat(new[]{"pill","pill"}).ToArray();
+                c.baseSupplierChance=0;c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
+                c.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=budget}};c.buyerBudgetVariation=0;
+            });
+            yield return Drag(shop.Session.Items.First(i=>i.Definition.id=="pill"),ContainerId.Display,2,0);
+            yield return Click("BeginBusiness");Assert.That(shop.Session.Offer.RemainingBudget,Is.EqualTo(budget));
+        }
+
+        [UnityTest] public IEnumerator BuyerBudgetAndInvalidBasketControlRealConfirmButton()
+        {
+            yield return PrepareThreePillsAndBuyer(40);var s=shop.Session;
+            yield return Click("NextCustomer"); // An unserved buyer can be skipped.
+            var buyer=s.Offer;Assert.That(buyer.RemainingBudget,Is.EqualTo(40));
+            var pills=s.Items.Where(i=>i.Definition.id=="pill").ToArray();var jade=s.Items.First(i=>i.Definition.id=="jade");
+            yield return Drag(pills[2],ContainerId.Counter,0,0); // A different copy from the displayed one.
+            yield return Drag(jade,ContainerId.Counter,2,0);
+            Assert.That(jade.Container,Is.EqualTo(ContainerId.Counter));Assert.That(shop.FindButton("AcceptTrade").interactable,Is.False);
+            Assert.That(CustomerText,Does.Contain("类别不符"));
+            Assert.That(s.FindSpace(jade,ContainerId.Storage,out int x,out int y));yield return Drag(jade,ContainerId.Storage,x,y);
+            Assert.That(shop.FindButton("AcceptTrade").interactable);yield return Click("AcceptTrade");
+            Assert.That(buyer.RemainingBudget,Is.EqualTo(22));Assert.That(s.Offer,Is.SameAs(buyer));
+            yield return Drag(pills[1],ContainerId.Counter,0,0);yield return Click("AcceptTrade");
+            Assert.That(buyer.RemainingBudget,Is.EqualTo(4));
+            yield return Drag(pills[0],ContainerId.Counter,0,0);
+            Assert.That(shop.FindButton("AcceptTrade").interactable,Is.False);Assert.That(CustomerText,Does.Contain("资金不足"));
+            yield return Click("NextCustomer");Assert.That(s.Offer.RemainingBudget,Is.EqualTo(40));
+            Assert.That(pills[0].Container,Is.EqualTo(ContainerId.Counter));Assert.That(shop.FindButton("AcceptTrade").interactable);
+            // Leaving and closing never move unsold player goods behind the player's back.
+            yield return Click("EndBusiness");yield return Drag(pills[0],ContainerId.Display,2,0);
+            Assert.That(s.FindSpace(pills[0],ContainerId.Storage,out x,out y));yield return Drag(pills[0],ContainerId.Storage,x,y);
+            yield return Click("Sleep");yield return Drag(pills[0],ContainerId.Counter,0,0);
+            Assert.That(pills[0].Container,Is.EqualTo(ContainerId.Counter));Assert.That(s.ValidateState(),Is.Null);LogAssert.NoUnexpectedReceived();
+        }
+
+        [UnityTest] public IEnumerator ThreeItemBasketAndOpenDisplayChangesWorkThroughRealDrags()
+        {
+            yield return PrepareThreePillsAndBuyer(60);var s=shop.Session;
+            var sign=s.Items.First(i=>i.Definition.id=="sign");
+            yield return Drag(sign,ContainerId.Display,0,0);
+            Assert.That(s.FindSpace(sign,ContainerId.Storage,out int x,out int y));yield return Drag(sign,ContainerId.Storage,x,y);
+            var jade=s.Items.First(i=>i.Definition.id=="jade");yield return Drag(jade,ContainerId.Display,0,0);
+            Assert.That(jade.Container,Is.EqualTo(ContainerId.Display));Assert.That(s.BuyersToday,Is.EqualTo(5));
+            yield return Click("NextCustomer");yield return Click("NextCustomer");
+            Assert.That(s.Offer.RequestedCategory,Is.EqualTo(ItemCategory.Medicine));Assert.That(s.Offer.RemainingBudget,Is.EqualTo(60));
+            var pills=s.Items.Where(i=>i.Definition.id=="pill").ToArray();
+            yield return Drag(pills[2],ContainerId.Counter,0,0);yield return Drag(pills[0],ContainerId.Counter,2,0);yield return Drag(pills[1],ContainerId.Counter,0,2);
+            Assert.That(CustomerText,Does.Contain("18×3=54"));Assert.That(CustomerText,Does.Contain("交易成立"));
+            int money=s.Money;yield return Click("AcceptTrade");
+            Assert.That(s.Money,Is.EqualTo(money+54));Assert.That(s.Sales,Is.EqualTo(3));Assert.That(s.Offer.RemainingBudget,Is.EqualTo(6));
+            Assert.That(s.Items.Any(i=>i.Definition.id=="pill"),Is.False);Assert.That(shop.FindButton("AcceptTrade").interactable,Is.False);
+            while(s.Offer!=null)yield return Click("NextCustomer");Assert.That(shop.FindButton("NextCustomer").interactable,Is.False);
+            // A new category added after opening does not append new customers.
+            Assert.That(s.RemainingCustomers,Is.Zero);Assert.That(s.ValidateState(),Is.Null);LogAssert.NoUnexpectedReceived();
+        }
+
+        [UnityTest] public IEnumerator EmptyDisplayStillReceivesFiveAndRealDragsUpdateBudgetTierPreview()
+        {
+            var s=shop.Session;
+            Assert.That(CustomerText,Does.Contain("空展示柜也有客人"));Assert.That(CustomerText,Does.Contain("18–22"));
+            yield return Click("BeginBusiness");var snapshot=s.TodayAttraction;
+            yield return Drag(s.Items.First(i=>i.Definition.id=="jade"),ContainerId.Display,0,0);
+            Assert.That(s.TodayAttraction,Is.SameAs(snapshot));Assert.That(snapshot.BuyerCategory,Is.EqualTo(ItemCategory.Unclassified));
+            for(int n=0;n<5;n++)
+            {
+                Assert.That(s.Offer,Is.Not.Null);if(s.Offer.Direction==TradeDirection.CustomerBuys) Assert.That(s.Offer.RemainingBudget,Is.InRange(18,22));
+                yield return Click("NextCustomer");
+            }
+            Assert.That(s.ServedToday,Is.EqualTo(5));Assert.That(s.Offer,Is.Null);Assert.That(shop.FindButton("NextCustomer").interactable,Is.False);
+            yield return Click("EndBusiness");yield return Click("Sleep");
+            yield return Drag(s.Items.First(i=>i.Definition.id=="pill"),ContainerId.Display,2,0);
+            Assert.That(CustomerText,Does.Contain("丹药"));Assert.That(CustomerText,Does.Contain("18–22"));
+            yield return Click("Craft");
+            yield return Drag(s.Items.First(i=>i.Definition.id=="pill" && i.Container==ContainerId.Storage),ContainerId.Display,2,2);
+            Assert.That(CustomerText,Does.Contain("展示价值 36"));Assert.That(CustomerText,Does.Contain("档位 ≥30"));Assert.That(CustomerText,Does.Contain("54–66"));
+            yield return Click("BeginBusiness");
+            for(int n=0;n<5;n++)
+            {
+                if(s.Offer.Direction==TradeDirection.CustomerBuys) {Assert.That(s.Offer.RequestedCategory,Is.EqualTo(ItemCategory.Medicine));Assert.That(s.Offer.RemainingBudget,Is.InRange(54,66));}
+                yield return Click("NextCustomer");
+            }
+            Assert.That(s.ServedToday,Is.EqualTo(5));Assert.That(s.ValidateState(),Is.Null);LogAssert.NoUnexpectedReceived();
         }
 
         [UnityTest] public IEnumerator FlipButtonReflectsHorizontallyAfterRotation()

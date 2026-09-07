@@ -15,6 +15,7 @@ MonoBehaviour:
   items:
   - id: herb
     title: "\u51DD\u6C14\u8349"
+    category: 2
     description: "\u70BC\u4E39\u539F\u6599 \xB7 L \u5F62\u3002\u4E0E\u7075\u9732\u70BC\u6210\u56DE\u6C14\u4E39\u3002"
     color: {r: 0.36, g: 0.72, b: 0.51, a: 1}
     cells:
@@ -24,8 +25,10 @@ MonoBehaviour:
     purchasePrice: 4
     salePrice: 3
     procurementSign: 0
+    advertisedCategory: 2
   - id: dew
     title: "\u7075\u9732"
+    category: 2
     description: "\u70BC\u4E39\u539F\u6599 \xB7 \u5355\u683C\u3002\u6536\u8D2D\u62DB\u724C\u5E26\u6765\u7A33\u5B9A\u4F9B\u8D27\u3002"
     color: {r: 0.36, g: 0.67, b: 0.88, a: 1}
     cells:
@@ -33,8 +36,10 @@ MonoBehaviour:
     purchasePrice: 3
     salePrice: 2
     procurementSign: 0
+    advertisedCategory: 2
   - id: pill
     title: "\u56DE\u6C14\u4E39"
+    category: 1
     description: "\u70BC\u4E39\u6210\u54C1 \xB7 2\xD72 \u4E39\u76D2\u3002\u539F\u6599\u6210\u672C 7\uFF0C\u51FA\u552E\u6536\u5165 18\u3002"
     color: {r: 0.93, g: 0.68, b: 0.31, a: 1}
     cells:
@@ -45,8 +50,10 @@ MonoBehaviour:
     purchasePrice: 20
     salePrice: 18
     procurementSign: 0
+    advertisedCategory: 2
   - id: cinnabar
     title: "\u6731\u7802"
+    category: 2
     description: "\u4E0D\u89C4\u5219\u8BD5\u6446\u7269 \xB7 T \u5F62\uFF0C\u65CB\u8F6C\u4F1A\u6539\u53D8\u5360\u683C\u3002"
     color: {r: 0.83, g: 0.42, b: 0.39, a: 1}
     cells:
@@ -57,8 +64,10 @@ MonoBehaviour:
     purchasePrice: 8
     salePrice: 6
     procurementSign: 0
+    advertisedCategory: 2
   - id: jade
     title: "\u7389\u5323"
+    category: 4
     description: "\u5927\u4EF6\u8BD5\u6446\u7269 \xB7 2\xD72\uFF0C\u5360\u7528\u56DB\u683C\u3002"
     color: {r: 0.56, g: 0.71, b: 0.69, a: 1}
     cells:
@@ -69,8 +78,10 @@ MonoBehaviour:
     purchasePrice: 18
     salePrice: 14
     procurementSign: 0
+    advertisedCategory: 2
   - id: sword
     title: "\u6728\u5251"
+    category: 3
     description: "\u957F\u6761\u8BD5\u6446\u7269 \xB7 \u56DB\u683C\uFF0C\u7AD6\u653E\u6216\u6A2A\u653E\u3002"
     color: {r: 0.69, g: 0.55, b: 0.37, a: 1}
     cells:
@@ -81,9 +92,11 @@ MonoBehaviour:
     purchasePrice: 14
     salePrice: 10
     procurementSign: 0
+    advertisedCategory: 2
   - id: sign
     title: "\u6536\u8D2D\u724C"
-    description: "\u4E1A\u52A1\u62DB\u724C \xB7 \u653E\u5165\u5C55\u793A\u67DC\uFF0C\u6BCF\u5929\u5E26\u6765\u4E24\u7EC4\u51DD\u6C14\u8349\u4E0E\u7075\u9732\u3002\u4E0D\u53EF\u51FA\u552E\u3002"
+    category: 5
+    description: "\u6750\u6599\u5E7F\u544A\u724C \xB7 \u5F00\u95E8\u65F6\u63D0\u9AD8\u5356\u5BB6\u6982\u7387\uFF0C\u5E76\u5438\u5F15\u51FA\u552E\u6750\u6599\u7684\u5356\u5BB6\uFF1B\u6BCF\u65E5\u603B\u5BA2\u6D41\u4ECD\u4E3A 5 \u4F4D\u3002\u4E0D\u53EF\u51FA\u552E\u3002"
     color: {r: 0.65, g: 0.56, b: 0.83, a: 1}
     cells:
     - {x: 0, y: 0}
@@ -92,6 +105,7 @@ MonoBehaviour:
     purchasePrice: 0
     salePrice: 0
     procurementSign: 1
+    advertisedCategory: 2
   startingItems:
   - sign
   - herb
@@ -106,3 +120,16 @@ MonoBehaviour:
   startingMoney: 120
   rentPeriod: 7
   firstRent: 20
+  buyerBudgetTiers:
+  - minimumDisplayValue: 0
+    baseBudget: 20
+  - minimumDisplayValue: 30
+    baseBudget: 60
+  - minimumDisplayValue: 100
+    baseBudget: 150
+  - minimumDisplayValue: 300
+    baseBudget: 400
+  buyerBudgetVariation: 0.1
+  baseSupplierChance: 0.4
+  advertisementSupplierBonus: 0.4
+  displayedGoodsBuyerBonus: 0.2

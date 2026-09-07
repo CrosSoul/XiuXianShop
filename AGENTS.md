@@ -2,6 +2,8 @@
 
 适用于本仓库所有任务。先阅读本文件及与任务相关的 Docs 文档；用户当前明确指令优先。
 
+- 实现、修复、审查 Unity 玩法与交互，或按目标模式推进开发时，读取并使用项目 Skill [unity-goal-driven-development](.agents/skills/unity-goal-driven-development/SKILL.md)；无关问答、纯文档整理和 Skill 安装维护不强制触发。
+
 ## 项目与范围
 
 - 这是一个单人开发的 2D 修仙店铺经营游戏，目前只服务于一个小型单机 Demo。

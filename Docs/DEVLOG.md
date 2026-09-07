@@ -2,6 +2,60 @@
 
 按任务记录日期、范围、实际改动、验证和未完成内容。不将计划功能写成已实现功能。
 
+## 2026-09-07 — 每日五位随机顾客与展示预算档位
+
+- 读取 FigJam 节点 28:1049 的最新展示吸引判定。按用户后续选择，五个顾客逐位随机决定买卖方向，不采用固定 2 卖家＋3 买家的建议；按用户补充将预算改为离散档位，不使用展示价值连续函数。
+- 空展示柜也允许营业，每天只生成五位；反复点下一位或同一位连续成交不会增加名额。展示物品只影响开门时的抽样，开门后搬动不重生成，睡觉后重新计算。
+- 默认卖家概率为基础 40%＋有效广告牌 40 个百分点－有可售商品展示 20 个百分点，截断到 0–100%。因此空柜/仅商品/仅广告/两者都有分别为 40%/20%/80%/60%，全部在 Inspector 可调。广告牌重复不叠加；单日可能全买家或全卖家。
+- 买家只求购展示总售价最高的单一类别，同类不同商品合计；并列按类别枚举顺序稳定决定。没有可售展示时从配置中的可售类别随机求购，不要求玩家持有。其他展示类别不贡献预算。
+- 默认预算档位：0–29→基准 20（18–22）；30–99→60（54–66）；100–299→150（135–165）；≥300→400（360–440）。范围为约 ±10% 内的整数值，每位买家独立随机；门槛、基准和浮动比例可调。同档展示 20/22 不再改变预算范围。
+- 广告牌新增 advertisedCategory；默认收购牌为材料。卖家从广告类别对应的可供货商品中随机携带一件；没有有效广告时从所有可供货商品随机选择。当前材料包括草、露、朱砂，不再保证固定两组草露供货。没有可供货商品时只生成买家；异常空商品配置有明确失败提示。
+- 修改原 ShopCatalog、ShopSession、ShopPrototype 和两个测试文件；新增轻量 DisplayAttraction 数据快照用于预览和开门，复用现有队列，没有引入 Manager/Service。随机种子仅作为 ShopSession 可选构造参数便于测试，正常游玩逐局随机。
+- ShopCatalog.asset 经 Unity MCP/Editor API 更新档位和概率、广告类别/描述，移除旧固定预算数组。核对保留七种定义原价格、形状、类别、开局库存和场景引用；未手写 Unity YAML。同步设计、计划、试玩和验收文档。
+- Edit Mode 39/39（约 1.29 秒）、Play Mode 7/7（约 12.27 秒）通过。覆盖 400 个种子的五人队列与概率分配、10 组档位边界、每位预算波动、最高类别、广告类别、重复预览不改变随机结果、营业快照和次日重新生成。Play Mode 通过实际鼠标/键盘/UGUI，从保存场景完成两天随机经营和空柜→两盒丹药跨档；原多件/连续交易用隔离配置回归，不冒充现在默认仍固定 20/40/60。
+- 已查看真实 Play 预览截图：两盒丹药价值 36，档位 ≥30，资金 54–66，材料招牌下买家 40% / 卖家 60%。截图与 MCP 请求均在 Temp 中，不提交。人工试玩、全分辨率与 Player 构建未执行，手动步骤已更新。
+- 最终 MCP：Editor ready、Play stopped、无编译/Domain Reload；ShopPrototype 与 Catalog 均已保存无脏标记，原两个根对象及资产引用有效；输入测试临时值已恢复。Console MCP 缓冲与原生计数均 Error=0、Warning=0。本次没有清空日志，起始存在的旧截图错误仅作为历史记录保留，不归因于本次玩法修复。
+- Git 开始时已包含上一轮代码/资产/测试/文档变更，以及其他任务的 AGENTS 与 .agents Skill；保留已有工作。未改 Packages、ProjectSettings、场景、.meta、容器尺寸或其他 FigJam 功能；未暂存、提交或推送。无需开发者手动配置 Unity Editor。
+
+## 2026-09-07 — 买家类别与预算、多件结算和自由搬动
+
+- 按本次三项反馈调整现有原型，不扩展产业或其他玩法。为所有商品定义增加单一 Category 标签：丹药、材料、装备、容器、业务招牌；顾客改为求购类别 + 剩余预算，不再绑定某一件商品实例。
+- 默认每个不同的展示类别吸引预算 20、40、60 的三位买家，同类别不按展示件数重复生成。预算数组放在 ShopCatalog 的 Inspector 中；这是本次采用的简单确定性客流配置。招牌仍带来四次供货。全部客源只在开始营业时生成，之后增减展示物品不会影响当天队列。
+- 柜台接受任意自有物品。确认出售统一验证整批可出售、类别符合、总价不超过预算；空柜台、不可出售品、类别错误和资金不足均禁用按钮并显示原因。UI 显示类别、剩余资金、总价值与按商品分组的单价×数量小计。
+- 成交整批移除物品、增加玩家资金并扣除顾客预算，买家保留，可连续购买。下一位允许未成交跳过；拒绝、换客、闭店保留自有物品的当前位置，不自动归还展示。供货者未付款物品仍受归属保护。
+- 三个区域在准备、营业、闭店阶段均允许玩家自由拖放，保留形状、碰撞、旋转和翻转规则。柜台被自有物品占满时，供货请求保留，腾空后可重试下一位，不丢失物品。
+- 修改 ShopCatalog.cs、ShopSession.cs、ShopPrototype.cs，两个既有测试文件及 ShopCatalog.asset。配置资产由 Unity MCP/Editor API 保值迁移，只增加类别和预算字段，不手写 YAML。同步 GAME_DESIGN、DEV_PLAN、试玩指南与验收记录。
+- 验证：Edit Mode 22/22，通过用户预算 20、40、60 的示例、多件交易原子性、任意副本、同类别不同商品、跨阶段搬动和客源快照。Play Mode 6/6（约 11.94 秒），通过 Input System 虚拟鼠标、键盘与实际 UGUI 按钮完成两天循环及新交易流程；不是人工试玩。
+- UI 测试调试中修复 Game View 失焦造成模拟输入失效、临时设置对象被 Unity 自动销毁导致 SetUp 失败的问题。最终仅在测试期间临时调整并恢复两项输入值；MCP 确认原值恢复，Project Settings 没有修改。
+- 已进入临时 Play 会话查看预算 60/三盒丹药的交易画面，18×3=54 与确认按钮正常。首次截图因 Temp 子目录缺失失败；补目录后重试成功并查看图片。最终 Console 保留该条已解决的截图 Error，0 Warning；没有清空日志。测试结束、截图前 Console 原生计数和 MCP 缓冲均为 0 Error / 0 Warning，未发现玩法脚本异常。
+- 最终退出 Play，Editor ready、未编译、未 Domain Reload；ShopPrototype 已保存无脏标记，原两个根对象和 Catalog 引用保留。未改 Package、输入或 Build 设置、管线、场景和 .meta。
+- 续作时 Unity 工具未出现在当前工具列表，使用原本配置的 Unity MCP stdio 服务完成测试和收尾；Temp 中的客户端/请求/截图均不提交。未创建本地提交或推送。并行出现的 AGENTS/Skill/其他 DEVLOG 变更保留，不归入本次实现。
+- 开发者无需手动配置 Editor。人工操作手感、全分辨率和 Player 构建未验证；具体手动路径及预期结果已补入 FIRST_PLAYABLE_GUIDE.md。收尾读取并应用工作区新增的 unity-goal-driven-development Skill，未扩展已授权范围。
+
+## 2026-09-07 — Karpathy 社区准则适配为项目级 Codex Skill
+
+- 本次仅研究、适配和安装开发行为准则，不推进游戏功能，不提交或推送 Git。使用 skill-creator 与 OpenAI Docs 指导，未执行上游脚本或安装命令，未安装全局 Skill 或改其他项目。
+- 联网核查上游 README、CLAUDE.md、Skill、Claude 插件清单、Cursor 规则/说明、EXAMPLES 及完整文件树；main 为 `2c606141936f1eeef17fa3043a72095b4765b9c2`。上游值得作为轻量底稿，但不照搬“困惑就停下询问”、示例中的逐步确认或字面最小化。来源、完整适配映射及许可现状见 [.agents/skills/unity-goal-driven-development/references/UPSTREAM.md](../.agents/skills/unity-goal-driven-development/references/UPSTREAM.md)。
+- 当前代码中已有 Storage/Display/Counter 三个容器、形状旋转/翻转、拖动、交易、炼丹与睡觉路径。ShopPrototype 的静态布局创建背包/仓库、展示柜、谈判柜台；没有据此认定用户背景中的独立“下方物品栏”已完成。已有验收文档中的 16 项 Edit Mode / 4 项 Play Mode 通过是历史记录，本次未重跑，也不代表当前已有改动或人工试玩已验证。
+- 安装前发现根 AGENTS.md；项目内未发现其他 AGENTS.override.md、CLAUDE.md、Skill 或 .codex 配置。原有六项未提交改动为 ShopCatalog.asset、ShopCatalog.cs、ShopPrototype.cs、ShopSession.cs、ShopSessionTests.cs、ShopPlayableTests.cs，本任务均未编辑。
+
+### 实际文件改动
+
+- 新增 `.agents/skills/unity-goal-driven-development/SKILL.md`：保留理解问题、简单方案、精准修改、可验证目标四项原则；允许补齐当前目标所需交互/状态/边界，自主处理小决定，保护 Unity 序列化与资源引用，持续至已授权里程碑，按证据层级汇报。
+- 新增该 Skill 的 `references/UPSTREAM.md`：保存上游提交、作者 forrestchang、Karpathy 思想来源、MIT 声明及 Codex 官方依据。上游完整文件树没有独立 LICENSE 或版权年份正文，本次不伪造它们。
+- 根 AGENTS.md 仅增加一条有范围限制的 Skill 阅读引用；原文逐项保留。此引用是代理阅读指令，不是虚构的 include 配置。当前日志追加本节，其他设计与计划未调整。
+- 按官方 [Build skills](https://learn.chatgpt.com/docs/build-skills) 使用项目 `.agents/skills`，以 description 供匹配、正文按需加载；没有添加可选 openai.yaml，沿用隐式调用默认允许。按官方 [AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md) 保留根规则并增量引用，不复制 Claude/Cursor 配置。
+
+### 实际验证与边界
+
+- Codex CLI 0.153.4 的 `codex debug prompt-input` 成功返回有效 JSON，技能目录映射指向当前项目 `.agents/skills`，技能列表含新名称、完整中文 description 和 SKILL.md 路径，项目 AGENTS 文本含新增引用。没有发送模型执行任务；这证明本地 CLI 的发现、元数据解析和提示装配，不能等同于桌面当前旧会话已刷新，或证明模型已在真实玩法任务中选择并遵循正文。
+- 静态检查通过：UTF-8 文本、必需前言字段、名称与目录一致、名称/描述长度、来源相对链接和无模板占位；Git 未忽略新 Skill。`git diff --check` 通过。独立阅读核对触发边界：玩法实现/修复适用，普通可逆实现决定不应询问，纯文档/Skill 维护不强制触发；未进行模型行为测试。
+- skill-creator 的 quick_validate.py 已尝试，但环境缺少 PyYAML，未运行成功；未为此安装全局依赖。实际 Codex 元数据解析和上述静态检查作为本次格式验证证据，不冒称该脚本通过。
+- 文件 SHA-256 比对：Assets、Packages、ProjectSettings 共 117 个文件中 116 个与本次写入前快照一致；暂停与续作期间 `Assets/Tests/PlayMode/ShopPlayableTests.cs` 内容发生变化，本任务没有对其发出写操作，保留现状，不回退或归入本次成果。AGENTS.md 去除唯一新增引用后与原文完全一致。
+- 收尾 Git 状态另出现 Docs/FIRST_PLAYABLE_GUIDE.md 与 Docs/GAME_DESIGN.md 的改动；本任务未写入这两份文件，作为并行或外部工作区变化保留，不将它们列为本次安装文件。
+- Unity MCP 最终只读检查：Editor ready、compiling=false、domainReloadInProgress=false、Play Mode stopped；当前捕获缓冲 Error/Warning 为 0。较早检查曾捕获同一 FindFirstObjectByType 弃用警告两条；任务跨暂停后缓冲已变化，不声称是本次修复。本任务没有清空 Console，没有触发编译、测试、进入 Play 或保存场景。
+- 无需手动 Unity Editor 操作。后续项目开发可自动匹配，也可显式写 `$unity-goal-driven-development`；若桌面技能列表未出现，按官方说明重启 Codex，并用新会话读取更新后的 AGENTS.md。真实任务中的选择、执行效果及玩家试玩仍未验证。
+
 ## 2026-09-07 — Dev 任务停留在 editor_status 的排查
 
 - 本次仅调查任务执行、连接与日志，保留工作区已有变更；项目内仅补充本条日志，未修改代码、资产、设置或 Play Mode 状态，未运行玩法测试。

@@ -1,0 +1,6 @@
+{
+  "name": "XiuXianShop.EditModeTests",
+  "references": ["XiuXianShop.Runtime"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}

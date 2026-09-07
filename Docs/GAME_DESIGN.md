@@ -25,10 +25,10 @@
 
 ## 当前状态
 
-- 已完成基础整理与 URP 2D 项目基线转换。
-- 当前 SampleScene 仅包含正交 Main Camera，使用 URP Renderer2D 和默认 Unlit Sprite 材质。
-- Inventory、Customer、Trading、加工、日期和睡觉等玩法均未实现。
-- 已有最小 2D 相机基线；店铺背景、角色、商品和可交互 UI 尚未搭建。
+- 已完成第一阶段可玩经营原型，入口为 Assets/Scenes/ShopPrototype.unity；原 SampleScene 作为 2D 空场景保留。
+- 原型使用三个真实形状格子容器，支持鼠标拖动、旋转、水平翻转、碰撞预览与非法回退。
+- 展示决定原料供货与商品买家；已实现单件买卖、拒绝、炼丹、闭店、睡觉跨日及七日房租。
+- 使用颜色格子、静态顾客占位和中文 UI，无正式美术或范围外玩法。详见 FIRST_PLAYABLE_GUIDE.md 和 FIRST_PLAYABLE_VERIFICATION.md。
 
 ## 本阶段边界
 

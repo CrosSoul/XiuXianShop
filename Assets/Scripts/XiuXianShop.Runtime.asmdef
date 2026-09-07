@@ -1,0 +1,5 @@
+{
+  "name": "XiuXianShop.Runtime",
+  "rootNamespace": "XiuXianShop",
+  "references": ["Unity.InputSystem", "Unity.ugui"]
+}

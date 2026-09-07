@@ -2,6 +2,16 @@
 
 按任务记录日期、范围、实际改动、验证和未完成内容。不将计划功能写成已实现功能。
 
+## 2026-09-08 — Game 视图字体模糊与低分辨率排查
+
+- 完成 Notion 中负责人 Codex 的同名 P0 排查任务。起始 Git 工作区干净；通过 MCP 读取 Unity 6000.6.0f1、实际场景、Game 视图及 Play Mode UI。
+- 确认当前 Free Aspect 启用 Low Resolution Aspect Ratios；本机像素缩放约 1.145833，画面以 1743×912 渲染再放大。经 Editor API 关闭后，同一窗口为 1997×1045、Game Scale=1，Canvas scaleFactor 从 0.912127 变为 1.045146；重复开关复核并查看原始截图。
+- URP Render Scale=1，Main Camera 不使用动态分辨率/目标 RenderTexture；UI 为 Overlay，动态中文字体正常。没有修改 C#、Asset、Scene、Package、Project Settings 或正式 UI 布局；修复仅为本机 Game 视图预览选项，个人布局不提交。
+- 新增 DISPLAY_CLARITY.md 和 Docs/Images 下两张实际 Play 原始 PNG，更新 FIRST_PLAYABLE_GUIDE.md。截图使用帧结束后的 ScreenCapture，包含 Overlay UI；MCP screenshot 的相机单独渲染不能作为此 UI 的截图证据。
+- 实际 Play 检查：1997×1045 下，UGUI Raycast 正确命中灵露物品和开始营业按钮；调用真实拖放处理器将物品移入展示柜，发送按钮 pointerClick 后成功开门，生成 5 位顾客，ValidateState 返回 null。这是 MCP 驱动的组件/指针事件验证，不是人工鼠标试玩。
+- 自动测试限制：MCP list_tests 找到 7 项 Play Mode 测试，但 run_tests 与直接 TestRunnerApi.Execute 均实际执行 0 项；新生成 XML 也为 total=0，不能报告 7/7 通过。未扩大范围修改测试工具/Package。此项属于回归测试执行缺口，不影响已通过开关对比定位的预览问题。
+- 收尾原生 Console Error=0、Warning=0，未清空日志；Editor ready、Play stopped、无编译/Domain Reload，ShopPrototype 场景无未保存修改。人工显示舒适度、其他电脑/分辨率与 Player 构建未验证；复查步骤见 DISPLAY_CLARITY.md。
+
 ## 2026-09-07 — 每日五位随机顾客与展示预算档位
 
 - 读取 FigJam 节点 28:1049 的最新展示吸引判定。按用户后续选择，五个顾客逐位随机决定买卖方向，不采用固定 2 卖家＋3 买家的建议；按用户补充将预算改为离散档位，不使用展示价值连续函数。

@@ -3,6 +3,8 @@
 适用于本仓库所有任务。先阅读本文件及与任务相关的 Docs 文档；用户当前明确指令优先。
 
 - 实现、修复、审查 Unity 玩法与交互，或按目标模式推进开发时，读取并使用项目 Skill [unity-goal-driven-development](.agents/skills/unity-goal-driven-development/SKILL.md)；无关问答、纯文档整理和 Skill 安装维护不强制触发。
+- 处理本项目 Jira Key、领取/继续开发任务、汇报进度证据或更新正式规则与数据时，使用 [pawnshop-atlassian-workflow](.agents/skills/pawnshop-atlassian-workflow/SKILL.md)：任务与进度归 Jira DP，正式知识与数据归 Confluence D；普通代码补全不要求加载整个知识库。
+- 当前工作流不再向 Notion 更新状态或进度；仅明确迁移、来源核对或读取旧资料时访问并保留原件。历史任务书中的 Notion 路由不作为当前汇报入口；本地 DEVLOG 继续记录工程事实，不替代 Jira。
 
 ## 项目与范围
 

@@ -135,6 +135,47 @@ MonoBehaviour:
   startingMoney: 120
   retailMarkup: 0.15
   priceTags: []
+  marketEvents:
+  - id: medicine-demand
+    title: "\u4E39\u836F\u6C42\u8D2D\u6F6E"
+    description: "\u836F\u574A\u6C42\u8D2D\u589E\u591A\uFF0C\u4E39\u836F\u51FA\u552E\u62A5\u4EF7\u6682\u65F6\u4E0A\u6DA8\u3002"
+    effect:
+      id: medicine-demand
+      title: "\u4E39\u836F\u6C42\u8D2D\u6F6E"
+      percent: 0.2
+      category: 1
+      playerSells: 1
+      playerBuys: 0
+  - id: medicine-supply
+    title: "\u4E39\u836F\u96C6\u4E2D\u5230\u8D27"
+    description: "\u5546\u961F\u96C6\u4E2D\u4F9B\u8D27\uFF0C\u4E39\u836F\u4E70\u5356\u62A5\u4EF7\u6682\u65F6\u4E0B\u964D\u3002"
+    effect:
+      id: medicine-supply
+      title: "\u4E39\u836F\u96C6\u4E2D\u5230\u8D27"
+      percent: -0.1
+      category: 1
+      playerSells: 1
+      playerBuys: 1
+  - id: materials-supply
+    title: "\u7075\u6750\u4E30\u6536"
+    description: "\u7075\u6750\u8D27\u6E90\u589E\u52A0\uFF0C\u6536\u8D2D\u6750\u6599\u62A5\u4EF7\u6682\u65F6\u4E0B\u964D\u3002"
+    effect:
+      id: materials-supply
+      title: "\u7075\u6750\u4E30\u6536"
+      percent: -0.2
+      category: 2
+      playerSells: 0
+      playerBuys: 1
+  - id: equipment-demand
+    title: "\u6CD5\u5668\u884C\u60C5\u5347\u6E29"
+    description: "\u88C5\u5907\u4EA4\u6613\u9700\u6C42\u589E\u52A0\uFF0C\u88C5\u5907\u4E70\u5356\u62A5\u4EF7\u6682\u65F6\u4E0A\u6DA8\u3002"
+    effect:
+      id: equipment-demand
+      title: "\u6CD5\u5668\u884C\u60C5\u5347\u6E29"
+      percent: 0.2
+      category: 3
+      playerSells: 1
+      playerBuys: 1
   rentPeriod: 7
   firstRent: 20
   buyerBudgetTiers:

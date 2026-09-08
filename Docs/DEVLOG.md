@@ -2,6 +2,15 @@
 
 按任务记录日期、范围、实际改动、验证和未完成内容。不将计划功能写成已实现功能。
 
+## 2026-09-08 — Jira / Confluence 日常工作流 Skill
+
+- 按用户明确要求执行 codex_jira_confluence_workflow_skill.md，仅安装流程与验证读取；初始 main / `a8653361296a8f122ccedb700bcb86ec34568107`，工作区干净。没有执行 DP-14/DP-16，没有改游戏代码或资源。
+- 新增 `.agents/skills/pawnshop-atlassian-workflow/SKILL.md` 与 `references/project-contract.md`；根 AGENTS.md 增加两条短路由，明确进度与证据归 Jira DP、正式知识与数据归 Confluence D、Notion 仅保留历史用途。保留旧 Skill、既有项目规则、历史文档与用户/插件级 Skills。
+- 复用当前 Atlassian Rovo 插件，不重复安装或改 MCP 配置；实际核对 DP 项目、D 空间、候选队列 DP-14/DP-16、DP-14 全部详情和可用 transitions、Done 的 DP-5，以及 Board 专用接口。工作台和关联数据规范读到正文，数据规范另取 HTML 避免 Markdown 宏有损；三个数据库返回结构与记录，不代表已接通 Unity 同步。
+- Codex CLI 0.153.4 的 debug prompt-input 识别新 Skill 和 AGENTS 路由，未发送模型执行任务。quick_validate.py 因环境缺少 PyYAML 未跑通，实际 Codex 解析与本地格式/路径检查作为验证证据；不安装全局依赖。
+- 完成 16 项本地情境推演，覆盖领取、阻塞、测试失败、待验收、用户验收后 Done、角色排除、历史 Done、离线和不确定回写；均无远程写操作。这是规则审阅，非独立模型端到端执行测试。详见 [ATLASSIAN_WORKFLOW_VALIDATION.md](ATLASSIAN_WORKFLOW_VALIDATION.md)。
+- Unity MCP 当前 ready、未编译/Domain Reload、Play stopped，捕获 Error/Warning 0，未清空；无玩法测试。真实 Jira/Confluence 写入能力未测，没有创建测试垃圾或改变业务状态，无 OAuth 操作需求。未提交或推送，保留本地审阅。
+
 ## 2026-09-08 — v3 一天营业交易切片与动态报价
 
 - 按用户 `xianxia_pawnshop_next8h_codex_v3.md` 的 M0–M4 完成。起始分支 main、HEAD `651f626 Resolution fix`，`guest generation` 为提交 `1e5486e`；起始仅任务书未跟踪，已保护。应用项目 unity-goal-driven-development Skill；只读获取 Notion GDD v0.2 等六页，以及 FigJam 主界面、商品详情、多件交易和睡觉参考图。

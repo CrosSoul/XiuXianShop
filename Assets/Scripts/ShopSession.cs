@@ -58,6 +58,8 @@ namespace XiuXianShop
         public const int DailyCustomerCount = 5;
         readonly ShopCatalog catalog;
         readonly System.Random customerRandom;
+        readonly int customerSeedValue;
+        int customerDraws;
         readonly List<GridItem> items = new List<GridItem>();
         readonly Dictionary<string, PriceTag> priceTags = new Dictionary<string, PriceTag>();
         readonly Queue<(TradeDirection direction, string definitionId, ItemCategory category, int budget)> queue
@@ -78,6 +80,7 @@ namespace XiuXianShop
         public int Purchases { get; private set; }
         public int Sales { get; private set; }
         public int PricingRevision { get; private set; }
+        public MarketCalendar Calendar { get; private set; }
         public int OpeningMoney { get; private set; }
         public int IncomeToday { get; private set; }
         public int ExpensesToday { get; private set; }
@@ -90,10 +93,13 @@ namespace XiuXianShop
         public bool HasFurnace => true;
         public string Message { get; private set; } = "先整理物品，再把收购牌和商品放入展示柜。丹炉已备好。";
 
-        public ShopSession(ShopCatalog catalog, bool seed = true, int? customerSeed = null)
+        public ShopSession(ShopCatalog catalog, bool seed = true, int? customerSeed = null, MarketCalendar calendar = null)
         {
             this.catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
-            customerRandom = customerSeed.HasValue ? new System.Random(customerSeed.Value) : new System.Random();
+            customerSeedValue=customerSeed??Guid.NewGuid().GetHashCode();
+            customerRandom = new System.Random(customerSeedValue);
+            Calendar=calendar??new MarketCalendar(catalog.marketEvents,customerSeed??Guid.NewGuid().GetHashCode());
+            Calendar.Between(1,14);
             Money = catalog.startingMoney;
             OpeningMoney = Money;
             foreach(var tag in catalog.priceTags ?? Array.Empty<PriceTag>()) SetPriceTag(tag);
@@ -105,6 +111,52 @@ namespace XiuXianShop
                     if (!FindSpace(item, ContainerId.Storage, out int x, out int y)) throw new InvalidOperationException("Starter inventory does not fit.");
                     Place(item,ContainerId.Storage,x,y,0,false); items.Add(item);
                 }
+        }
+
+        double DrawCustomerChance() {customerDraws++;return customerRandom.NextDouble();}
+        int DrawCustomerNumber(int minimum,int maximum) {customerDraws++;return customerRandom.Next(minimum,maximum);}
+
+        public int? ProjectedRent(int day)
+        {
+            if(day<Day || day%catalog.rentPeriod!=0)return null;
+            int amount=Rent;
+            for(int date=NextRentDay;date<day;date+=catalog.rentPeriod) amount=(int)Math.Ceiling(amount*1.05);
+            return amount;
+        }
+        public string CaptureSave()
+        {
+            if(Phase!=DayPhase.Preparation)throw new InvalidOperationException("仅营业准备阶段可存档；请先闭店并睡觉。");
+            return JsonUtility.ToJson(new ShopSave {catalogSignature=Hash128.Compute(JsonUtility.ToJson(catalog)).ToString(),
+                day=Day,money=Money,rent=Rent,debt=RentDebt,nextId=nextId,customerSeed=customerSeedValue,customerDraws=customerDraws,
+                crafted=Crafted,purchases=Purchases,sales=Sales,calendar=Calendar.Capture(),tags=priceTags.Values.Select(t=>t.Copy()).ToArray(),
+                items=items.Select(i=>new SavedShopItem{id=i.Id,definitionId=i.Definition.id,container=i.Container,x=i.X,y=i.Y,
+                    rotation=i.Rotation,flipped=i.Flipped,hasPurchaseValue=i.PurchaseValue.HasValue,purchaseValue=i.PurchaseValue??0}).ToArray()},true);
+        }
+        public static ShopSession RestoreSave(ShopCatalog catalog,string json)
+        {
+            var save=JsonUtility.FromJson<ShopSave>(json);
+            if(save==null || save.version!=1 || save.catalogSignature!=Hash128.Compute(JsonUtility.ToJson(catalog)).ToString())
+                throw new ArgumentException("存档版本或商品配置不匹配，当前会话未改变。");
+            if(save.day<1 || save.money<0 || save.rent<1 || save.debt<0 || save.nextId<1 || save.items==null || save.tags==null ||
+                save.customerDraws<0 || save.customerDraws>10000000)throw new ArgumentException("存档数据不完整或无效。");
+            var session=new ShopSession(catalog,false,save.customerSeed,new MarketCalendar(save.calendar));
+            session.Day=save.day;session.Money=save.money;session.OpeningMoney=save.money;session.Rent=save.rent;session.RentDebt=save.debt;
+            session.nextId=save.nextId;session.Crafted=save.crafted;session.Purchases=save.purchases;session.Sales=save.sales;
+            for(int i=0;i<save.customerDraws;i++)session.customerRandom.NextDouble();
+            session.customerDraws=save.customerDraws;
+            session.priceTags.Clear();
+            foreach(var tag in save.tags)if(!session.SetPriceTag(tag))throw new ArgumentException("存档价格标签无效。");
+            foreach(var i in save.items)
+            {
+                if(i==null || i.id<1 || i.id>=save.nextId || !Enum.IsDefined(typeof(ContainerId),i.container) ||
+                    i.rotation<0 || i.rotation>3 || (i.hasPurchaseValue && i.purchaseValue<1))throw new ArgumentException("存档物品数据无效。");
+                session.items.Add(new GridItem {Id=i.id,Definition=catalog.Find(i.definitionId),Owner=ItemOwner.Player,Container=i.container,
+                    X=i.x,Y=i.y,Rotation=i.rotation,Flipped=i.flipped,PurchaseValue=i.hasPurchaseValue?(int?)i.purchaseValue:null});
+            }
+            string error=session.ValidateState();if(error!=null)throw new ArgumentException("存档库存无效："+error);
+            session.Calendar.Between(MarketCalendar.WeekStart(session.Day),MarketCalendar.WeekStart(session.Day)+13);
+            session.Message=$"已恢复第 {session.Day} 天营业准备；市场安排与历史购买价值已保留。";
+            return session;
         }
 
         public static Vector2Int Size(ContainerId container)
@@ -131,7 +183,7 @@ namespace XiuXianShop
         }
         public PriceQuote Quote(ItemDefinition definition, TradeDirection direction)
         {
-            var effective = priceTags.Values.Where(t => (t.category == ItemCategory.Unclassified || t.category == definition.category) &&
+            var effective = priceTags.Values.Concat(Calendar.ActiveTags(Day)).Where(t => (t.category == ItemCategory.Unclassified || t.category == definition.category) &&
                 (direction == TradeDirection.CustomerBuys ? t.playerSells : t.playerBuys)).Select(t=>t.Copy()).ToList();
             if(direction == TradeDirection.CustomerBuys)
                 effective.Insert(0, new PriceTag {id="retail",title="零售加价",percent=catalog.retailMarkup});
@@ -220,16 +272,16 @@ namespace XiuXianShop
             TodayAttraction=attraction;
             for(int n=0;n<DailyCustomerCount;n++)
             {
-                if(customerRandom.NextDouble()<attraction.SupplierChance)
+                if(DrawCustomerChance()<attraction.SupplierChance)
                 {
-                    var supply=attraction.Supplies[customerRandom.Next(attraction.Supplies.Length)];
+                    var supply=attraction.Supplies[DrawCustomerNumber(0,attraction.Supplies.Length)];
                     queue.Enqueue((TradeDirection.CustomerSells,supply.id,ItemCategory.Unclassified,0));
                     SuppliersToday++;
                 }
                 else
                 {
-                    var category=attraction.BuyerCategory==ItemCategory.Unclassified?categories[customerRandom.Next(categories.Length)]:attraction.BuyerCategory;
-                    int budget=customerRandom.Next(attraction.MinimumBuyerBudget,attraction.MaximumBuyerBudget+1);
+                    var category=attraction.BuyerCategory==ItemCategory.Unclassified?categories[DrawCustomerNumber(0,categories.Length)]:attraction.BuyerCategory;
+                    int budget=DrawCustomerNumber(attraction.MinimumBuyerBudget,attraction.MaximumBuyerBudget+1);
                     queue.Enqueue((TradeDirection.CustomerBuys,null,category,budget));
                     BuyersToday++;
                 }
@@ -362,6 +414,7 @@ namespace XiuXianShop
             int paid=Math.Min(Money,due); Money-=paid; RentDebt=due-paid;
             Day++; Phase=DayPhase.Preparation; ServedToday=0;TodayAttraction=null;BuyersToday=0;SuppliersToday=0; queue.Clear();
             OpeningMoney=Money;IncomeToday=0;ExpensesToday=0;LastCustomerResult="新的一天，尚未接待顾客。";
+            Calendar.Between(MarketCalendar.WeekStart(Day),MarketCalendar.WeekStart(Day)+13);PricingRevision++;
             return Success($"第 {Day} 天清晨。库存、灵石和丹炉已保留。"+(due>0?$" 支付房租 {paid}，待付 {RentDebt}。":"今天重新配置展示，再次经营。"));
         }
         public string ValidateState()

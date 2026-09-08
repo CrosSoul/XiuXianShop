@@ -172,6 +172,110 @@ namespace XiuXianShop.Tests
         string CustomerText=>string.Join("\n",shop.GetComponentsInChildren<UnityEngine.UI.Text>().Where(t=>t.name=="CustomerDetails" || t.name=="TradeDetails" || t.name=="TradeStatus" || t.name=="DisplaySummary").Select(t=>t.text));
         string DetailText=>shop.GetComponentsInChildren<UnityEngine.UI.Text>().First(t=>t.name=="Selection").text;
 
+        string CalendarText(string name)=>shop.GetComponentsInChildren<UnityEngine.UI.Text>().First(t=>t.name==name).text;
+        IEnumerator CalendarFixture(int day=6)
+        {
+            yield return RestartWithTestCatalog(c=>
+            {
+                c.Find("pill").baseValue=20;c.startingItems=new[]{"pill","pill","pill"};
+                c.baseSupplierChance=0;c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
+                c.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=50}};c.buyerBudgetVariation=0;
+            },17);
+            shop.StartVerificationSession(testCatalog,17,MarketCalendar.OverlapExample());
+            shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP17_UI_Test_"+System.Guid.NewGuid()+".json");
+            while(shop.Session.Day<day){shop.Session.BeginBusiness();shop.Session.EndBusiness();shop.Session.Sleep();}
+            shop.Refresh();yield return null;yield return null;
+        }
+        [UnityTest] public IEnumerator CalendarRealClicksShowFourteenDatesOverlapDetailsAndBlockUnderlyingInput()
+        {
+            yield return CalendarFixture();
+            var item=shop.Session.Items[0];shop.SelectItem(item.Id);
+            yield return Click("CalendarOpen");Assert.That(shop.CalendarView.IsOpen);
+            Assert.That(shop.GetComponentsInChildren<RectTransform>().Count(r=>r.name.StartsWith("CalendarDay_")),Is.EqualTo(14));
+            Assert.That(CalendarText("CalendarHeading"),Does.Contain("今天：第 6 天"));
+            var markers=shop.GetComponentsInChildren<UnityEngine.UI.Text>().Where(t=>t.name=="RentMarker").Select(t=>t.text).ToArray();
+            CollectionAssert.AreEquivalent(new[]{"收租 20 灵石","收租 21 灵石"},markers);
+            var a=(RectTransform)shop.FindButton("MarketBar_example-rise_1").transform;
+            var b=(RectTransform)shop.FindButton("MarketBar_example-fall_1").transform;
+            Assert.That(a.anchoredPosition.y,Is.Not.EqualTo(b.anchoredPosition.y));
+            Assert.That(a.sizeDelta.x,Is.EqualTo(2*198-12));
+            yield return Click("MarketBar_example-fall_1");
+            Assert.That(CalendarText("CalendarEventDetails"),Does.Contain("丹药集中到货与集市临时让利"));
+            Assert.That(CalendarText("CalendarEventDetails"),Does.Contain("未开始"));Assert.That(CalendarText("CalendarEventDetails"),Does.Contain("-10%"));
+            int rotation=item.Rotation;yield return Key(UnityEngine.InputSystem.Key.R);Assert.That(item.Rotation,Is.EqualTo(rotation));
+            yield return Click("BeginBusiness");Assert.That(shop.Session.Phase,Is.EqualTo(DayPhase.Preparation),"Modal must intercept clicks on the underlying business button.");
+            yield return Click("CalendarNext");Assert.That(shop.CalendarView.FirstDay,Is.EqualTo(15));
+            yield return Click("CalendarPrevious");Assert.That(shop.CalendarView.FirstDay,Is.EqualTo(1));
+            yield return Click("CalendarToday");Assert.That(shop.CalendarView.FirstDay,Is.EqualTo(1));
+            Assert.That(shop.Session.Day,Is.EqualTo(6));Assert.That(shop.Session.Money,Is.EqualTo(120));
+            yield return Key(UnityEngine.InputSystem.Key.Escape);Assert.That(shop.CalendarView.IsOpen,Is.False);
+            yield return Click("CalendarOpen");yield return Click("CalendarClose");Assert.That(shop.CalendarView.IsOpen,Is.False);
+            LogAssert.NoUnexpectedReceived();
+        }
+        [UnityTest] public IEnumerator CalendarSaveLoadButtonsRestoreActualFileAndDoNotRepeatRent()
+        {
+            yield return CalendarFixture(7);var s=shop.Session;
+            string before=JsonUtility.ToJson(s.Calendar.Capture());
+            yield return Click("CalendarOpen");yield return Click("CalendarSave");
+            Assert.That(System.IO.File.Exists(shop.SavePath));Assert.That(CalendarText("CalendarMessage"),Does.Contain("已保存第 7 天"));
+            yield return Click("CalendarClose");
+            yield return Drag(s.Items[0],ContainerId.Counter,0,0);
+            yield return Click("CalendarOpen");yield return Click("CalendarLoad");
+            Assert.That(shop.Session.Items[0].Container,Is.EqualTo(ContainerId.Storage));Assert.That(shop.Session.Money,Is.EqualTo(120));
+            Assert.That(JsonUtility.ToJson(shop.Session.Calendar.Capture()),Is.EqualTo(before));
+            yield return Click("CalendarClose");yield return Click("BeginBusiness");
+            yield return Click("CalendarOpen");Assert.That(shop.FindButton("CalendarSave").interactable,Is.False);Assert.That(shop.FindButton("CalendarLoad").interactable,Is.False);
+            yield return Click("CalendarClose");yield return Click("EndBusiness");yield return Click("Sleep");
+            Assert.That(shop.Session.Day,Is.EqualTo(8));Assert.That(shop.Session.Money,Is.EqualTo(100));
+            yield return Click("CalendarOpen");yield return Click("CalendarSave");yield return Click("CalendarLoad");yield return Click("CalendarLoad");
+            Assert.That(shop.Session.Day,Is.EqualTo(8));Assert.That(shop.Session.Money,Is.EqualTo(100));
+            Assert.That(CalendarText("CalendarRent"),Does.Contain("第 14 天夜间，21 灵石"));
+            Assert.That(CalendarText("CalendarHeading"),Does.Contain("今天：第 8 天"));
+            System.IO.File.WriteAllText(shop.SavePath,"broken save");yield return Click("CalendarLoad");
+            Assert.That(CalendarText("CalendarMessage"),Does.Contain("当前经营保留"));Assert.That(shop.Session.Money,Is.EqualTo(100));
+            System.IO.File.Delete(shop.SavePath);
+            LogAssert.NoUnexpectedReceived();
+        }
+        [UnityTest] public IEnumerator CalendarDayChangesRefreshRealPricesBudgetAndSettlement()
+        {
+            yield return CalendarFixture(6);var s=shop.Session;
+            yield return Drag(s.Items[0],ContainerId.Display,0,0);
+            yield return Drag(s.Items[1],ContainerId.Counter,0,0);Assert.That(DetailText,Does.Contain("预估价值 23"));
+            yield return Click("BeginBusiness");yield return Click("EndBusiness");yield return Click("Sleep");
+            Assert.That(DetailText,Does.Contain("预估价值 27"));Assert.That(DetailText,Does.Contain("+20%"));
+            yield return Click("BeginBusiness");yield return Drag(s.Items[2],ContainerId.Counter,2,0);
+            Assert.That(CustomerText,Does.Contain("54 灵石"));Assert.That(shop.FindButton("AcceptTrade").interactable,Is.False);
+            yield return Click("EndBusiness");yield return Click("Sleep");
+            Assert.That(DetailText,Does.Contain("预估价值 25"));Assert.That(DetailText,Does.Contain("-10%"));
+            yield return Click("BeginBusiness");Assert.That(CustomerText,Does.Contain("50 灵石"));Assert.That(shop.FindButton("AcceptTrade").interactable);
+            int before=s.Money;yield return Click("AcceptTrade");Assert.That(s.Money,Is.EqualTo(before+50));Assert.That(s.Offer.RemainingBudget,Is.Zero);
+            yield return Click("EndBusiness");Assert.That(CustomerText,Does.Contain("本日收入    +50"));yield return Click("Sleep");
+            yield return Drag(s.Items[0],ContainerId.Counter,0,0);Assert.That(DetailText,Does.Contain("预估价值 25"));
+            yield return Click("BeginBusiness");yield return Click("EndBusiness");yield return Click("Sleep");
+            Assert.That(s.Day,Is.EqualTo(10));Assert.That(DetailText,Does.Contain("预估价值 23"));Assert.That(DetailText,Does.Not.Contain("-10%"));
+            LogAssert.NoUnexpectedReceived();
+        }
+        [UnityTest] public IEnumerator CrowdedCalendarScrollKeepsAllEventRowsReachable()
+        {
+            yield return CalendarFixture();
+            var state=MarketCalendar.OverlapExample().Capture();
+            var source=state.events.First(e=>e.id=="example-rise");
+            state.events=Enumerable.Range(0,5).Select(i=>{var e=source.Copy();e.id="crowded-"+i;e.title="重叠事件"+i;return e;}).ToArray();
+            shop.StartVerificationSession(testCatalog,17,new MarketCalendar(state));
+            yield return Click("CalendarOpen");
+            var viewport=shop.GetComponentsInChildren<UnityEngine.UI.ScrollRect>().Single(s=>s.name=="CalendarViewport");
+            Assert.That(viewport.content.rect.height,Is.GreaterThan(viewport.viewport.rect.height));
+            var bars=shop.GetComponentsInChildren<UnityEngine.UI.Button>().Where(b=>b.name.StartsWith("MarketBar_")).ToArray();
+            Assert.That(bars.Length,Is.EqualTo(10));
+            Assert.That(bars.Where(b=>b.name.EndsWith("_1")).Select(b=>((RectTransform)b.transform).anchoredPosition.y).Distinct().Count(),Is.EqualTo(5));
+            var point=RectTransformUtility.WorldToScreenPoint(null,viewport.viewport.TransformPoint(viewport.viewport.rect.center));
+            InputSystem.QueueStateEvent(mouse,new MouseState{position=point,scroll=new Vector2(0,-30)});yield return null;yield return null;
+            Assert.That(viewport.verticalNormalizedPosition,Is.LessThan(.1f));
+            yield return Click("MarketBar_crowded-4_1");
+            Assert.That(CalendarText("CalendarEventDetails"),Does.Contain("重叠事件4"));
+            yield return Click("CalendarClose");LogAssert.NoUnexpectedReceived();
+        }
+
         [UnityTest] public IEnumerator TwentyItemListScrollsAndSettlementResetsToTop()
         {
             yield return RestartWithTestCatalog(c=>
@@ -269,7 +373,7 @@ namespace XiuXianShop.Tests
         }
         IEnumerator RestartWithTestCatalog(System.Action<ShopCatalog> configure,int seed=-1)
         {
-            testCatalog=Object.Instantiate(shop.Catalog);configure(testCatalog);
+            testCatalog=Object.Instantiate(shop.Catalog);testCatalog.marketEvents=System.Array.Empty<MarketEventDefinition>();configure(testCatalog);
             Object.Destroy(shop.gameObject);yield return null;
             shop=new GameObject("Test Shop Prototype").AddComponent<ShopPrototype>();shop.Catalog=testCatalog;shop.CustomerSeed=seed;
             yield return null;yield return null;Canvas.ForceUpdateCanvases();

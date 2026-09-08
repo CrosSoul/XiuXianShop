@@ -23,6 +23,7 @@ namespace XiuXianShop.Editor
             verificationCatalog.startingItems=new[]{"pill","pill","pill"};
             foreach(var item in verificationCatalog.items)item.supplierAvailable=item.id=="pill";
             verificationCatalog.retailMarkup=.15f;
+            verificationCatalog.marketEvents=System.Array.Empty<MarketEventDefinition>();
             verificationCatalog.baseSupplierChance=.5f;
             verificationCatalog.advertisementSupplierBonus=0;verificationCatalog.displayedGoodsBuyerBonus=0;
             verificationCatalog.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=60}};
@@ -44,6 +45,39 @@ namespace XiuXianShop.Editor
         }
         [MenuItem("XiuXianShop/Validation/Toggle Sale Discount -30% (Play session)",true)]
         static bool CanToggleQuoteTest()=>CanStartVerification();
+        [MenuItem("XiuXianShop/Validation/Start Calendar Overlap Example (resets Play session)")]
+        public static void StartCalendarExample()
+        {
+            if(!CanStartVerification())return;
+            StartVerificationDay();
+            verificationCatalog.priceTags=System.Array.Empty<PriceTag>();
+            var shop=Object.FindFirstObjectByType<ShopPrototype>();
+            shop.StartVerificationSession(verificationCatalog,0,MarketCalendar.OverlapExample());
+            shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP17VerificationSave.json");
+            while(shop.Session.Day<6){shop.Session.BeginBusiness();shop.Session.EndBusiness();shop.Session.Sleep();}
+            shop.Refresh();shop.CalendarView.Open();
+        }
+        [MenuItem("XiuXianShop/Validation/Start Calendar Overlap Example (resets Play session)",true)]
+        static bool CanStartCalendarExample()=>CanStartVerification();
+        [MenuItem("XiuXianShop/Validation/Advance Calendar Example One Day (Play session)")]
+        public static void AdvanceCalendarExample()
+        {
+            if(!CanStartVerification() || verificationCatalog==null)return;
+            var shop=Object.FindFirstObjectByType<ShopPrototype>();
+            if(shop.Session.Phase==DayPhase.Preparation)shop.Session.BeginBusiness();
+            if(shop.Session.Phase==DayPhase.Open)shop.Session.EndBusiness();
+            shop.Session.Sleep();shop.Refresh();
+        }
+        [MenuItem("XiuXianShop/Validation/Advance Calendar Example One Day (Play session)",true)]
+        static bool CanAdvanceCalendarExample()=>CanStartVerification() && verificationCatalog!=null;
+        public static string InstallCalendarDefaults()
+        {
+            var catalog=AssetDatabase.LoadAssetAtPath<ShopCatalog>(CatalogPath);
+            if(catalog.marketEvents!=null && catalog.marketEvents.Length>0)return "Existing market configuration retained.";
+            catalog.marketEvents=MarketCalendar.PrototypeDefinitions();
+            EditorUtility.SetDirty(catalog);AssetDatabase.SaveAssetIfDirty(catalog);
+            return "Added four adjustable prototype market event definitions; existing catalog data retained.";
+        }
         static void CleanupVerification(PlayModeStateChange state)
         {
             if(state!=PlayModeStateChange.EnteredEditMode)return;

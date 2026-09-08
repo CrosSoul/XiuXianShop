@@ -58,8 +58,10 @@ namespace XiuXianShop
         [Min(0)] public int startingMoney = 120;
         [Tooltip("玩家出售时默认零售加价；0.15 表示 +15%。")]
         public float retailMarkup = .15f;
-        [Tooltip("用于明确配置/验证的有效价格标签；本轮不生成市场事件。")]
+        [Tooltip("明确配置的常驻价格标签；有日期的市场标签由 Market Events 生成。")]
         public PriceTag[] priceTags = Array.Empty<PriceTag>();
+        [Tooltip("可调整原型事件：每周随机安排2–3次，每次1–3天；开局复制成会话配置。")]
+        public MarketEventDefinition[] marketEvents = Array.Empty<MarketEventDefinition>();
         [Min(1)] public int rentPeriod = 7;
         [Min(1)] public int firstRent = 20;
         [Tooltip("按生效类别展示基础价值总和选档，同档价值变化不改变资金范围。空展示柜按价值 0。")]

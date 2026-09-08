@@ -19,6 +19,9 @@ namespace XiuXianShop
         public int SelectedId => selectedId;
         public string PreviewMessage { get; private set; }
         Font font;
+        public ShopCalendarView CalendarView { get; private set; }
+        public string CalendarMessage { get; private set; }
+        public string SavePath { get; set; }
         RectTransform content, ghost, preview;
         Text header, rent, phaseText, selection, customerTitle, customerDetails, notice, furnaceText, previewText, displaySummary, tradeDetails, tradeStatus, tradeHeading;
         int displayedPricingRevision;
@@ -57,6 +60,11 @@ namespace XiuXianShop
             if(Session!=null && displayedPricingRevision!=Session.PricingRevision && !IsDragging) Refresh();
             var keyboard=Keyboard.current;
             if(keyboard==null || Session==null) return;
+            if(CalendarView!=null && CalendarView.IsOpen)
+            {
+                if(keyboard.escapeKey.wasPressedThisFrame)CalendarView.Close();
+                return;
+            }
             if(keyboard.rKey.wasPressedThisFrame) RotateSelected();
             if(keyboard.fKey.wasPressedThisFrame) FlipSelected();
             if(keyboard.escapeKey.wasPressedThisFrame) CancelDrag();
@@ -84,7 +92,8 @@ namespace XiuXianShop
                 events.transform.SetParent(transform,false);
             }
             Card("Header",24,20,1552,66,panel);
-            Label(content,"ShopName",44,30,290,44,"栖云当铺",30,gold);
+            Label(content,"ShopName",44,30,190,44,"栖云当铺",30,gold);
+            MakeButton("CalendarOpen",240,33,100,38,"日历",()=>{CancelDrag();CalendarView.Open();});
             header=Label(content,"Resources",350,34,380,34,"",24,textColor);
             phaseText=Label(content,"Phase",754,35,310,32,"",22,gold);
             rent=Label(content,"Rent",1110,31,445,44,"",15,muted);
@@ -124,6 +133,8 @@ namespace XiuXianShop
             Card("Furnace",802,906,774,70,panel);
             furnaceText=Label(content,"Recipe",824,918,470,46,"",16,muted);
             craftButton=MakeButton("Craft",1300,919,254,43,"炼制回气丹",()=>Run(()=>Session.Craft()));
+            var calendarObject=new GameObject("CalendarOverlay",typeof(RectTransform),typeof(ShopCalendarView));
+            calendarObject.transform.SetParent(content,false);CalendarView=calendarObject.GetComponent<ShopCalendarView>();CalendarView.Initialize(this,font);
         }
 
         Text ScrollableText(string name,float x,float y,float width,float height)
@@ -253,6 +264,7 @@ namespace XiuXianShop
             rejectButton.interactable=offer!=null;
             rotateButton.interactable=flipButton.interactable=selected!=null;
             cancelButton.interactable=IsDragging;
+            if(CalendarView!=null)CalendarView.Refresh();
         }
         string ItemDescription(GridItem item)
         {
@@ -270,10 +282,37 @@ namespace XiuXianShop
         }
 
         // Explicit developer/test entry. The Editor menu supplies a temporary catalog clone.
-        public void StartVerificationSession(ShopCatalog configuration,int seed)
+        public void StartVerificationSession(ShopCatalog configuration,int seed,MarketCalendar calendar=null)
         {
-            CancelDrag();catalog=configuration;Session=new ShopSession(catalog,customerSeed:seed);
+            CancelDrag();catalog=configuration;Session=new ShopSession(catalog,customerSeed:seed,calendar:calendar);
+            CalendarMessage=null;CalendarView.Close();
             selectedId=0;localNotice=null;Refresh();
+        }
+
+        string PreparationSavePath => SavePath??System.IO.Path.Combine(Application.dataPath,"../UserSettings/ShopPreparation.json");
+        public void SavePreparation()
+        {
+            try
+            {
+                string json=Session.CaptureSave(),path=PreparationSavePath;
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+                System.IO.File.WriteAllText(path+".tmp",json);
+                if(System.IO.File.Exists(path))System.IO.File.Replace(path+".tmp",path,null);
+                else System.IO.File.Move(path+".tmp",path);
+                CalendarMessage=$"已保存第 {Session.Day} 天营业准备。";
+            }
+            catch(Exception e){CalendarMessage="无法保存："+e.Message;}
+        }
+        public void LoadPreparation()
+        {
+            if(Session.Phase!=DayPhase.Preparation){CalendarMessage="仅营业准备阶段可读档。";return;}
+            try
+            {
+                var restored=ShopSession.RestoreSave(catalog,System.IO.File.ReadAllText(PreparationSavePath));
+                CancelDrag();Session=restored;selectedId=0;localNotice=null;
+                CalendarMessage=$"已读取第 {Session.Day} 天营业准备，行情未重抽。";Refresh();
+            }
+            catch(Exception e){CalendarMessage="未读取，当前经营保留："+e.Message;}
         }
 
         RectTransform DrawItem(Transform parent,GridItem item,int rotation,bool flipped,float cell,bool interactive)

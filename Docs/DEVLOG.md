@@ -2,6 +2,20 @@
 
 按任务记录日期、范围、实际改动、验证和未完成内容。不将计划功能写成已实现功能。
 
+## 2026-09-08 — v3 一天营业交易切片与动态报价
+
+- 按用户 `xianxia_pawnshop_next8h_codex_v3.md` 的 M0–M4 完成。起始分支 main、HEAD `651f626 Resolution fix`，`guest generation` 为提交 `1e5486e`；起始仅任务书未跟踪，已保护。应用项目 unity-goal-driven-development Skill；只读获取 Notion GDD v0.2 等六页，以及 FigJam 主界面、商品详情、多件交易和睡觉参考图。
+- 新增 ShopPricing.cs，基础价值与运行报价分离，百分比先相加，出售默认+15%；同一计算用于详情、清单、预算及成交。实例记录实际购买价值，直接获得物品不显示购买历史；运行标签增删立即刷新 UI。旧固定价格仅保留迁移来源，实际交易不再读取。
+- ShopCatalog.asset 通过 Unity API 原位迁移到价格版本1，保留 GUID、原物品形状/类别、七件开局库存及场景引用；旧售价变为基础值，正常回气丹基础18、零售报价21。临时报价采用逐件四舍五入（中点远离零）、最低1、同 ID 替换、可限定类别/交易方向，完整假设与差异见 TRADING_SLICE_V3.md。未设计市场事件系统。
+- 保留每日五位逐位随机、离散预算±10%及开门快照；展示权重用基础价值。补齐当日收入、支出、起始/当前余额与变化，闭店结算后睡觉继续下一天，沿用既有房租。满柜台卖家现在可以等待空间或被跳过，不再阻塞当天队列；失败交易不扣款、不复制物品。
+- ShopPrototype 按参考整理左展示、中央顾客/谈判、底部仓库、右交易/详情的可交互 UI。每件报价及标签可滚动查看，总价/确认按钮固定；结算切换恢复滚动顶部。三个容器容量保留，现有即时炼丹入口与数据保留，没有仓库型炉子重构。
+- PrototypeBuilder 新增两个明确标记的 Play 验证菜单：重置为确定性买卖日、切换测试出售-30%标签；使用临时 Catalog 副本，不保存测试数据。固定种子0，在展示丹药后得到买/买/卖/买/买；提供20→23→17、收购16的可重复入口。
+- 实际编译成功。最终 Edit Mode **47/47**（约4.13秒）、Play Mode **10/10**（约15.78秒），无跳过；结构化结果保存在 V3_TEST_RESULTS.json。新增价格/历史/账目/满柜测试，旧18报价案例使用隔离配置，新增实际虚拟鼠标/键盘的动态刷新、完整买卖日及20件清单滚动测试。之前测试运行0项的现象在本轮重编译后未复现，不将其宣称为测试框架修复。
+- 实际 Play 画面验证：三件基础20商品按17成交收入51，再以16买入，余额155、收入51、支出16、净变化+35，睡觉后日期/库存/余额保留。查看本机1997×1045、1280×800与1920×1080画面，关键按钮屏内且射线命中；五张 ScreenCapture 原始 PNG 保存于 Docs/Images/v3-*.png。临时 Game 视图尺寸已恢复，沿用 Low Resolution Aspect Ratios=false、Scale=1 的显示修复。
+- 收尾续接时通过本机已配置的 Unity MCP stdio 服务复查，沙箱外只读连接成功（未修改连接配置）。**12:56 本地时间**：Editor ready，Play stopped，compiling=false、domainReloadInProgress=false；ShopPrototype 场景及 Catalog 均无脏标记，Main Camera / Shop Prototype 两个根对象和原 Catalog 引用有效，URP 2D Asset 仍生效。MCP 与原生 Console 均 **Error=0、Warning=0**，未清空日志；记录保存于 V3_FINAL_EDITOR_STATE.json。Editor 在收尾前已重新启动，当前计数是该会话实际状态；不将其用于否定历史日志。
+- 修改概要：ShopCatalog/ShopSession/ShopPrototype/Editor PrototypeBuilder、Catalog资产、既有 EditMode/PlayMode测试；新增 ShopPricing 及 ShopPricingTests（.meta 由 Unity 生成）。更新 GAME_DESIGN、DEV_PLAN、FIRST_PLAYABLE_GUIDE、FIRST_PLAYABLE_VERIFICATION、本日志；新增 v3 交接、测试结果、最终状态和截图。未改 Scene、Packages、ProjectSettings、Render Pipeline、输入/Build设置或 AGENTS；没有本地提交、暂存、push、merge、部署或修改远程服务。
+- 人工手感试玩、独立 Player 构建、所有分辨率与其他平台未测；自动 Play 不能替代人工体验。无需手动配置 Editor，开发者可直接打开 ShopPrototype Play，按 TRADING_SLICE_V3.md 的验证菜单步骤验收。正式美术、声望/市场事件、存档及炼丹二级页等范围外内容未实现，未自动开始下一阶段。
+
 ## 2026-09-08 — Game 视图字体模糊与低分辨率排查
 
 - 完成 Notion 中负责人 Codex 的同名 P0 排查任务。起始 Git 工作区干净；通过 MCP 读取 Unity 6000.6.0f1、实际场景、Game 视图及 Play Mode UI。

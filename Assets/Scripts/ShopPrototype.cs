@@ -20,7 +20,11 @@ namespace XiuXianShop
         public string PreviewMessage { get; private set; }
         Font font;
         RectTransform content, ghost, preview;
-        Text header, rent, phaseText, selection, customerTitle, customerDetails, notice, furnaceText, previewText, displaySummary;
+        Text header, rent, phaseText, selection, customerTitle, customerDetails, notice, furnaceText, previewText, displaySummary, tradeDetails, tradeStatus, tradeHeading;
+        int displayedPricingRevision;
+        TradeOffer displayedOffer;
+        DayPhase displayedPhase;
+        public int CustomerSeed { get; set; } = -1;
         Button beginButton, nextButton, endButton, sleepButton, craftButton, stageButton, acceptButton, rejectButton, rotateButton, flipButton, cancelButton;
         readonly Dictionary<ContainerId,RectTransform> grids=new Dictionary<ContainerId,RectTransform>();
         readonly Dictionary<ContainerId,Text> gridTitles=new Dictionary<ContainerId,Text>();
@@ -43,13 +47,14 @@ namespace XiuXianShop
             previousFrameRate=Application.targetFrameRate;
             Application.runInBackground=true;
             Application.targetFrameRate=60;
-            Session=new ShopSession(catalog);
+            Session=new ShopSession(catalog, customerSeed: CustomerSeed < 0 ? (int?)null : CustomerSeed);
             font=Font.CreateDynamicFontFromOSFont(new[]{"Microsoft YaHei","SimHei","Noto Sans CJK SC","Arial"},24);
             BuildScreen(); Refresh();
         }
 
         void Update()
         {
+            if(Session!=null && displayedPricingRevision!=Session.PricingRevision && !IsDragging) Refresh();
             var keyboard=Keyboard.current;
             if(keyboard==null || Session==null) return;
             if(keyboard.rKey.wasPressedThisFrame) RotateSelected();
@@ -78,48 +83,62 @@ namespace XiuXianShop
                 var events=new GameObject("EventSystem",typeof(EventSystem),typeof(InputSystemUIInputModule));
                 events.transform.SetParent(transform,false);
             }
-            Card("Header",24,22,1552,80,panel);
-            Label(content,"ShopName",44,33,335,42,"栖云小铺",32,gold);
-            Label(content,"Subtitle",45,76,330,20,"空间经营 / 炼丹原型",13,muted);
-            header=Label(content,"Resources",385,38,330,38,"",25,textColor);
-            phaseText=Label(content,"Phase",760,40,265,32,"",22,gold);
-            rent=Label(content,"Rent",1045,35,505,52,"",17,muted);
-            Label(content,"Instructions",36,118,970,50,"拖动物品到格子 · 点击选中后也可用按钮变形\n拖动时：R 旋转 / F 水平翻转 / Esc 取消。绿色可放，红色不可放。",17,muted);
-            rotateButton=MakeButton("Rotate",1015,115,168,46,"旋转  R ↻",RotateSelected);
-            flipButton=MakeButton("Flip",1195,115,176,46,"水平翻转  F",FlipSelected);
-            cancelButton=MakeButton("CancelDrag",1383,115,181,46,"取消拖动 Esc",CancelDrag);
+            Card("Header",24,20,1552,66,panel);
+            Label(content,"ShopName",44,30,290,44,"栖云当铺",30,gold);
+            header=Label(content,"Resources",350,34,380,34,"",24,textColor);
+            phaseText=Label(content,"Phase",754,35,310,32,"",22,gold);
+            rent=Label(content,"Rent",1110,31,445,44,"",15,muted);
 
-            CreateGrid(ContainerId.Storage,24,181,714,638,54,238,62,"背包 / 仓库");
-            CreateGrid(ContainerId.Display,758,181,394,328,781,238,58,"今日展示柜");
-            CreateGrid(ContainerId.Counter,1172,181,404,328,1224,238,58,"谈判柜台");
-            selection=Label(content,"Selection",52,700,658,96,"",17,textColor);
-            displaySummary=Label(content,"DisplaySummary",775,474,360,32,"",13,muted);
-            Label(content,"OwnershipLegend",1191,478,365,24,"己 = 你的物品    客 = 顾客物品",14,muted);
+            CreateGrid(ContainerId.Display,24,112,340,312,44,166,44,"展示柜");
+            displaySummary=Label(content,"DisplaySummary",44,352,300,66,"",15,textColor);
+            Card("DayActions",24,440,340,128,panel);
+            beginButton=MakeButton("BeginBusiness",40,451,150,44,"开始营业",()=>Run(()=>Session.BeginBusiness()),true);
+            endButton=MakeButton("EndBusiness",198,451,150,44,"结束营业",()=>Run(()=>Session.EndBusiness()));
+            nextButton=MakeButton("NextCustomer",40,506,308,46,"下一位顾客",()=>Run(()=>Session.NextCustomer()));
 
-            Card("CustomerCard",758,528,818,224,panel);
-            Card("CustomerPortrait",781,550,82,116,new Color(.15f,.23f,.25f));
-            Label(content,"Portrait",796,567,54,60,"客",38,gold);
-            Label(content,"PortraitFoot",790,625,68,28,"来客",13,muted);
-            customerTitle=Label(content,"CustomerTitle",885,545,660,35,"",23,gold);
-            customerDetails=Label(content,"CustomerDetails",885,589,660,92,"",16,textColor);
-            customerDetails.resizeTextForBestFit=true;customerDetails.resizeTextMinSize=12;customerDetails.resizeTextMaxSize=16;
-            stageButton=MakeButton("StageSale",781,689,234,43,"摆入一件同类商品",()=>Run(()=>Session.StageSale()));
-            acceptButton=MakeButton("AcceptTrade",1027,689,246,43,"确认交易",()=>Run(()=>Session.AcceptTrade()),true);
-            rejectButton=MakeButton("RejectTrade",1285,689,264,43,"拒绝 / 不成交",()=>Run(()=>Session.RejectTrade()));
+            Card("CustomerCard",388,112,592,176,panel);
+            customerTitle=Label(content,"CustomerTitle",410,129,548,38,"",25,gold);
+            customerDetails=Label(content,"CustomerDetails",410,173,548,103,"",18,textColor);
+            CreateGrid(ContainerId.Counter,388,306,592,262,458,355,49,"谈判柜台");
+            stageButton=MakeButton("StageSale",730,358,232,42,"摆入一件同类商品",()=>Run(()=>Session.StageSale()));
+            rotateButton=MakeButton("Rotate",730,412,110,42,"旋转 R",RotateSelected);
+            flipButton=MakeButton("Flip",852,412,110,42,"翻转 F",FlipSelected);
+            cancelButton=MakeButton("CancelDrag",730,466,232,42,"取消拖动 Esc",CancelDrag);
+            Label(content,"OwnershipLegend",730,521,232,34,"己：自有   客：未付款",16,muted);
 
-            Label(content,"DailyActions",776,770,770,27,"每日流程：配置展示 → 营业 → 接待 → 闭店 → 睡觉",17,muted);
-            beginButton=MakeButton("BeginBusiness",775,811,180,50,"开始营业",()=>Run(()=>Session.BeginBusiness()),true);
-            nextButton=MakeButton("NextCustomer",972,811,180,50,"下一位顾客",()=>Run(()=>Session.NextCustomer()));
-            endButton=MakeButton("EndBusiness",1169,811,180,50,"结束营业",()=>Run(()=>Session.EndBusiness()));
-            sleepButton=MakeButton("Sleep",1366,811,180,50,"睡觉 / 下一天",()=>Run(()=>Session.Sleep()),true);
+            Card("TradeCard",1004,112,572,456,panel);
+            tradeHeading=Label(content,"TradeHeading",1024,129,532,34,"本次交易",23,gold);
+            tradeDetails=ScrollableText("TradeDetails",1024,175,530,255);
+            tradeStatus=Label(content,"TradeStatus",1024,441,532,59,"",17,textColor);
+            acceptButton=MakeButton("AcceptTrade",1024,511,260,42,"确认交易",()=>Run(()=>Session.AcceptTrade()),true);
+            rejectButton=MakeButton("RejectTrade",1296,511,260,42,"拒绝 / 不成交",()=>Run(()=>Session.RejectTrade()));
+            sleepButton=MakeButton("Sleep",1024,511,532,42,"结算完毕 · 睡觉进入下一天",()=>Run(()=>Session.Sleep()),true);
 
-            Card("Furnace",24,837,714,139,panel);
-            Label(content,"FurnaceTitle",48,853,422,31,"丹炉 · 已拥有",23,gold);
-            furnaceText=Label(content,"Recipe",48,893,420,64,"",16,textColor);
-            craftButton=MakeButton("Craft",493,875,214,58,"炼制回气丹",()=>Run(()=>Session.Craft()),true);
-            Card("NoticeCard",758,879,818,97,new Color(.12f,.19f,.21f));
-            notice=Label(content,"Notice",778,893,774,67,"",17,textColor);
-            previewText=Label(content,"PlacementHint",51,675,659,25,"绿色：合法    红色：非法    物品间空洞可以嵌放",15,muted);
+            notice=Label(content,"Notice",40,577,1516,24,"",16,gold);
+            CreateGrid(ContainerId.Storage,24,618,756,358,44,663,43,"库存 / 自由整理");
+            previewText=Label(content,"PlacementHint",504,677,250,86,"绿色可放 · 红色不可放\n拖动物品 / R 旋转\nF 翻转 / Esc 取消",17,muted);
+            Label(content,"StorageHelp",504,790,250,143,"营业前后均可自由搬运。\n\n展示柜只在开门时吸引顾客；营业后可作额外仓库。",18,textColor);
+            Card("ItemDetailCard",802,618,774,272,panel);
+            Label(content,"ItemDetailTitle",824,634,730,32,"物品详情",23,gold);
+            selection=ScrollableText("Selection",824,677,730,198);
+            Card("Furnace",802,906,774,70,panel);
+            furnaceText=Label(content,"Recipe",824,918,470,46,"",16,muted);
+            craftButton=MakeButton("Craft",1300,919,254,43,"炼制回气丹",()=>Run(()=>Session.Craft()));
+        }
+
+        Text ScrollableText(string name,float x,float y,float width,float height)
+        {
+            var viewport=Rect(content,name+"Viewport",x,y,width,height);
+            Image(viewport,new Color(.07f,.105f,.12f),true);
+            viewport.gameObject.AddComponent<RectMask2D>();
+            var scroll=viewport.gameObject.AddComponent<ScrollRect>();
+            var text=Label(viewport,name,8,5,width-20,height,"",18,textColor);
+            var fitter=text.gameObject.AddComponent<ContentSizeFitter>();
+            fitter.verticalFit=ContentSizeFitter.FitMode.PreferredSize;
+            scroll.viewport=viewport;scroll.content=text.rectTransform;
+            scroll.horizontal=false;scroll.vertical=true;scroll.movementType=ScrollRect.MovementType.Clamped;
+            scroll.scrollSensitivity=25;
+            return text;
         }
 
         void CreateGrid(ContainerId id,float px,float py,float pw,float ph,float gx,float gy,float cell,string title)
@@ -180,28 +199,50 @@ namespace XiuXianShop
                 var size=ShopSession.Size(pair.Key); pair.Value.text=$"{name}  {Session.Occupied(pair.Key)}/{size.x*size.y}";
             }
             var selected=Session.Find(selectedId);
-            selection.text=selected==null?"点击物品查看名称、价格与形状。\n先把紫色「收购牌」与金色「回气丹」拖进展示柜。\n同一格子规则适用于背包、展示柜和柜台。":$"选中：{selected.Definition.title} · {(selected.Owner==ItemOwner.Player?"你的物品":"顾客所有")} · 占 {selected.Cells.Length} 格\n{selected.Definition.description}\n收购 {selected.Definition.purchasePrice} / 出售 {selected.Definition.salePrice} 灵石";
-            if(selected!=null) selection.text+=$" · 类别：{ShopCatalog.CategoryName(selected.Definition.category)}";
+            selection.text=selected==null?"点击物品查看价值、标签与说明。\n仓库中的预估价值等于基础价值；放入谈判柜台后按本次报价显示。":ItemDescription(selected);
             var attraction=Session.Phase==DayPhase.Preparation?Session.PreviewAttraction():Session.TodayAttraction;
             string preferredCategory=attraction.BuyerCategory==ItemCategory.Unclassified?"随机类别":ShopCatalog.CategoryName(attraction.BuyerCategory);
-            displaySummary.text=Session.Phase==DayPhase.Preparation?$"每日 5 位 · 买家 {1-attraction.SupplierChance:P0} / 卖家 {attraction.SupplierChance:P0}\n买家：{preferredCategory} · 资金 {attraction.MinimumBuyerBudget}–{attraction.MaximumBuyerBudget}":$"今日 5 位：买家 {Session.BuyersToday} / 卖家 {Session.SuppliersToday}\n已离场 {Session.ServedToday} · 待到访 {Session.RemainingCustomers} · 客源已确定";
+            displaySummary.text=Session.Phase==DayPhase.Preparation?$"每日 5 位 · 买家 {1-attraction.SupplierChance:P0} / 卖家 {attraction.SupplierChance:P0}\n{preferredCategory} · 资金 {attraction.MinimumBuyerBudget}–{attraction.MaximumBuyerBudget}\n基础价值 {attraction.DisplayValue} · 档位 ≥{attraction.BudgetTierMinimum}":$"今日买家 {Session.BuyersToday} / 卖家 {Session.SuppliersToday}\n已离场 {Session.ServedToday} · 待到访 {Session.RemainingCustomers}\n开门时的展示效果已锁定";
             var offer=Session.Offer;
             bool canAccept=Session.CanAcceptTrade(out int total,out string tradeReason);
-            if(offer==null)
+            bool closed=Session.Phase==DayPhase.Closed;
+            tradeHeading.text=closed?"今日结算":"本次交易 · 清单可滚动";
+            if(closed)
             {
-                customerTitle.text=Session.Phase==DayPhase.Open?"客人已离开":"等待开门";
-                customerDetails.text=Session.Phase==DayPhase.Open?$"今天已接待 {Session.ServedToday} 位，剩余 {Session.RemainingCustomers} 位。\n点击「下一位顾客」，或结束营业。":$"每日固定 5 位，各自随机决定买卖方向；空展示柜也有客人。\n买家偏好：{preferredCategory} · 展示价值 {attraction.DisplayValue} · 档位 ≥{attraction.BudgetTierMinimum}\n资金范围 {attraction.MinimumBuyerBudget}–{attraction.MaximumBuyerBudget}；卖家供货：{attraction.SupplierDescription}。\n仅在开门时生成当天客源，之后可自由整理。";
+                customerTitle.text="今日已闭店";
+                customerDetails.text="营业结束，物品留在原位。\n查看右侧结算，睡觉后进入下一天。";
+                tradeDetails.text=$"第 {Session.Day} 天\n\n起始余额    {Session.OpeningMoney} 灵石\n本日收入    +{Session.IncomeToday}\n本日支出    −{Session.ExpensesToday}\n余额变化    {Session.BalanceChange:+0;-0;0}\n当前余额    {Session.Money} 灵石\n\n房租在睡觉时按既有规则处理。";
+            }
+            else if(offer==null)
+            {
+                customerTitle.text=Session.Phase==DayPhase.Open?(Session.RemainingCustomers>0?"等待下一位顾客":"今日顾客已全部离场"):"营业前 · 配置店铺";
+                customerDetails.text=Session.Phase==DayPhase.Open?$"{Session.LastCustomerResult}\n剩余 {Session.RemainingCustomers} 位，可呼叫下一位或闭店。":$"空展示柜也有客人 · 每日 5 位\n偏好：{preferredCategory} · 资金 {attraction.MinimumBuyerBudget}–{attraction.MaximumBuyerBudget}\n供货：{attraction.SupplierDescription}";
+                tradeDetails.text=Session.Phase==DayPhase.Open?"当前没有顾客。\n自有物品可以继续在三区域搬运。": "先把商品或收购牌放到左侧展示柜，再开始营业。\n\n玩家出售：基础价值 + 零售加价及有效标签。\n玩家收购：按卖家货物的当前报价付款。\n\n逐件报价求和，确认时按同一金额结算。";
             }
             else
             {
-                var item=Session.Find(offer.ItemId);
                 bool buying=offer.Direction==TradeDirection.CustomerSells;
-                customerTitle.text=$"{offer.CustomerName}  /  {(buying?"向你出售":"向你购买")}";
-                customerDetails.text=buying?$"{item.Definition.title} × 1  ·  顾客报价 {offer.Price} 灵石\n{tradeReason}\n付款后收入背包；柜台上的自有物品保持不变。":$"想要：{ShopCatalog.CategoryName(offer.RequestedCategory)}  ·  剩余资金：{offer.RemainingBudget}  ·  总价值：{total} 灵石\n{tradeReason}\n{Session.CounterSaleSummary}";
+                customerTitle.text=$"{offer.CustomerName} · {(buying?"卖家 / 你收购":"买家 / 你出售")}";
+                string reason=buying?(attraction.HasAdvertisement?$"收购牌 · {attraction.SupplierDescription}":"自然到访"):(attraction.BuyerCategory==ItemCategory.Unclassified?"自然到访":$"展示柜 · {preferredCategory}");
+                customerDetails.text=buying?$"向你出售：{offer.SupplierItem.Definition.title}\n你的可用资金：{Session.Money} 灵石\n吸引原因：{reason}":$"想要：{ShopCatalog.CategoryName(offer.RequestedCategory)} · 剩余资金：{offer.RemainingBudget}\n总价值：{total} 灵石\n吸引原因：{reason}";
+                var basket=buying?new[]{offer.SupplierItem}:Session.In(ContainerId.Counter).Where(i=>i.Owner==ItemOwner.Player).ToArray();
+                tradeDetails.text=string.Join("\n\n",basket.Select(i=>{var q=Session.Quote(i);return $"{i.Definition.title} × 1    报价 {q.Amount} 灵石\n基础 {q.BaseValue} · {q.Modifiers}";}));
+                if(basket.Length==0) tradeDetails.text="谈判柜台为空，拖入商品开始报价。";
+                tradeDetails.text+=$"\n\n合计 {basket.Length} 件 / {total} 灵石";
             }
-            SetButtonTitle(acceptButton,offer!=null && offer.Direction==TradeDirection.CustomerSells?$"确认收购  −{offer.Price}":offer!=null?$"确认出售  +{total}":"确认交易");
-            int cost=catalog.Find(catalog.herbId).purchasePrice+catalog.Find(catalog.dewId).purchasePrice;
-            furnaceText.text=$"背包原料：凝气草 {Count(catalog.herbId)} / 灵露 {Count(catalog.dewId)}\n1 草 + 1 露 → 1 丹 · 成本 {cost} / 售价 {catalog.Find(catalog.productId).salePrice}";
+            tradeStatus.text=closed?"收支已核对，可继续整理后进入下一天。":offer==null?tradeReason:$"本次总价 {total} 灵石\n{tradeReason}";
+            tradeStatus.color=canAccept?new Color(.54f,.85f,.65f):gold;
+            SetButtonTitle(acceptButton,offer!=null && offer.Direction==TradeDirection.CustomerSells?$"确认收购  −{total}":offer!=null?$"确认出售  +{total}":"确认交易");
+            SetButtonTitle(nextButton,offer==null?"呼叫下一位顾客":"送别并接待下一位");
+            acceptButton.gameObject.SetActive(!closed);rejectButton.gameObject.SetActive(!closed);sleepButton.gameObject.SetActive(closed);
+            furnaceText.text=$"丹炉（保留功能） · 凝气草 {Count(catalog.herbId)} / 灵露 {Count(catalog.dewId)}\n1 草 + 1 露 → 1 丹";
+            displayedPricingRevision=Session.PricingRevision;
+            if(displayedOffer!=offer || displayedPhase!=Session.Phase)
+            {
+                Canvas.ForceUpdateCanvases();
+                tradeDetails.GetComponentInParent<ScrollRect>().verticalNormalizedPosition=1;
+                displayedOffer=offer;displayedPhase=Session.Phase;
+            }
             notice.text=localNotice??Session.Message;
             beginButton.interactable=Session.Phase==DayPhase.Preparation;
             nextButton.interactable=Session.Phase==DayPhase.Open && (offer!=null || Session.RemainingCustomers>0);
@@ -213,10 +254,27 @@ namespace XiuXianShop
             rotateButton.interactable=flipButton.interactable=selected!=null;
             cancelButton.interactable=IsDragging;
         }
+        string ItemDescription(GridItem item)
+        {
+            var q=Session.Estimate(item);
+            string history=item.PurchaseValue.HasValue?$" · 购买价值 {item.PurchaseValue.Value}":"";
+            return $"{item.Definition.title} · {ShopCatalog.CategoryName(item.Definition.category)} · {(item.Owner==ItemOwner.Player?"自有":"顾客所有")} · 占 {item.Cells.Length} 格\n基础价值 {q.BaseValue} · 预估价值 {q.Amount}{history}\n{q.Modifiers}\n{item.Definition.description}";
+        }
         int Count(string definitionId)=>Session.In(ContainerId.Storage).Count(i=>i.Definition.id==definitionId && i.Owner==ItemOwner.Player);
         static void SetButtonTitle(Button b,string value)=>b.GetComponentInChildren<Text>().text=value;
         public void Run(Func<bool> action) { if(IsDragging) {localNotice="请先放下物品，或按 Esc 取消拖动。";notice.text=localNotice;return;} localNotice=null; action(); Refresh(); }
-        public void SelectItem(int id) { if(IsDragging)return; selectedId=id;localNotice=null;Refresh(); }
+        public void SelectItem(int id)
+        {
+            if(IsDragging)return;selectedId=id;localNotice=null;Refresh();
+            Canvas.ForceUpdateCanvases();selection.GetComponentInParent<ScrollRect>().verticalNormalizedPosition=1;
+        }
+
+        // Explicit developer/test entry. The Editor menu supplies a temporary catalog clone.
+        public void StartVerificationSession(ShopCatalog configuration,int seed)
+        {
+            CancelDrag();catalog=configuration;Session=new ShopSession(catalog,customerSeed:seed);
+            selectedId=0;localNotice=null;Refresh();
+        }
 
         RectTransform DrawItem(Transform parent,GridItem item,int rotation,bool flipped,float cell,bool interactive)
         {
@@ -230,14 +288,14 @@ namespace XiuXianShop
                 var fill=Rect(tile,"Fill",3,3,cell-11,cell-11); Image(fill,item.Definition.color,interactive);
             }
             var first=shape.OrderBy(p=>p.y).ThenBy(p=>p.x).First();
-            var name=Label(rect,"ItemName",first.x*cell+3,first.y*cell+18,cell-7,26,item.Definition.title,14,new Color(.08f,.12f,.14f)); name.alignment=TextAnchor.MiddleCenter;
+            var name=Label(rect,"ItemName",first.x*cell+3,first.y*cell+18,cell-7,26,item.Definition.title,12,new Color(.08f,.12f,.14f)); name.alignment=TextAnchor.MiddleCenter;
             Label(rect,"Owner",first.x*cell+5,first.y*cell+3,cell-8,17,item.Owner==ItemOwner.Customer?"客":"己",11,new Color(.12f,.18f,.20f));
             return rect;
         }
         public Vector2 CellScreenPosition(ContainerId container,int x,int y)
         { return RectTransformUtility.WorldToScreenPoint(null,grids[container].TransformPoint(new Vector3((x+.5f)*cellSizes[container],-(y+.5f)*cellSizes[container],0))); }
         public RectTransform ItemView(int id)=>itemViews.TryGetValue(id,out var view)?view:null;
-        public Button FindButton(string name)=>content.GetComponentsInChildren<Button>().First(b=>b.name==name);
+        public Button FindButton(string name)=>content.GetComponentsInChildren<Button>(true).First(b=>b.name==name);
 
         public void BeginItemDrag(int id,Vector2 screen)
         {

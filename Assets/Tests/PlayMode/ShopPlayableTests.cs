@@ -169,12 +169,109 @@ namespace XiuXianShop.Tests
             yield return null;LogAssert.NoUnexpectedReceived();
         }
 
-        string CustomerText=>shop.GetComponentsInChildren<UnityEngine.UI.Text>().First(t=>t.name=="CustomerDetails").text;
-        IEnumerator RestartWithTestCatalog(System.Action<ShopCatalog> configure)
+        string CustomerText=>string.Join("\n",shop.GetComponentsInChildren<UnityEngine.UI.Text>().Where(t=>t.name=="CustomerDetails" || t.name=="TradeDetails" || t.name=="TradeStatus" || t.name=="DisplaySummary").Select(t=>t.text));
+        string DetailText=>shop.GetComponentsInChildren<UnityEngine.UI.Text>().First(t=>t.name=="Selection").text;
+
+        [UnityTest] public IEnumerator TwentyItemListScrollsAndSettlementResetsToTop()
+        {
+            yield return RestartWithTestCatalog(c=>
+            {
+                c.startingItems=Enumerable.Repeat("dew",20).ToArray();c.baseSupplierChance=0;
+                c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
+                c.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=60}};c.buyerBudgetVariation=0;
+            });
+            var s=shop.Session;var items=s.Items.ToArray();
+            yield return Drag(items[0],ContainerId.Display,0,0);yield return Click("BeginBusiness");
+            // Populate the stress case directly; regular dragging is covered by the other Play tests.
+            for(int n=0;n<20;n++)Assert.That(s.Move(items[n].Id,ContainerId.Counter,n%5,n/5,0,false));
+            shop.Refresh();yield return null;yield return null;Canvas.ForceUpdateCanvases();
+            var scroll=shop.GetComponentsInChildren<UnityEngine.UI.ScrollRect>().First(r=>r.name=="TradeDetailsViewport");
+            Assert.That(scroll.content.rect.height,Is.GreaterThan(scroll.viewport.rect.height));
+            Assert.That(CustomerText,Does.Contain("合计 20 件 / 40"));
+            var point=RectTransformUtility.WorldToScreenPoint(null,scroll.viewport.TransformPoint(scroll.viewport.rect.center));
+            yield return MouseAt(point,false);
+            InputSystem.QueueStateEvent(mouse,new MouseState{position=point,scroll=new Vector2(0,-120)});
+            yield return null;yield return null;
+            Assert.That(scroll.verticalNormalizedPosition,Is.LessThan(.5f),"Mouse wheel must scroll the actual trade viewport.");
+            yield return Click("AcceptTrade");Assert.That(s.Money,Is.EqualTo(160));
+            yield return Click("EndBusiness");yield return null;Canvas.ForceUpdateCanvases();
+            Assert.That(CustomerText,Does.Contain("起始余额    120"));Assert.That(scroll.content.anchoredPosition.y,Is.LessThanOrEqualTo(6));
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [UnityTest] public IEnumerator DynamicQuotesRefreshVisibleDetailsAndConfirmWithoutManualRefresh()
+        {
+            yield return RestartWithTestCatalog(c=>
+            {
+                c.Find("pill").baseValue=20;c.startingItems=new[]{"pill","pill","pill"};
+                c.baseSupplierChance=0;c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
+                c.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=60}};c.buyerBudgetVariation=0;
+            });
+            var s=shop.Session;var pills=s.Items.ToArray();shop.SelectItem(pills[0].Id);
+            Assert.That(DetailText,Does.Contain("基础价值 20 · 预估价值 20"));Assert.That(DetailText,Does.Not.Contain("购买价值"));
+            yield return null;Canvas.ForceUpdateCanvases();
+            yield return Drag(pills[0],ContainerId.Display,0,0);yield return Click("BeginBusiness");
+            yield return Drag(pills[0],ContainerId.Counter,0,0);
+            Assert.That(DetailText,Does.Contain("预估价值 23"));Assert.That(DetailText,Does.Contain("+15%"));
+            yield return Drag(pills[1],ContainerId.Counter,2,0);yield return Drag(pills[2],ContainerId.Counter,0,2);
+            Assert.That(CustomerText,Does.Contain("合计 3 件 / 69"));Assert.That(shop.FindButton("AcceptTrade").interactable,Is.False);
+            s.SetPriceTag(new PriceTag{id="market-test",title="测试降价",percent=-.3f});
+            yield return null;yield return null;
+            Assert.That(CustomerText,Does.Contain("合计 3 件 / 51"));Assert.That(DetailText,Does.Contain("预估价值 17"));
+            Assert.That(shop.FindButton("AcceptTrade").interactable,Is.True);
+            yield return Click("AcceptTrade");Assert.That(s.Money,Is.EqualTo(171));Assert.That(s.Offer.RemainingBudget,Is.EqualTo(9));
+            Assert.That(s.Items,Is.Empty);Assert.That(shop.FindButton("AcceptTrade").interactable,Is.False);
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [UnityTest] public IEnumerator CompleteDayBuysAndSellsWithPurchaseHistorySettlementAndNextDay()
+        {
+            yield return RestartWithTestCatalog(c=>
+            {
+                c.Find("pill").baseValue=20;c.startingItems=new[]{"pill","pill","pill"};
+                foreach(var d in c.items)d.supplierAvailable=d.id=="pill";
+                c.baseSupplierChance=.5f;c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
+                c.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=60}};c.buyerBudgetVariation=0;
+                c.priceTags=new[]{new PriceTag{id="buy-test",title="测试收购修正",percent=-.2f,playerSells=false}};
+            },0);
+            var s=shop.Session;yield return Drag(s.Items[0],ContainerId.Display,0,0);yield return Click("BeginBusiness");
+            int bought=0,sold=0;GridItem purchased=null;
+            for(int n=0;n<5;n++)
+            {
+                Assert.That(s.Offer,Is.Not.Null);
+                if(s.Offer.Direction==TradeDirection.CustomerSells)
+                {
+                    purchased=s.Offer.SupplierItem;Assert.That(CustomerText,Does.Contain("报价 16"));
+                    yield return Click("AcceptTrade");bought++;
+                    shop.SelectItem(purchased.Id);Assert.That(DetailText,Does.Contain("购买价值 16"));
+                    Assert.That(DetailText,Does.Contain("预估价值 20"));
+                }
+                else
+                {
+                    var item=s.Items.FirstOrDefault(i=>i.Owner==ItemOwner.Player && i.Definition.id=="pill");
+                    if(item!=null)
+                    {
+                        yield return Drag(item,ContainerId.Counter,0,0);Assert.That(CustomerText,Does.Contain("报价 23"));
+                        yield return Click("AcceptTrade");sold++;
+                    }
+                }
+                if(n<4 || s.Offer!=null)yield return Click("NextCustomer");
+            }
+            Assert.That(bought,Is.GreaterThan(0));Assert.That(sold,Is.GreaterThan(0));Assert.That(s.RemainingCustomers,Is.Zero);
+            Assert.That(s.Money,Is.EqualTo(120+23*sold-16*bought));Assert.That(s.ValidateState(),Is.Null);
+            yield return Click("EndBusiness");Assert.That(CustomerText,Does.Contain($"本日收入    +{23*sold}"));
+            Assert.That(CustomerText,Does.Contain($"本日支出    −{16*bought}"));Assert.That(shop.FindButton("AcceptTrade").gameObject.activeSelf,Is.False);
+            int money=s.Money,count=s.Items.Count;
+            yield return Click("Sleep");Assert.That(s.Day,Is.EqualTo(2));Assert.That(s.Money,Is.EqualTo(money));Assert.That(s.Items.Count,Is.EqualTo(count));
+            Assert.That(s.IncomeToday,Is.Zero);Assert.That(s.ExpensesToday,Is.Zero);
+            yield return Click("BeginBusiness");Assert.That(s.Phase,Is.EqualTo(DayPhase.Open));
+            LogAssert.NoUnexpectedReceived();
+        }
+        IEnumerator RestartWithTestCatalog(System.Action<ShopCatalog> configure,int seed=-1)
         {
             testCatalog=Object.Instantiate(shop.Catalog);configure(testCatalog);
             Object.Destroy(shop.gameObject);yield return null;
-            shop=new GameObject("Test Shop Prototype").AddComponent<ShopPrototype>();shop.Catalog=testCatalog;
+            shop=new GameObject("Test Shop Prototype").AddComponent<ShopPrototype>();shop.Catalog=testCatalog;shop.CustomerSeed=seed;
             yield return null;yield return null;Canvas.ForceUpdateCanvases();
         }
         IEnumerator PrepareThreePillsAndBuyer(int budget)
@@ -182,7 +279,7 @@ namespace XiuXianShop.Tests
             yield return RestartWithTestCatalog(c=>
             {
                 c.startingItems=c.startingItems.Concat(new[]{"pill","pill"}).ToArray();
-                c.baseSupplierChance=0;c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
+                c.retailMarkup=0;c.baseSupplierChance=0;c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
                 c.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=budget}};c.buyerBudgetVariation=0;
             });
             yield return Drag(shop.Session.Items.First(i=>i.Definition.id=="pill"),ContainerId.Display,2,0);
@@ -227,7 +324,7 @@ namespace XiuXianShop.Tests
             Assert.That(s.Offer.RequestedCategory,Is.EqualTo(ItemCategory.Medicine));Assert.That(s.Offer.RemainingBudget,Is.EqualTo(60));
             var pills=s.Items.Where(i=>i.Definition.id=="pill").ToArray();
             yield return Drag(pills[2],ContainerId.Counter,0,0);yield return Drag(pills[0],ContainerId.Counter,2,0);yield return Drag(pills[1],ContainerId.Counter,0,2);
-            Assert.That(CustomerText,Does.Contain("18×3=54"));Assert.That(CustomerText,Does.Contain("交易成立"));
+            Assert.That(CustomerText,Does.Contain("合计 3 件 / 54"));Assert.That(CustomerText,Does.Contain("交易成立"));
             int money=s.Money;yield return Click("AcceptTrade");
             Assert.That(s.Money,Is.EqualTo(money+54));Assert.That(s.Sales,Is.EqualTo(3));Assert.That(s.Offer.RemainingBudget,Is.EqualTo(6));
             Assert.That(s.Items.Any(i=>i.Definition.id=="pill"),Is.False);Assert.That(shop.FindButton("AcceptTrade").interactable,Is.False);
@@ -254,7 +351,7 @@ namespace XiuXianShop.Tests
             Assert.That(CustomerText,Does.Contain("丹药"));Assert.That(CustomerText,Does.Contain("18–22"));
             yield return Click("Craft");
             yield return Drag(s.Items.First(i=>i.Definition.id=="pill" && i.Container==ContainerId.Storage),ContainerId.Display,2,2);
-            Assert.That(CustomerText,Does.Contain("展示价值 36"));Assert.That(CustomerText,Does.Contain("档位 ≥30"));Assert.That(CustomerText,Does.Contain("54–66"));
+            Assert.That(CustomerText,Does.Contain("基础价值 36"));Assert.That(CustomerText,Does.Contain("档位 ≥30"));Assert.That(CustomerText,Does.Contain("54–66"));
             yield return Click("BeginBusiness");
             for(int n=0;n<5;n++)
             {

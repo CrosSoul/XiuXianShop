@@ -10,7 +10,7 @@ namespace XiuXianShop
     [Serializable]
     public sealed class BuyerBudgetTier
     {
-        [Min(0), Tooltip("此档展示总售价下限，包含该数值；下一档下限不包含在此档。")]
+        [Min(0), Tooltip("此档展示基础价值总和下限，包含该数值；下一档下限不包含在此档。")]
         public int minimumDisplayValue;
         [Min(1)] public int baseBudget;
     }
@@ -24,8 +24,12 @@ namespace XiuXianShop
         [TextArea] public string description;
         public Color color = Color.white;
         public Vector2Int[] cells;
-        [Min(0)] public int purchasePrice;
-        [Min(0)] public int salePrice;
+        [Min(0), Tooltip("商品固有价值；成交报价在此基础上按标签计算。")]
+        public int baseValue;
+        public bool supplierAvailable = true;
+        // Retained only for one-time migration of existing assets, never read by trading.
+        [HideInInspector] public int purchasePrice;
+        [HideInInspector] public int salePrice;
         public bool procurementSign;
         [Tooltip("仅广告牌使用：吸引出售此类别商品的顾客。")]
         public ItemCategory advertisedCategory = ItemCategory.Material;
@@ -45,15 +49,20 @@ namespace XiuXianShop
     [CreateAssetMenu(menuName = "XiuXianShop/Prototype Catalog")]
     public sealed class ShopCatalog : ScriptableObject
     {
+        [HideInInspector] public int priceModelVersion;
         public ItemDefinition[] items;
         public string[] startingItems = { "sign", "herb", "dew", "pill", "cinnabar", "jade", "sword" };
         public string herbId = "herb";
         public string dewId = "dew";
         public string productId = "pill";
         [Min(0)] public int startingMoney = 120;
+        [Tooltip("玩家出售时默认零售加价；0.15 表示 +15%。")]
+        public float retailMarkup = .15f;
+        [Tooltip("用于明确配置/验证的有效价格标签；本轮不生成市场事件。")]
+        public PriceTag[] priceTags = Array.Empty<PriceTag>();
         [Min(1)] public int rentPeriod = 7;
         [Min(1)] public int firstRent = 20;
-        [Tooltip("按生效类别展示总售价选档，同档价值变化不改变资金范围。空展示柜按价值 0。")]
+        [Tooltip("按生效类别展示基础价值总和选档，同档价值变化不改变资金范围。空展示柜按价值 0。")]
         public BuyerBudgetTier[] buyerBudgetTiers =
         {
             new BuyerBudgetTier {minimumDisplayValue=0,baseBudget=20},
@@ -99,11 +108,12 @@ namespace XiuXianShop
         // Used once by the scene builder. The resulting asset is editable in Inspector.
         public void SetPrototypeDefaults()
         {
+            priceModelVersion=1;
             items = new[]
             {
                 Def("herb", "凝气草", "炼丹原料 · L 形。与灵露炼成回气丹。", new Color(.36f,.72f,.51f), 4, 3, new[]{P(0,0),P(0,1),P(1,1)}),
                 Def("dew", "灵露", "炼丹原料 · 单格。收购招牌带来稳定供货。", new Color(.36f,.67f,.88f), 3, 2, new[]{P(0,0)}),
-                Def("pill", "回气丹", "炼丹成品 · 2×2 丹盒。原料成本 7，出售收入 18。", new Color(.93f,.68f,.31f), 20, 18, new[]{P(0,0),P(1,0),P(0,1),P(1,1)}),
+                Def("pill", "回气丹", "炼丹成品 · 2×2 丹盒。以凝气草和灵露炼制，成交时按有效标签报价。", new Color(.93f,.68f,.31f), 20, 18, new[]{P(0,0),P(1,0),P(0,1),P(1,1)}),
                 Def("cinnabar", "朱砂", "不规则试摆物 · T 形，旋转会改变占格。", new Color(.83f,.42f,.39f), 8, 6, new[]{P(0,0),P(1,0),P(2,0),P(1,1)}),
                 Def("jade", "玉匣", "大件试摆物 · 2×2，占用四格。", new Color(.56f,.71f,.69f), 18, 14, new[]{P(0,0),P(1,0),P(0,1),P(1,1)}),
                 Def("sword", "木剑", "长条试摆物 · 四格，竖放或横放。", new Color(.69f,.55f,.37f), 14, 10, new[]{P(0,0),P(0,1),P(0,2),P(0,3)}),
@@ -112,6 +122,6 @@ namespace XiuXianShop
         }
         static Vector2Int P(int x, int y) => new Vector2Int(x,y);
         static ItemDefinition Def(string id, string title, string description, Color color, int buy, int sell, Vector2Int[] cells, bool sign = false)
-            => new ItemDefinition { id=id, title=title, category=PrototypeCategory(id), description=description, color=color, purchasePrice=buy, salePrice=sell, cells=cells, procurementSign=sign };
+            => new ItemDefinition { id=id, title=title, category=PrototypeCategory(id), description=description, color=color, baseValue=sell, supplierAvailable=buy>0, purchasePrice=buy, salePrice=sell, cells=cells, procurementSign=sign };
     }
 }

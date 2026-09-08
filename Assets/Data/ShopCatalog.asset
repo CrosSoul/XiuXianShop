@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23ccc4918895cb44092fa11381c60e88, type: 3}
   m_Name: ShopCatalog
   m_EditorClassIdentifier: XiuXianShop.Runtime::XiuXianShop.ShopCatalog
+  priceModelVersion: 1
   items:
   - id: herb
     title: "\u51DD\u6C14\u8349"
@@ -22,6 +23,8 @@ MonoBehaviour:
     - {x: 0, y: 0}
     - {x: 0, y: 1}
     - {x: 1, y: 1}
+    baseValue: 3
+    supplierAvailable: 1
     purchasePrice: 4
     salePrice: 3
     procurementSign: 0
@@ -33,6 +36,8 @@ MonoBehaviour:
     color: {r: 0.36, g: 0.67, b: 0.88, a: 1}
     cells:
     - {x: 0, y: 0}
+    baseValue: 2
+    supplierAvailable: 1
     purchasePrice: 3
     salePrice: 2
     procurementSign: 0
@@ -40,13 +45,15 @@ MonoBehaviour:
   - id: pill
     title: "\u56DE\u6C14\u4E39"
     category: 1
-    description: "\u70BC\u4E39\u6210\u54C1 \xB7 2\xD72 \u4E39\u76D2\u3002\u539F\u6599\u6210\u672C 7\uFF0C\u51FA\u552E\u6536\u5165 18\u3002"
+    description: "\u70BC\u4E39\u6210\u54C1 \xB7 2\xD72 \u4E39\u76D2\u3002\u4EE5\u51DD\u6C14\u8349\u548C\u7075\u9732\u70BC\u5236\uFF0C\u6210\u4EA4\u65F6\u6309\u6709\u6548\u6807\u7B7E\u62A5\u4EF7\u3002"
     color: {r: 0.93, g: 0.68, b: 0.31, a: 1}
     cells:
     - {x: 0, y: 0}
     - {x: 1, y: 0}
     - {x: 0, y: 1}
     - {x: 1, y: 1}
+    baseValue: 18
+    supplierAvailable: 1
     purchasePrice: 20
     salePrice: 18
     procurementSign: 0
@@ -61,6 +68,8 @@ MonoBehaviour:
     - {x: 1, y: 0}
     - {x: 2, y: 0}
     - {x: 1, y: 1}
+    baseValue: 6
+    supplierAvailable: 1
     purchasePrice: 8
     salePrice: 6
     procurementSign: 0
@@ -75,6 +84,8 @@ MonoBehaviour:
     - {x: 1, y: 0}
     - {x: 0, y: 1}
     - {x: 1, y: 1}
+    baseValue: 14
+    supplierAvailable: 1
     purchasePrice: 18
     salePrice: 14
     procurementSign: 0
@@ -89,6 +100,8 @@ MonoBehaviour:
     - {x: 0, y: 1}
     - {x: 0, y: 2}
     - {x: 0, y: 3}
+    baseValue: 10
+    supplierAvailable: 1
     purchasePrice: 14
     salePrice: 10
     procurementSign: 0
@@ -102,6 +115,8 @@ MonoBehaviour:
     - {x: 0, y: 0}
     - {x: 1, y: 0}
     - {x: 1, y: 1}
+    baseValue: 0
+    supplierAvailable: 0
     purchasePrice: 0
     salePrice: 0
     procurementSign: 1
@@ -118,6 +133,8 @@ MonoBehaviour:
   dewId: dew
   productId: pill
   startingMoney: 120
+  retailMarkup: 0.15
+  priceTags: []
   rentPeriod: 7
   firstRent: 20
   buyerBudgetTiers:

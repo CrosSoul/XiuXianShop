@@ -20,6 +20,7 @@ namespace XiuXianShop
         public int Y { get; internal set; }
         public int Rotation { get; internal set; }
         public bool Flipped { get; internal set; }
+        public int? PurchaseValue { get; internal set; }
         public Vector2Int[] Cells => Definition.Shape(Rotation, Flipped);
     }
 
@@ -29,7 +30,9 @@ namespace XiuXianShop
         public string CustomerName { get; internal set; }
         // ItemId/Price are only used by suppliers. Buyers request a category, never an instance ID.
         public int ItemId { get; internal set; }
-        public int Price { get; internal set; }
+        public GridItem SupplierItem { get; internal set; }
+        internal Func<int> CurrentPrice;
+        public int Price => CurrentPrice?.Invoke() ?? 0;
         public ItemCategory RequestedCategory { get; internal set; }
         public int RemainingBudget { get; internal set; }
     }
@@ -56,6 +59,7 @@ namespace XiuXianShop
         readonly ShopCatalog catalog;
         readonly System.Random customerRandom;
         readonly List<GridItem> items = new List<GridItem>();
+        readonly Dictionary<string, PriceTag> priceTags = new Dictionary<string, PriceTag>();
         readonly Queue<(TradeDirection direction, string definitionId, ItemCategory category, int budget)> queue
             = new Queue<(TradeDirection,string,ItemCategory,int)>();
         int nextId = 1;
@@ -73,6 +77,12 @@ namespace XiuXianShop
         public int Crafted { get; private set; }
         public int Purchases { get; private set; }
         public int Sales { get; private set; }
+        public int PricingRevision { get; private set; }
+        public int OpeningMoney { get; private set; }
+        public int IncomeToday { get; private set; }
+        public int ExpensesToday { get; private set; }
+        public int BalanceChange => Money - OpeningMoney;
+        public string LastCustomerResult { get; private set; } = "尚未接待顾客。";
         public DisplayAttraction TodayAttraction { get; private set; }
         public int BuyersToday { get; private set; }
         public int SuppliersToday { get; private set; }
@@ -85,6 +95,8 @@ namespace XiuXianShop
             this.catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             customerRandom = customerSeed.HasValue ? new System.Random(customerSeed.Value) : new System.Random();
             Money = catalog.startingMoney;
+            OpeningMoney = Money;
+            foreach(var tag in catalog.priceTags ?? Array.Empty<PriceTag>()) SetPriceTag(tag);
             Rent = catalog.firstRent;
             if (seed)
                 foreach (string id in catalog.startingItems)
@@ -103,6 +115,30 @@ namespace XiuXianShop
         GridItem NewItem(ItemDefinition def, ItemOwner owner) => new GridItem{Id=nextId++, Definition=def, Owner=owner};
         bool Fail(string message) { Message=message; return false; }
         bool Success(string message) { Message=message; return true; }
+
+        public bool SetPriceTag(PriceTag tag)
+        {
+            if(tag == null || string.IsNullOrWhiteSpace(tag.id) || tag.id == "retail" ||
+                float.IsNaN(tag.percent) || float.IsInfinity(tag.percent) || Math.Abs(tag.percent)>100) return false;
+            priceTags[tag.id] = tag.Copy(); PricingRevision++; return true;
+        }
+        public bool RemovePriceTag(string id)
+        { if(!priceTags.Remove(id)) return false; PricingRevision++; return true; }
+        public PriceQuote Quote(GridItem item)
+        {
+            var direction = item.Owner == ItemOwner.Player ? TradeDirection.CustomerBuys : TradeDirection.CustomerSells;
+            return Quote(item.Definition, direction);
+        }
+        public PriceQuote Quote(ItemDefinition definition, TradeDirection direction)
+        {
+            var effective = priceTags.Values.Where(t => (t.category == ItemCategory.Unclassified || t.category == definition.category) &&
+                (direction == TradeDirection.CustomerBuys ? t.playerSells : t.playerBuys)).Select(t=>t.Copy()).ToList();
+            if(direction == TradeDirection.CustomerBuys)
+                effective.Insert(0, new PriceTag {id="retail",title="零售加价",percent=catalog.retailMarkup});
+            return new PriceQuote(definition, effective);
+        }
+        public PriceQuote Estimate(GridItem item) => item.Container == ContainerId.Counter ? Quote(item) :
+            new PriceQuote(item.Definition, Array.Empty<PriceTag>());
 
         public bool Fits(GridItem item, ContainerId target, int x, int y, int rotation, bool flipped, ISet<int> ignored = null)
         {
@@ -135,6 +171,7 @@ namespace XiuXianShop
         {
             if (!CanMove(id,target,x,y,rotation,flipped,out string reason)) return Fail(reason);
             var item=Find(id); Place(item,target,x,y,rotation,flipped);
+            TryPlaceSupplierItem();
             return Success($"已摆放 {item.Definition.title}。" );
         }
         static void Place(GridItem item, ContainerId target, int x, int y, int rotation, bool flipped)
@@ -144,11 +181,11 @@ namespace XiuXianShop
         {
             var display=In(ContainerId.Display).Where(i=>i.Owner==ItemOwner.Player).ToArray();
             var dominant=display.Where(i=>IsSaleItem(i.Definition)).GroupBy(i=>i.Definition.category)
-                .Select(g=>new {Category=g.Key,Value=g.Sum(i=>i.Definition.salePrice)})
+                .Select(g=>new {Category=g.Key,Value=g.Sum(i=>i.Definition.baseValue)})
                 .OrderByDescending(g=>g.Value).ThenBy(g=>(int)g.Category).FirstOrDefault();
             var advertised=display.Where(i=>i.Definition.procurementSign).Select(i=>i.Definition.advertisedCategory).Distinct().ToArray();
             // Select definitions by the sign's category, not a hard-coded herb/dew schedule.
-            var allSupplies=catalog.items.Where(d=>IsSaleItem(d) && d.purchasePrice>0).ToArray();
+            var allSupplies=catalog.items.Where(d=>IsSaleItem(d) && d.supplierAvailable).ToArray();
             var supplies=allSupplies.Where(d=>advertised.Contains(d.category)).ToArray();
             bool hasAdvertisement=supplies.Length>0;
             float supplierChance=Mathf.Clamp01(catalog.baseSupplierChance+(hasAdvertisement?catalog.advertisementSupplierBonus:0)-(dominant!=null?catalog.displayedGoodsBuyerBonus:0));
@@ -170,7 +207,7 @@ namespace XiuXianShop
                 Supplies=hasAdvertisement?supplies:allSupplies
             };
         }
-        static bool IsSaleItem(ItemDefinition definition) => !definition.procurementSign && definition.salePrice>0
+        static bool IsSaleItem(ItemDefinition definition) => !definition.procurementSign && definition.baseValue>0
             && definition.category!=ItemCategory.Unclassified && definition.category!=ItemCategory.BusinessSign;
 
         public bool BeginBusiness()
@@ -205,21 +242,29 @@ namespace XiuXianShop
         {
             if (Phase!=DayPhase.Open) return Fail("请先开始营业。" );
             // Departure is explicit, even after a successful sale or with an unfinished basket.
-            if (Offer!=null) { CancelOffer(); ServedToday++; }
+            if (Offer!=null) { LastCustomerResult="已主动送别上一位顾客。"; CancelOffer(); ServedToday++; }
             if (queue.Count==0) return Success("今日顾客已接待完。可以结束营业，炼丹整理，再睡觉。" );
             var request=queue.Peek();
             GridItem item=null;
             if (request.direction==TradeDirection.CustomerSells)
             {
                 item=NewItem(catalog.Find(request.definitionId),ItemOwner.Customer);
-                if (!FindSpace(item,ContainerId.Counter,out int x,out int y)) return Fail("柜台没有空间接待供货。" );
-                Place(item,ContainerId.Counter,x,y,0,false); items.Add(item);
             }
             queue.Dequeue();
-            Offer=new TradeOffer{Direction=request.direction,ItemId=item?.Id??0,Price=item?.Definition.purchasePrice??0,
+            Offer=new TradeOffer{Direction=request.direction,ItemId=item?.Id??0,SupplierItem=item,CurrentPrice=()=>item==null?0:Quote(item.Definition,TradeDirection.CustomerSells).Amount,
                 CustomerName=request.direction==TradeDirection.CustomerSells?"采药客 · 阿青":"散修 · 云生",
                 RequestedCategory=request.category,RemainingBudget=request.budget};
+            TryPlaceSupplierItem();
+            if(item!=null && Find(item.Id)==null) return Success("卖家正在等待柜台空间；可以先腾出位置，也可以主动接待下一位。" );
             return Success(request.direction==TradeDirection.CustomerSells ? "供货已上柜台。顾客物品确认收购后才属于你。" : $"顾客求购{ShopCatalog.CategoryName(request.category)}，预算 {request.budget}。可多件或分次出售，随时接待下一位。" );
+        }
+
+        void TryPlaceSupplierItem()
+        {
+            var item=Offer?.SupplierItem;
+            if(item==null || Find(item.Id)!=null) return;
+            if(FindSpace(item,ContainerId.Counter,out int x,out int y))
+            { Place(item,ContainerId.Counter,x,y,0,false);items.Add(item); }
         }
 
         public bool StageSale()
@@ -231,7 +276,7 @@ namespace XiuXianShop
         }
 
         public string CounterSaleSummary => string.Join(" + ", In(ContainerId.Counter).Where(i=>i.Owner==ItemOwner.Player)
-            .GroupBy(i=>i.Definition).Select(g=>$"{g.Key.title} {g.Key.salePrice}×{g.Count()}={g.Key.salePrice*g.Count()}"));
+            .GroupBy(i=>new {i.Definition.title, Price=Quote(i).Amount}).Select(g=>$"{g.Key.title} {g.Key.Price}×{g.Count()}={g.Key.Price*g.Count()}"));
 
         public bool CanAcceptTrade(out int total, out string reason)
         {
@@ -240,15 +285,18 @@ namespace XiuXianShop
             if(Offer.Direction==TradeDirection.CustomerSells)
             {
                 var item=Find(Offer.ItemId);total=Offer.Price;
-                if(item==null || item.Owner!=ItemOwner.Customer || item.Container!=ContainerId.Counter) {reason="顾客货物缺失或归属不正确。";return false;}
+                if(item==null) {reason="谈判柜台空间不足：腾出空间后自动摆入，或点击下一位跳过。";return false;}
+                if(item.Owner!=ItemOwner.Customer || item.Container!=ContainerId.Counter) {reason="顾客货物归属不正确。";return false;}
                 if(Money<total) {reason=$"灵石不足：需要 {total}，当前 {Money}。";return false;}
                 if(!FindSpace(item,ContainerId.Storage,out _,out _)) {reason="背包空间不足；先整理或旋转货物，不会扣款。";return false;}
                 reason="可收购：付款后货物进入背包。";return true;
             }
             var basket=In(ContainerId.Counter).Where(i=>i.Owner==ItemOwner.Player).ToArray();
-            total=basket.Sum(i=>i.Definition.salePrice);
+            long sum=basket.Sum(i=>(long)Quote(i).Amount);
+            if(sum>int.MaxValue-Money) {reason="本次金额超出可结算范围。"; return false;}
+            total=(int)sum;
             if(basket.Length==0) {reason="柜台为空，请摆入要出售的物品。";return false;}
-            if(basket.Any(i=>i.Definition.procurementSign || i.Definition.salePrice<=0)) {reason="柜台含不可出售的物品，请移出。";return false;}
+            if(basket.Any(i=>!IsSaleItem(i.Definition))) {reason="柜台含不可出售的物品，请移出。";return false;}
             var wrong=basket.FirstOrDefault(i=>i.Definition.category!=Offer.RequestedCategory);
             if(wrong!=null) {reason=$"类别不符：{wrong.Definition.title}不是{ShopCatalog.CategoryName(Offer.RequestedCategory)}。";return false;}
             if(total>Offer.RemainingBudget) {reason=$"顾客资金不足：总价 {total}，剩余预算 {Offer.RemainingBudget}。";return false;}
@@ -263,14 +311,15 @@ namespace XiuXianShop
                 var basket=In(ContainerId.Counter).Where(i=>i.Owner==ItemOwner.Player).ToArray();
                 // Validate the entire basket above, then commit all items and money together.
                 foreach(var sold in basket) items.Remove(sold);
-                Money+=total;Offer.RemainingBudget-=total;Sales+=basket.Length;
+                Money+=total;IncomeToday+=total;Offer.RemainingBudget-=total;Sales+=basket.Length;
                 return Success($"已出售 {basket.Length} 件，收入 {total}。顾客剩余预算 {Offer.RemainingBudget}，可继续交易或点击下一位。" );
             }
             var item=Find(Offer.ItemId);
             string title=item.Definition.title;
             FindSpace(item,ContainerId.Storage,out int x,out int y);
-            Money-=total;item.Owner=ItemOwner.Player;Place(item,ContainerId.Storage,x,y,item.Rotation,item.Flipped);Purchases++;
+            Money-=total;ExpensesToday+=total;item.PurchaseValue=total;item.Owner=ItemOwner.Player;Place(item,ContainerId.Storage,x,y,item.Rotation,item.Flipped);Purchases++;
             Offer=null; ServedToday++;
+            LastCustomerResult=$"收购完成，卖家已离开；支付 {total} 灵石。";
             return Success($"已收购 {title}，支付 {total} 灵石。供货顾客已离开。" );
         }
 
@@ -278,6 +327,7 @@ namespace XiuXianShop
         {
             if (Offer==null) return Fail("当前没有需要拒绝的交易。" );
             CancelOffer(); ServedToday++;
+            LastCustomerResult="已拒绝本次交易，顾客离开。";
             return Success("已拒绝交易。玩家物品和灵石未减少，顾客已离开。" );
         }
         void CancelOffer()
@@ -291,7 +341,7 @@ namespace XiuXianShop
         {
             if(Phase!=DayPhase.Open) return Fail("当前没有营业。" );
             CancelOffer(); queue.Clear(); Phase=DayPhase.Closed;
-            return Success("今日已闭店。你的物品保持当前位置，可以继续整理、炼丹并睡觉。" );
+            return Success($"今日已闭店。收入 {IncomeToday}，支出 {ExpensesToday}，余额变化 {BalanceChange:+0;-0;0}。查看结算后可进入下一天。" );
         }
         public bool Craft()
         {
@@ -302,9 +352,7 @@ namespace XiuXianShop
             var consumed=new HashSet<int>{herb.Id,dew.Id};
             if(!FindSpace(product,ContainerId.Storage,out int x,out int y,consumed)) return Fail("没有连续空间容纳成品；请先整理。原料未消耗。" );
             items.Remove(herb); items.Remove(dew); Place(product,ContainerId.Storage,x,y,0,false); items.Add(product); Crafted++;
-            int cost=herb.Definition.purchasePrice+dew.Definition.purchasePrice;
-            int sale=product.Definition.salePrice;
-            return Success($"炼丹完成：凝气草 + 灵露 → 回气丹，已放入背包。成本 {cost}，出售 {sale}，毛利 {sale-cost} 灵石。" );
+            return Success("炼丹完成：凝气草 + 灵露 → 回气丹，已放入背包。直接制作的物品无购买价值。" );
         }
         public bool Sleep()
         {
@@ -313,6 +361,7 @@ namespace XiuXianShop
             if(Day%catalog.rentPeriod==0) { due+=Rent; Rent=(int)Math.Ceiling(Rent*1.05); }
             int paid=Math.Min(Money,due); Money-=paid; RentDebt=due-paid;
             Day++; Phase=DayPhase.Preparation; ServedToday=0;TodayAttraction=null;BuyersToday=0;SuppliersToday=0; queue.Clear();
+            OpeningMoney=Money;IncomeToday=0;ExpensesToday=0;LastCustomerResult="新的一天，尚未接待顾客。";
             return Success($"第 {Day} 天清晨。库存、灵石和丹炉已保留。"+(due>0?$" 支付房租 {paid}，待付 {RentDebt}。":"今天重新配置展示，再次经营。"));
         }
         public string ValidateState()

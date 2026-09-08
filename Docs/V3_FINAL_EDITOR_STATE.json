@@ -1,0 +1,50 @@
+[
+  {
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"status\": \"ready\",\n  \"compiling\": false,\n  \"domainReloadInProgress\": false,\n  \"playMode\": \"stopped\",\n  \"lastHeartbeat\": \"2026-09-08T04:56:31.8090865Z\",\n  \"projectPath\": \"D:\\\\Unity\\\\UnityProjects\\\\XiuXianShop\",\n  \"unityVersion\": \"6000.6.0f1\"\n}"
+        }
+      ]
+    },
+    "jsonrpc": "2.0",
+    "id": 2
+  },
+  {
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"total\": 0,\n  \"returned\": 0,\n  \"logs\": []\n}"
+        }
+      ]
+    },
+    "jsonrpc": "2.0",
+    "id": 3
+  },
+  {
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"total\": 0,\n  \"returned\": 0,\n  \"logs\": []\n}"
+        }
+      ]
+    },
+    "jsonrpc": "2.0",
+    "id": 4
+  },
+  {
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"output\": null,\n  \"diagnostics\": [],\n  \"success\": true,\n  \"result\": {\n    \"scene\": \"Assets/Scenes/ShopPrototype.unity\",\n    \"sceneDirty\": false,\n    \"roots\": [\n      \"Main Camera\",\n      \"Shop Prototype\"\n    ],\n    \"catalogDirty\": false,\n    \"catalogReference\": \"Assets/Data/ShopCatalog.asset\",\n    \"version\": 1,\n    \"retailMarkup\": 0.15,\n    \"tags\": 0,\n    \"items\": [\n      {\n        \"id\": \"herb\",\n        \"baseValue\": 3,\n        \"supplierAvailable\": true\n      },\n      {\n        \"id\": \"dew\",\n        \"baseValue\": 2,\n        \"supplierAvailable\": true\n      },\n      {\n        \"id\": \"pill\",\n        \"baseValue\": 18,\n        \"supplierAvailable\": true\n      },\n      {\n        \"id\": \"cinnabar\",\n        \"baseValue\": 6,\n        \"supplierAvailable\": true\n      },\n      {\n        \"id\": \"jade\",\n        \"baseValue\": 14,\n        \"supplierAvailable\": true\n      },\n      {\n        \"id\": \"sword\",\n        \"baseValue\": 10,\n        \"supplierAvailable\": true\n      },\n      {\n        \"id\": \"sign\",\n        \"baseValue\": 0,\n        \"supplierAvailable\": false\n      }\n    ],\n    \"pipeline\": \"XiuXianShop_2D_RPAsset\",\n    \"console\": {\n      \"errors\": 0,\n      \"warnings\": 0,\n      \"logs\": 0\n    },\n    \"playing\": false,\n    \"compiling\": false\n  }\n}"
+        }
+      ]
+    },
+    "jsonrpc": "2.0",
+    "id": 5
+  }
+]

@@ -8,7 +8,7 @@ namespace XiuXianShop.Tests
     public sealed class ShopSessionTests
     {
         ShopCatalog catalog;
-        [SetUp] public void Setup() { catalog=ScriptableObject.CreateInstance<ShopCatalog>();catalog.SetPrototypeDefaults();BuyersOnly(); }
+        [SetUp] public void Setup() { catalog=ScriptableObject.CreateInstance<ShopCatalog>();catalog.SetPrototypeDefaults();catalog.retailMarkup=0;BuyersOnly(); }
         [TearDown] public void Teardown() { UnityEngine.Object.DestroyImmediate(catalog); }
         ShopSession Session(params string[] ids) {catalog.startingItems=ids;return new ShopSession(catalog);}
         static string Snapshot(ShopSession s)=>s.Money+"|"+s.Day+"|"+string.Join(";",s.Items.OrderBy(i=>i.Id).Select(i=>$"{i.Id},{i.Definition.id},{i.Container},{i.Owner},{i.X},{i.Y},{i.Rotation},{i.Flipped}"));
@@ -18,7 +18,7 @@ namespace XiuXianShop.Tests
         void SuppliersOnly(string id="herb")
         {
             catalog.baseSupplierChance=1;catalog.advertisementSupplierBonus=0;catalog.displayedGoodsBuyerBonus=0;
-            foreach(var d in catalog.items) if(d.id!=id)d.purchasePrice=0;
+            foreach(var d in catalog.items) if(d.id!=id)d.supplierAvailable=false;
         }
 
         [Test] public void RotationAndReflectionHaveExpectedOccupiedCells()
@@ -195,7 +195,8 @@ namespace XiuXianShop.Tests
             var s=Session(new[]{"sign"}.Concat(Enumerable.Repeat("dew",20)).ToArray());var sign=s.Items[0];Display(s,sign);
             var dew=s.Items.Where(i=>i.Definition.id=="dew").ToArray();
             for(int n=0;n<20;n++)Assert.That(s.Move(dew[n].Id,ContainerId.Counter,n%5,n/5,0,false));
-            Assert.That(s.BeginBusiness(),Is.False);Assert.That(s.Phase,Is.EqualTo(DayPhase.Open));Assert.That(s.RemainingCustomers,Is.EqualTo(5));
+            Assert.That(s.BeginBusiness(),Is.True);Assert.That(s.Phase,Is.EqualTo(DayPhase.Open));Assert.That(s.RemainingCustomers,Is.EqualTo(4));
+            Assert.That(s.CanAcceptTrade(out _,out _),Is.False);
             Assert.That(s.Move(sign.Id,ContainerId.Storage,0,0,0,false));
             foreach(var item in dew) {Assert.That(s.FindSpace(item,ContainerId.Storage,out int x,out int y));Assert.That(s.Move(item.Id,ContainerId.Storage,x,y,0,false));}
             Assert.That(s.NextCustomer());Assert.That(s.SupplyAdvertisedToday);Assert.That(s.Offer.Direction,Is.EqualTo(TradeDirection.CustomerSells));
@@ -233,7 +234,7 @@ namespace XiuXianShop.Tests
 
         [Test] public void TwoProcureCraftSellLoopsAndTwoDaysAreProfitable()
         {
-            catalog.baseSupplierChance=1;catalog.startingItems=new[]{"sign"};catalog.Find("cinnabar").purchasePrice=0;
+            catalog.baseSupplierChance=1;catalog.startingItems=new[]{"sign"};catalog.Find("cinnabar").supplierAvailable=false;
             var s=new ShopSession(catalog,customerSeed:0);Display(s,s.Items[0]);
             // Day 1 obtains two complete ingredient sets through normal suppliers.
             Assert.That(s.BeginBusiness());
@@ -244,12 +245,12 @@ namespace XiuXianShop.Tests
                 else Assert.That(s.RejectTrade());
                 if(i<4)Assert.That(s.NextCustomer());
             }
-            Assert.That(s.Purchases,Is.EqualTo(4));Assert.That(s.Money,Is.EqualTo(106));
+            Assert.That(s.Purchases,Is.EqualTo(4));Assert.That(s.Money,Is.EqualTo(110));
             Assert.That(s.Craft());Assert.That(s.Craft());Assert.That(s.EndBusiness());Assert.That(s.Sleep());
             BuyersOnly();var pills=s.In(ContainerId.Storage).Where(i=>i.Definition.id=="pill").ToArray();
             Display(s,pills[0],2,0);Display(s,pills[1],4,0);Assert.That(s.BeginBusiness());
             for(int i=0;i<2;i++){Assert.That(s.StageSale());Assert.That(s.AcceptTrade());if(i==0)Assert.That(s.NextCustomer());}
-            Assert.That(s.Day,Is.EqualTo(2));Assert.That(s.Crafted,Is.EqualTo(2));Assert.That(s.Sales,Is.EqualTo(2));Assert.That(s.Money,Is.EqualTo(142));
+            Assert.That(s.Day,Is.EqualTo(2));Assert.That(s.Crafted,Is.EqualTo(2));Assert.That(s.Sales,Is.EqualTo(2));Assert.That(s.Money,Is.EqualTo(146));
             Assert.That(s.Items.Count,Is.EqualTo(1));Assert.That(s.Items[0].Definition.id,Is.EqualTo("sign"));
             Assert.That(s.EndBusiness());Assert.That(s.Sleep());Assert.That(s.Day,Is.EqualTo(3));Assert.That(s.HasFurnace);Valid(s);
         }
@@ -286,13 +287,13 @@ namespace XiuXianShop.Tests
 
         [Test] public void OnlyHighestCategoryCountsAndTiesUseStableCategoryOrder()
         {
-            catalog.Find("herb").salePrice=10;catalog.Find("pill").salePrice=50;
+            catalog.Find("herb").baseValue=10;catalog.Find("pill").baseValue=50;
             var s=Session("herb","herb","herb","pill");
             Display(s,s.Items[0]);Display(s,s.Items[1],2,0);Display(s,s.Items[2],4,0);Display(s,s.Items[3],0,2);
             var preview=s.PreviewAttraction();Assert.That(preview.BuyerCategory,Is.EqualTo(ItemCategory.Medicine));Assert.That(preview.DisplayValue,Is.EqualTo(50));
-            catalog.Find("pill").salePrice=30;
+            catalog.Find("pill").baseValue=30;
             Assert.That(s.PreviewAttraction().BuyerCategory,Is.EqualTo(ItemCategory.Medicine),"Equal category totals use enum order, not placement order.");
-            catalog.Find("herb").salePrice=11;
+            catalog.Find("herb").baseValue=11;
             Assert.That(s.PreviewAttraction().BuyerCategory,Is.EqualTo(ItemCategory.Material));Assert.That(s.PreviewAttraction().DisplayValue,Is.EqualTo(33));
         }
 
@@ -310,7 +311,7 @@ namespace XiuXianShop.Tests
         {
             var defaults=ScriptableObject.CreateInstance<ShopCatalog>();
             catalog.buyerBudgetTiers=defaults.buyerBudgetTiers;UnityEngine.Object.DestroyImmediate(defaults);catalog.buyerBudgetVariation=.1f;
-            catalog.Find("pill").salePrice=value;catalog.startingItems=new[]{"pill"};
+            catalog.Find("pill").baseValue=value;catalog.startingItems=new[]{"pill"};
             var observed=new System.Collections.Generic.HashSet<int>();
             for(int seed=0;seed<30;seed++)
             {

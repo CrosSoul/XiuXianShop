@@ -57,9 +57,9 @@ namespace XiuXianShop
             heading.text=$"两周日历 · 第 {firstDay}–{firstDay+13} 天   |   今天：第 {session.Day} 天";
             rentInfo.text=$"下次收租：第 {session.NextRentDay} 天夜间，{session.Rent} 灵石；待付房租 {session.RentDebt}。\n每 {session.Catalog.rentPeriod} 天收租，下期约涨5%；只在睡觉时结算，翻阅不扣款。未来金额为按当前租金推算。";
             previous.interactable=firstDay>1;save.interactable=load.interactable=session.Phase==DayPhase.Preparation;
-            message.text=shop.CalendarMessage??"点击持续条查看完整名称与效果；事件较多时可在日期区域滚动查看。绿色生效中，蓝色未开始，灰色已结束。";
+            message.text=shop.CalendarMessage??"行情在开始当天公开完整持续时间。点击持续条查看详情；可滚动查看。绿色生效中，灰色已结束。";
             foreach(Transform child in rows) {child.gameObject.SetActive(false);Destroy(child.gameObject);}
-            var segments=session.Calendar.Segments(firstDay);
+            var segments=session.Calendar.Segments(firstDay,session.Day);
             float top=0;
             for(int week=0;week<2;week++)
             {
@@ -85,20 +85,20 @@ namespace XiuXianShop
                     string name=e.title.Length>9*s.Days?e.title.Substring(0,Math.Max(3,9*s.Days-1))+"…":e.title;
                     var b=Button(rows,$"MarketBar_{e.id}_{week}",s.Column*198+4,top+68+s.Lane*36,s.Days*198-12,30,
                         (e.startDay<firstDay+week*7?"‹ ":"")+name+(e.endDay>firstDay+week*7+6?" ›":""),()=>SelectEvent(e.id));
-                    b.targetGraphic.color=e.ActiveOn(session.Day)?new Color(.23f,.40f,.29f):session.Day<e.startDay?new Color(.19f,.30f,.40f):new Color(.26f,.27f,.28f);
+                    b.targetGraphic.color=e.ActiveOn(session.Day)?new Color(.23f,.40f,.29f):new Color(.26f,.27f,.28f);
                 }
                 top+=height+18;
             }
             rows.sizeDelta=new Vector2(1388,Math.Max(390,top));
-            var visible=session.Calendar.Between(firstDay,firstDay+13);
+            var visible=session.Calendar.VisibleBetween(firstDay,firstDay+13,session.Day);
             if(!visible.Any(e=>e.id==selectedEventId))selectedEventId=visible.FirstOrDefault(e=>e.ActiveOn(session.Day))?.id??visible.FirstOrDefault()?.id;
             SelectEvent(selectedEventId);
         }
         void SelectEvent(string id)
         {
             selectedEventId=id;
-            var e=shop.Session.Calendar.Between(firstDay,firstDay+13).FirstOrDefault(x=>x.id==id);
-            if(e==null){details.text="这两周暂无市场事件。日期只随睡觉推进，浏览日历不会改变行情。";return;}
+            var e=shop.Session.Calendar.VisibleBetween(firstDay,firstDay+13,shop.Session.Day).FirstOrDefault(x=>x.id==id);
+            if(e==null){details.text="这两周暂无已公开行情；行情到开始当天才会公布。日期只随睡觉推进，浏览日历不会改变行情。";return;}
             var t=e.effect;
             string direction=t.playerBuys && t.playerSells?"玩家买入与出售":t.playerBuys?"玩家买入":"玩家出售";
             details.text=$"{e.title}  ·  {e.StatusOn(shop.Session.Day)}\n第 {e.startDay}–{e.endDay} 天（含首尾，共 {e.Duration} 天）  |  {ShopCatalog.CategoryName(t.category)}  |  {direction} {t.percent*100:+0.##;-0.##;0}%\n{e.description}\n价格标签与其他有效修正相加；未来不生效，结束后自动失效。";

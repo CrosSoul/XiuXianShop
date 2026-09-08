@@ -20,6 +20,7 @@ namespace XiuXianShop
         public string PreviewMessage { get; private set; }
         Font font;
         public ShopCalendarView CalendarView { get; private set; }
+        public ShopNegotiationView NegotiationView { get; private set; }
         public string CalendarMessage { get; private set; }
         public string SavePath { get; set; }
         RectTransform content, ghost, preview;
@@ -63,6 +64,11 @@ namespace XiuXianShop
             if(CalendarView!=null && CalendarView.IsOpen)
             {
                 if(keyboard.escapeKey.wasPressedThisFrame)CalendarView.Close();
+                return;
+            }
+            if(NegotiationView!=null && NegotiationView.IsOpen)
+            {
+                if(keyboard.escapeKey.wasPressedThisFrame)NegotiationView.Close();
                 return;
             }
             if(keyboard.rKey.wasPressedThisFrame) RotateSelected();
@@ -115,13 +121,15 @@ namespace XiuXianShop
             cancelButton=MakeButton("CancelDrag",730,466,232,42,"取消拖动 Esc",CancelDrag);
             Label(content,"OwnershipLegend",730,521,232,34,"己：自有   客：未付款",16,muted);
 
-            Card("TradeCard",1004,112,572,456,panel);
-            tradeHeading=Label(content,"TradeHeading",1024,129,532,34,"本次交易",23,gold);
-            tradeDetails=ScrollableText("TradeDetails",1024,175,530,255);
-            tradeStatus=Label(content,"TradeStatus",1024,441,532,59,"",17,textColor);
-            acceptButton=MakeButton("AcceptTrade",1024,511,260,42,"确认交易",()=>Run(()=>Session.AcceptTrade()),true);
-            rejectButton=MakeButton("RejectTrade",1296,511,260,42,"拒绝 / 不成交",()=>Run(()=>Session.RejectTrade()));
-            sleepButton=MakeButton("Sleep",1024,511,532,42,"结算完毕 · 睡觉进入下一天",()=>Run(()=>Session.Sleep()),true);
+            CreateGrid(ContainerId.CustomerCounter,1004,112,572,246,1026,168,44,"顾客柜台 / 来货");
+            Label(content,"CustomerGoodsHint",1270,174,280,150,"蓝框是顾客来货。\n拖入谈判柜台提出买入。\n\n确认购买前不能移入仓库或展示柜。",18,muted);
+            Card("TradeCard",1004,370,572,198,panel);
+            tradeHeading=Label(content,"TradeHeading",1024,379,532,29,"本次交易",22,gold);
+            tradeDetails=ScrollableText("TradeDetails",1024,412,530,56);
+            tradeStatus=Label(content,"TradeStatus",1024,475,532,39,"",16,textColor);
+            acceptButton=MakeButton("NegotiationOpen",1024,519,260,36,"打开谈判",()=>NegotiationView.Open(),true);
+            rejectButton=MakeButton("RejectTrade",1296,519,260,36,"拒绝 / 不成交",()=>Run(()=>Session.RejectTrade()));
+            sleepButton=MakeButton("Sleep",1024,519,532,36,"结算完毕 · 睡觉进入下一天",()=>Run(()=>Session.Sleep()),true);
 
             notice=Label(content,"Notice",40,577,1516,24,"",16,gold);
             CreateGrid(ContainerId.Storage,24,618,756,358,44,663,43,"库存 / 自由整理");
@@ -135,6 +143,8 @@ namespace XiuXianShop
             craftButton=MakeButton("Craft",1300,919,254,43,"炼制回气丹",()=>Run(()=>Session.Craft()));
             var calendarObject=new GameObject("CalendarOverlay",typeof(RectTransform),typeof(ShopCalendarView));
             calendarObject.transform.SetParent(content,false);CalendarView=calendarObject.GetComponent<ShopCalendarView>();CalendarView.Initialize(this,font);
+            var negotiationObject=new GameObject("NegotiationOverlay",typeof(RectTransform),typeof(ShopNegotiationView));
+            negotiationObject.transform.SetParent(content,false);NegotiationView=negotiationObject.GetComponent<ShopNegotiationView>();NegotiationView.Initialize(this,font);
         }
 
         Text ScrollableText(string name,float x,float y,float width,float height)
@@ -206,7 +216,7 @@ namespace XiuXianShop
             rent.text=$"下次房租：第 {Session.NextRentDay} 天夜间 / {Session.Rent} 灵石\n待付房租 {Session.RentDebt}  ·  每 7 天结算，下期约涨 5%";
             foreach(var pair in gridTitles)
             {
-                string name=pair.Key==ContainerId.Storage?"背包 / 仓库":pair.Key==ContainerId.Display?"今日展示柜":"谈判柜台";
+                string name=pair.Key==ContainerId.Storage?"背包 / 仓库":pair.Key==ContainerId.Display?"今日展示柜":pair.Key==ContainerId.CustomerCounter?"顾客柜台 / 来货":"谈判柜台";
                 var size=ShopSession.Size(pair.Key); pair.Value.text=$"{name}  {Session.Occupied(pair.Key)}/{size.x*size.y}";
             }
             var selected=Session.Find(selectedId);
@@ -233,17 +243,17 @@ namespace XiuXianShop
             else
             {
                 bool buying=offer.Direction==TradeDirection.CustomerSells;
-                customerTitle.text=$"{offer.CustomerName} · {(buying?"卖家 / 你收购":"买家 / 你出售")}";
+                customerTitle.text=$"{offer.CustomerName} · {(buying?"携货求购":"求购商品")}";
                 string reason=buying?(attraction.HasAdvertisement?$"收购牌 · {attraction.SupplierDescription}":"自然到访"):(attraction.BuyerCategory==ItemCategory.Unclassified?"自然到访":$"展示柜 · {preferredCategory}");
-                customerDetails.text=buying?$"向你出售：{offer.SupplierItem.Definition.title}\n你的可用资金：{Session.Money} 灵石\n吸引原因：{reason}":$"想要：{ShopCatalog.CategoryName(offer.RequestedCategory)} · 剩余资金：{offer.RemainingBudget}\n总价值：{total} 灵石\n吸引原因：{reason}";
-                var basket=buying?new[]{offer.SupplierItem}:Session.In(ContainerId.Counter).Where(i=>i.Owner==ItemOwner.Player).ToArray();
+                customerDetails.text=$"想要：{ShopCatalog.CategoryName(offer.RequestedCategory)} · 剩余资金：{offer.RemainingBudget}\n来货 {offer.SupplierItems.Count(i=>i.ForSale)} 件 · 总价值：{total} 灵石\n吸引原因：{reason}";
+                var basket=buying?offer.SupplierItems.Where(i=>i.ForSale).ToArray():Session.In(ContainerId.Counter).Where(i=>i.Owner==ItemOwner.Player).ToArray();
                 tradeDetails.text=string.Join("\n\n",basket.Select(i=>{var q=Session.Quote(i);return $"{i.Definition.title} × 1    报价 {q.Amount} 灵石\n基础 {q.BaseValue} · {q.Modifiers}";}));
                 if(basket.Length==0) tradeDetails.text="谈判柜台为空，拖入商品开始报价。";
                 tradeDetails.text+=$"\n\n合计 {basket.Length} 件 / {total} 灵石";
             }
             tradeStatus.text=closed?"收支已核对，可继续整理后进入下一天。":offer==null?tradeReason:$"本次总价 {total} 灵石\n{tradeReason}";
             tradeStatus.color=canAccept?new Color(.54f,.85f,.65f):gold;
-            SetButtonTitle(acceptButton,offer!=null && offer.Direction==TradeDirection.CustomerSells?$"确认收购  −{total}":offer!=null?$"确认出售  +{total}":"确认交易");
+            SetButtonTitle(acceptButton,"打开谈判 / 查看报价");
             SetButtonTitle(nextButton,offer==null?"呼叫下一位顾客":"送别并接待下一位");
             acceptButton.gameObject.SetActive(!closed);rejectButton.gameObject.SetActive(!closed);sleepButton.gameObject.SetActive(closed);
             furnaceText.text=$"丹炉（保留功能） · 凝气草 {Count(catalog.herbId)} / 灵露 {Count(catalog.dewId)}\n1 草 + 1 露 → 1 丹";
@@ -259,12 +269,13 @@ namespace XiuXianShop
             nextButton.interactable=Session.Phase==DayPhase.Open && (offer!=null || Session.RemainingCustomers>0);
             endButton.interactable=Session.Phase==DayPhase.Open;
             sleepButton.interactable=Session.Phase==DayPhase.Closed;
-            stageButton.interactable=offer!=null && offer.Direction==TradeDirection.CustomerBuys;
-            acceptButton.interactable=canAccept;
+            stageButton.interactable=offer!=null;
+            acceptButton.interactable=offer!=null;
             rejectButton.interactable=offer!=null;
             rotateButton.interactable=flipButton.interactable=selected!=null;
             cancelButton.interactable=IsDragging;
             if(CalendarView!=null)CalendarView.Refresh();
+            if(NegotiationView!=null)NegotiationView.Refresh();
         }
         string ItemDescription(GridItem item)
         {
@@ -285,7 +296,7 @@ namespace XiuXianShop
         public void StartVerificationSession(ShopCatalog configuration,int seed,MarketCalendar calendar=null)
         {
             CancelDrag();catalog=configuration;Session=new ShopSession(catalog,customerSeed:seed,calendar:calendar);
-            CalendarMessage=null;CalendarView.Close();
+            CalendarMessage=null;CalendarView.Close();NegotiationView.Close();
             selectedId=0;localNotice=null;Refresh();
         }
 

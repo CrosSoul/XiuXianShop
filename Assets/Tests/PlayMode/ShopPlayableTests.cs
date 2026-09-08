@@ -12,7 +12,7 @@ using UnityEngine.TestTools;
 
 namespace XiuXianShop.Tests
 {
-    public sealed class ShopPlayableTests
+    public sealed partial class ShopPlayableTests
     {
         ShopPrototype shop;
         Mouse mouse;
@@ -195,19 +195,23 @@ namespace XiuXianShop.Tests
             Assert.That(CalendarText("CalendarHeading"),Does.Contain("今天：第 6 天"));
             var markers=shop.GetComponentsInChildren<UnityEngine.UI.Text>().Where(t=>t.name=="RentMarker").Select(t=>t.text).ToArray();
             CollectionAssert.AreEquivalent(new[]{"收租 20 灵石","收租 21 灵石"},markers);
+            Assert.That(shop.GetComponentsInChildren<UnityEngine.UI.Button>().Any(b=>b.name.Contains("example-rise") || b.name.Contains("example-fall")),Is.False);
+            Assert.That(CalendarText("CalendarEventDetails"),Does.Not.Contain("丹药集中到货"));
+            while(shop.Session.Day<8){shop.Session.BeginBusiness();shop.Session.EndBusiness();shop.Session.Sleep();}
+            shop.Refresh();yield return null;yield return null;
             var a=(RectTransform)shop.FindButton("MarketBar_example-rise_1").transform;
             var b=(RectTransform)shop.FindButton("MarketBar_example-fall_1").transform;
             Assert.That(a.anchoredPosition.y,Is.Not.EqualTo(b.anchoredPosition.y));
             Assert.That(a.sizeDelta.x,Is.EqualTo(2*198-12));
             yield return Click("MarketBar_example-fall_1");
             Assert.That(CalendarText("CalendarEventDetails"),Does.Contain("丹药集中到货与集市临时让利"));
-            Assert.That(CalendarText("CalendarEventDetails"),Does.Contain("未开始"));Assert.That(CalendarText("CalendarEventDetails"),Does.Contain("-10%"));
+            Assert.That(CalendarText("CalendarEventDetails"),Does.Contain("生效中"));Assert.That(CalendarText("CalendarEventDetails"),Does.Contain("-10%"));
             int rotation=item.Rotation;yield return Key(UnityEngine.InputSystem.Key.R);Assert.That(item.Rotation,Is.EqualTo(rotation));
             yield return Click("BeginBusiness");Assert.That(shop.Session.Phase,Is.EqualTo(DayPhase.Preparation),"Modal must intercept clicks on the underlying business button.");
             yield return Click("CalendarNext");Assert.That(shop.CalendarView.FirstDay,Is.EqualTo(15));
             yield return Click("CalendarPrevious");Assert.That(shop.CalendarView.FirstDay,Is.EqualTo(1));
-            yield return Click("CalendarToday");Assert.That(shop.CalendarView.FirstDay,Is.EqualTo(1));
-            Assert.That(shop.Session.Day,Is.EqualTo(6));Assert.That(shop.Session.Money,Is.EqualTo(120));
+            yield return Click("CalendarToday");Assert.That(shop.CalendarView.FirstDay,Is.EqualTo(8));
+            Assert.That(shop.Session.Day,Is.EqualTo(8));Assert.That(shop.Session.Money,Is.EqualTo(100));
             yield return Key(UnityEngine.InputSystem.Key.Escape);Assert.That(shop.CalendarView.IsOpen,Is.False);
             yield return Click("CalendarOpen");yield return Click("CalendarClose");Assert.That(shop.CalendarView.IsOpen,Is.False);
             LogAssert.NoUnexpectedReceived();
@@ -262,6 +266,8 @@ namespace XiuXianShop.Tests
             var source=state.events.First(e=>e.id=="example-rise");
             state.events=Enumerable.Range(0,5).Select(i=>{var e=source.Copy();e.id="crowded-"+i;e.title="重叠事件"+i;return e;}).ToArray();
             shop.StartVerificationSession(testCatalog,17,new MarketCalendar(state));
+            while(shop.Session.Day<7){shop.Session.BeginBusiness();shop.Session.EndBusiness();shop.Session.Sleep();}
+            shop.Refresh();yield return null;
             yield return Click("CalendarOpen");
             var viewport=shop.GetComponentsInChildren<UnityEngine.UI.ScrollRect>().Single(s=>s.name=="CalendarViewport");
             Assert.That(viewport.content.rect.height,Is.GreaterThan(viewport.viewport.rect.height));

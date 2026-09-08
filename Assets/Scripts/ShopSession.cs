@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace XiuXianShop
 {
-    public enum ContainerId { Storage, Display, Counter }
+    public enum ContainerId { Storage, Display, Counter, CustomerCounter }
     public enum DayPhase { Preparation, Open, Closed }
     public enum ItemOwner { Player, Customer }
     public enum TradeDirection { CustomerBuys, CustomerSells }
@@ -21,6 +21,7 @@ namespace XiuXianShop
         public int Rotation { get; internal set; }
         public bool Flipped { get; internal set; }
         public int? PurchaseValue { get; internal set; }
+        public bool ForSale => Owner==ItemOwner.Customer;
         public Vector2Int[] Cells => Definition.Shape(Rotation, Flipped);
     }
 
@@ -28,9 +29,11 @@ namespace XiuXianShop
     {
         public TradeDirection Direction { get; internal set; }
         public string CustomerName { get; internal set; }
-        // ItemId/Price are only used by suppliers. Buyers request a category, never an instance ID.
-        public int ItemId { get; internal set; }
-        public GridItem SupplierItem { get; internal set; }
+        // Compatibility accessors for the first remaining supply; direction is an arrival hint,
+        // never a restriction on which side of a mixed transaction the customer can use.
+        public IReadOnlyList<GridItem> SupplierItems { get; internal set; } = Array.Empty<GridItem>();
+        public GridItem SupplierItem => SupplierItems.FirstOrDefault(i=>i.ForSale);
+        public int ItemId => SupplierItem?.Id??0;
         internal Func<int> CurrentPrice;
         public int Price => CurrentPrice?.Invoke() ?? 0;
         public ItemCategory RequestedCategory { get; internal set; }
@@ -62,8 +65,8 @@ namespace XiuXianShop
         int customerDraws;
         readonly List<GridItem> items = new List<GridItem>();
         readonly Dictionary<string, PriceTag> priceTags = new Dictionary<string, PriceTag>();
-        readonly Queue<(TradeDirection direction, string definitionId, ItemCategory category, int budget)> queue
-            = new Queue<(TradeDirection,string,ItemCategory,int)>();
+        readonly Queue<(TradeDirection direction, string[] definitionIds, ItemCategory category, int budget)> queue
+            = new Queue<(TradeDirection,string[],ItemCategory,int)>();
         int nextId = 1;
         public IReadOnlyList<GridItem> Items => items;
         public ShopCatalog Catalog => catalog;
@@ -214,7 +217,8 @@ namespace XiuXianShop
             var item=Find(id);
             reason="";
             if (item==null) { reason="物品已不在这里。"; return false; }
-            if (item.Owner==ItemOwner.Customer && target!=ContainerId.Counter) { reason="这是顾客的货物；确认收购后才属于你。"; return false; }
+            if (item.ForSale && target!=ContainerId.Counter && target!=ContainerId.CustomerCounter) { reason="这是顾客的货物；确认收购后才属于你。"; return false; }
+            if (!item.ForSale && target==ContainerId.CustomerCounter) { reason="顾客柜台仅展示顾客来货；自有物品请放在仓库、展示柜或谈判柜台。"; return false; }
             if (!Fits(item,target,x,y,rotation,flipped)) { reason="放不下：不能越界，也不能覆盖其他物品。"; return false; }
             return true;
         }
@@ -223,7 +227,7 @@ namespace XiuXianShop
         {
             if (!CanMove(id,target,x,y,rotation,flipped,out string reason)) return Fail(reason);
             var item=Find(id); Place(item,target,x,y,rotation,flipped);
-            TryPlaceSupplierItem();
+            TryPlaceSupplierItems();
             return Success($"已摆放 {item.Definition.title}。" );
         }
         static void Place(GridItem item, ContainerId target, int x, int y, int rotation, bool flipped)
@@ -272,17 +276,18 @@ namespace XiuXianShop
             TodayAttraction=attraction;
             for(int n=0;n<DailyCustomerCount;n++)
             {
+                var category=attraction.BuyerCategory==ItemCategory.Unclassified?categories[DrawCustomerNumber(0,categories.Length)]:attraction.BuyerCategory;
+                int budget=DrawCustomerNumber(attraction.MinimumBuyerBudget,attraction.MaximumBuyerBudget+1);
                 if(DrawCustomerChance()<attraction.SupplierChance)
                 {
-                    var supply=attraction.Supplies[DrawCustomerNumber(0,attraction.Supplies.Length)];
-                    queue.Enqueue((TradeDirection.CustomerSells,supply.id,ItemCategory.Unclassified,0));
+                    // Two goods per supplying visitor is a temporary demo convention, not a balance rule.
+                    var supplies=Enumerable.Range(0,2).Select(_=>attraction.Supplies[DrawCustomerNumber(0,attraction.Supplies.Length)].id).ToArray();
+                    queue.Enqueue((TradeDirection.CustomerSells,supplies,category,budget));
                     SuppliersToday++;
                 }
                 else
                 {
-                    var category=attraction.BuyerCategory==ItemCategory.Unclassified?categories[DrawCustomerNumber(0,categories.Length)]:attraction.BuyerCategory;
-                    int budget=DrawCustomerNumber(attraction.MinimumBuyerBudget,attraction.MaximumBuyerBudget+1);
-                    queue.Enqueue((TradeDirection.CustomerBuys,null,category,budget));
+                    queue.Enqueue((TradeDirection.CustomerBuys,Array.Empty<string>(),category,budget));
                     BuyersToday++;
                 }
             }
@@ -296,32 +301,26 @@ namespace XiuXianShop
             // Departure is explicit, even after a successful sale or with an unfinished basket.
             if (Offer!=null) { LastCustomerResult="已主动送别上一位顾客。"; CancelOffer(); ServedToday++; }
             if (queue.Count==0) return Success("今日顾客已接待完。可以结束营业，炼丹整理，再睡觉。" );
-            var request=queue.Peek();
-            GridItem item=null;
-            if (request.direction==TradeDirection.CustomerSells)
-            {
-                item=NewItem(catalog.Find(request.definitionId),ItemOwner.Customer);
-            }
-            queue.Dequeue();
-            Offer=new TradeOffer{Direction=request.direction,ItemId=item?.Id??0,SupplierItem=item,CurrentPrice=()=>item==null?0:Quote(item.Definition,TradeDirection.CustomerSells).Amount,
+            var request=queue.Dequeue();
+            Offer=new TradeOffer{Direction=request.direction, SupplierItems=request.definitionIds.Select(id=>NewItem(catalog.Find(id),ItemOwner.Customer)).ToArray(),
                 CustomerName=request.direction==TradeDirection.CustomerSells?"采药客 · 阿青":"散修 · 云生",
                 RequestedCategory=request.category,RemainingBudget=request.budget};
-            TryPlaceSupplierItem();
-            if(item!=null && Find(item.Id)==null) return Success("卖家正在等待柜台空间；可以先腾出位置，也可以主动接待下一位。" );
-            return Success(request.direction==TradeDirection.CustomerSells ? "供货已上柜台。顾客物品确认收购后才属于你。" : $"顾客求购{ShopCatalog.CategoryName(request.category)}，预算 {request.budget}。可多件或分次出售，随时接待下一位。" );
+            var current=Offer;current.CurrentPrice=()=>current.SupplierItem==null?0:Quote(current.SupplierItem).Amount;
+            TryPlaceSupplierItems();
+            return Success($"顾客求购{ShopCatalog.CategoryName(request.category)}，预算 {request.budget}。来货在顾客柜台，确认前仍属顾客；可继续交易或随时下一位。" );
         }
 
-        void TryPlaceSupplierItem()
+        void TryPlaceSupplierItems()
         {
-            var item=Offer?.SupplierItem;
-            if(item==null || Find(item.Id)!=null) return;
-            if(FindSpace(item,ContainerId.Counter,out int x,out int y))
-            { Place(item,ContainerId.Counter,x,y,0,false);items.Add(item); }
+            if(Offer==null)return;
+            foreach(var item in Offer.SupplierItems.Where(i=>i.ForSale && Find(i.Id)==null))
+                if(FindSpace(item,ContainerId.CustomerCounter,out int x,out int y))
+                { Place(item,ContainerId.CustomerCounter,x,y,0,false);items.Add(item); }
         }
 
         public bool StageSale()
         {
-            if (Offer==null || Offer.Direction!=TradeDirection.CustomerBuys) return Fail("当前没有待摆放的出售商品。" );
+            if (Offer==null) return Fail("当前没有待摆放的出售商品。" );
             foreach(var item in items.Where(i=>i.Owner==ItemOwner.Player && i.Container!=ContainerId.Counter && !i.Definition.procurementSign && i.Definition.category==Offer.RequestedCategory))
                 if(FindSpace(item,ContainerId.Counter,out int x,out int y)) return Move(item.Id,ContainerId.Counter,x,y,item.Rotation,item.Flipped);
             return Fail("没有可摆放的同类商品，或柜台空间不足。也可以手动拖入任意物品。" );
@@ -370,9 +369,8 @@ namespace XiuXianShop
             string title=item.Definition.title;
             FindSpace(item,ContainerId.Storage,out int x,out int y);
             Money-=total;ExpensesToday+=total;item.PurchaseValue=total;item.Owner=ItemOwner.Player;Place(item,ContainerId.Storage,x,y,item.Rotation,item.Flipped);Purchases++;
-            Offer=null; ServedToday++;
-            LastCustomerResult=$"收购完成，卖家已离开；支付 {total} 灵石。";
-            return Success($"已收购 {title}，支付 {total} 灵石。供货顾客已离开。" );
+            LastCustomerResult=$"收购完成，支付 {total} 灵石；顾客仍在等待。";
+            return Success($"已收购 {title}，支付 {total} 灵石。可以继续交易或主动下一位。" );
         }
 
         public bool RejectTrade()
@@ -385,8 +383,7 @@ namespace XiuXianShop
         void CancelOffer()
         {
             if(Offer==null) return;
-            var item=Find(Offer.ItemId);
-            if(item!=null && item.Owner==ItemOwner.Customer) items.Remove(item);
+            items.RemoveAll(i=>i.ForSale);
             Offer=null;
         }
         public bool EndBusiness()
@@ -425,7 +422,9 @@ namespace XiuXianShop
             foreach(var item in items)
             {
                 if(!Fits(item,item.Container,item.X,item.Y,item.Rotation,item.Flipped)) return "Invalid grid placement: "+item.Id;
-                if(item.Owner==ItemOwner.Customer && (Offer==null || Offer.ItemId!=item.Id || item.Container!=ContainerId.Counter)) return "Orphaned customer item";
+                if(item.ForSale && (Offer==null || !Offer.SupplierItems.Contains(item) ||
+                    (item.Container!=ContainerId.Counter && item.Container!=ContainerId.CustomerCounter))) return "Orphaned customer item";
+                if(!item.ForSale && item.Container==ContainerId.CustomerCounter)return "Player item on customer counter";
             }
             return null;
         }

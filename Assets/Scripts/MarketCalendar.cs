@@ -84,30 +84,49 @@ namespace XiuXianShop
 
         void EnsureWeek(int week)
         {
-            if(week<1 || !generatedWeeks.Add(week) || fixedSchedule || definitions.Length==0)return;
+            // Generate missing weeks in order so browsing ahead cannot change the schedule.
+            for(int w=1;w<=week;w++)
+                if(generatedWeeks.Add(w) && !fixedSchedule && definitions.Length>0)GenerateWeek(w);
+        }
+        void GenerateWeek(int week)
+        {
             var random=new System.Random(unchecked(seed ^ (week*73856093)));
             int count=random.Next(2,4);
             for(int i=0;i<count;i++)
             {
-                var d=definitions[random.Next(definitions.Length)];
-                int start=(week-1)*7+1+random.Next(7);
-                events.Add(new MarketEvent {id=$"market:{week}:{i}",title=d.title,description=d.description,
-                    startDay=start,endDay=start+random.Next(1,4)-1,effect=d.effect.Copy()});
+                var candidates=new List<MarketEvent>();
+                foreach(var d in definitions)
+                for(int offset=0;offset<7;offset++)
+                for(int duration=1;duration<=3;duration++)
+                {
+                    int start=(week-1)*7+1+offset,end=start+duration-1;
+                    // Stable effect IDs identify the market type, including saved events.
+                    // Ending on day 4 blocks days 5 and 6; the earliest repeat is day 7.
+                    if(events.Any(e=>e.effect.id==d.id && start<=e.endDay+2 && end+2>=e.startDay))continue;
+                    var effect=d.effect.Copy();effect.id=d.id;
+                    candidates.Add(new MarketEvent {id=$"market:{week}:{i}",title=d.title,description=d.description,
+                        startDay=start,endDay=end,effect=effect});
+                }
+                // A small custom event pool may run out: never violate the cooldown to fill a quota.
+                if(candidates.Count==0)break;
+                events.Add(candidates[random.Next(candidates.Count)]);
             }
         }
         public MarketEvent[] Between(int first,int last)
         {
             // Include the previous week: a 3-day event can continue across the boundary.
-            for(int w=Math.Max(1,(first-1)/7);w<=(last-1)/7+1;w++)EnsureWeek(w);
+            EnsureWeek((last-1)/7+1);
             return events.Where(e=>e.startDay<=last && e.endDay>=first).OrderBy(e=>e.startDay).ThenBy(e=>e.id,StringComparer.Ordinal).Select(e=>e.Copy()).ToArray();
         }
         public IEnumerable<PriceTag> ActiveTags(int day) => Between(day,day).Where(e=>e.ActiveOn(day)).Select(e=>
         {
             var tag=e.effect.Copy();tag.id=e.id;tag.title=e.title;return tag;
         });
-        public CalendarEventSegment[] Segments(int firstDay)
+        public MarketEvent[] VisibleBetween(int first,int last,int today)
+            => Between(first,last).Where(e=>e.startDay<=today).ToArray();
+        public CalendarEventSegment[] Segments(int firstDay,int today=int.MaxValue)
         {
-            var visible=Between(firstDay,firstDay+13);
+            var visible=VisibleBetween(firstDay,firstDay+13,today);
             var result=new List<CalendarEventSegment>();
             for(int week=0;week<2;week++)
             {

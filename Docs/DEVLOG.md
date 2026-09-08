@@ -2,6 +2,18 @@
 
 按任务记录日期、范围、实际改动、验证和未完成内容。不将计划功能写成已实现功能。
 
+## 2026-09-09 — DP-17 初步验收反馈：行情冷却与当天公开
+
+- 用户确认 calendar v1 运行正常、初步验收通过，并明确不再反复测试。当前 Git 基线为 `d36ca8f calendar v1`；该提交不是本轮 Codex 创建。本轮只落实两项反馈及相关文档，未提交或推送。
+- MarketCalendar 按稳定行情类型 ID 排除持续期间及结束后两个完整日的重复候选，最早再次开始日为 `上次结束日 + 3`。缺失周按时间顺序生成，翻页顺序不改变安排，保持已有存档事件；旧存档中的旧规则安排不追溯删除。自定义池不足时优先遵守冷却，不强行凑数。
+- ShopCalendarView 的持续条、默认选中及详情统一过滤 `startDay <= today`；开始当天显示完整持续时间，结束后保留历史，未公开事件不生成 UI 行或提前泄露标题。未修改报价公式、房租、客流、场景、Prefab、配置资产、Package 或 Project Settings。
+- 新增两项 `CalendarFeedback` Edit Mode 回归用例；现有 Play Mode 测试改为先检查未公开，再推进至第 8 天检查重叠条，并更新拥挤布局夹具日期。按用户要求没有重跑整套回归。旧版本已有 Edit Mode 67/67、Play Mode 13/13 结果仅作为历史证据，不宣称覆盖本轮反馈。
+- `git diff --check` 通过。Unity MCP 最近成功读取：Editor ready、Play stopped、compiling=false、domainReload=false（heartbeat 2026-09-08 17:40:54 UTC）；Console Error/Exception 共 3 条，Warning 0。三条均发生于 17:27:13 UTC 的旧测试执行：Play 中 SaveModifiedSceneTask 抛异常，后续 ExitPlayModeTask 与测试运行器报错。未清空日志，不能宣称 Error=0。
+- 编译请求曾受自动审批 HTTP 522/超时阻塞；只读确认 Editor stopped、sceneDirty=false 后恢复成功：recompile completed、failed=false、errors=[]。随后仅执行 `CalendarFeedback` 类别的 Edit Mode 两项，**2/2 通过、0 失败，总计 0.6 秒**：`MarketsRevealOnlyOnStartDayWithTheirWholeDurationAndStayVisibleInHistory` 与 `SameMarketTypeLeavesTwoFullDaysAndBrowsingOrderDoesNotReroll`。没有重复执行旧的 67 项或整套 Play Mode；本轮 UI 用例已更新但未重新运行。
+- Jira/Confluence 曾返回 HTTP 522/525，随后连接恢复。GDD 入口已由他人拆为系统子页，本轮保留该结构；最新报价页 https://zzrzzrzzr11.atlassian.net/wiki/spaces/D/pages/1310722 从 v1 更新至 **v2**，仅追加用户确认的“两天空档、开始当天公开”规则。DP-17 描述已同步取消未来行情可提前查看的旧约定，保留其他内容和真实负责人。
+- 本轮交接为 [DP17_CALENDAR.md](DP17_CALENDAR.md)，并同步 GAME_DESIGN、DEV_PLAN、FIRST_PLAYABLE_GUIDE 与原任务书的未来显示规则。历史图片不再作为当前公开时间证据。无需手动配置资产，编译及两项针对性验证阻塞已经解决；未声称本轮修改已获用户人工验收。
+- 最终 MCP 复查：Editor **ready**、Play stopped、compiling=false、domainReload=false（17:53:08 UTC heartbeat）；当前捕获 Console **Error=0、Warning=0**。未调用清空日志；以上当前计数不否定先前记录的三条测试运行器历史错误。DP-17 交付评论 10001 写入成功，状态已流转 **Ready for Review**，未标 Done。
+
 ## 2026-09-08 — Jira / Confluence 日常工作流 Skill
 
 - 按用户明确要求执行 codex_jira_confluence_workflow_skill.md，仅安装流程与验证读取；初始 main / `a8653361296a8f122ccedb700bcb86ec34568107`，工作区干净。没有执行 DP-14/DP-16，没有改游戏代码或资源。

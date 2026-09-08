@@ -43,6 +43,40 @@ namespace XiuXianShop.Tests
             Assert.That(JsonUtility.ToJson(new MarketCalendarState{events=restored.Between(561,700)}),
                 Is.EqualTo(JsonUtility.ToJson(new MarketCalendarState{events=calendar.Between(561,700)})));
         }
+        [Test,Category("CalendarFeedback")] public void SameMarketTypeLeavesTwoFullDaysAndBrowsingOrderDoesNotReroll()
+        {
+            var definitions=MarketCalendar.PrototypeDefinitions();
+            var calendar=new MarketCalendar(definitions,19);
+            var events=calendar.Between(1,560);
+            foreach(var group in events.GroupBy(e=>e.effect.id))
+            {
+                var ordered=group.OrderBy(e=>e.startDay).ToArray();
+                for(int i=1;i<ordered.Length;i++)
+                    Assert.That(ordered[i].startDay,Is.GreaterThanOrEqualTo(ordered[i-1].endDay+3));
+            }
+            var browsed=new MarketCalendar(definitions,19);browsed.Between(547,560);browsed.Between(1,14);
+            Assert.That(JsonUtility.ToJson(browsed.Capture()),Is.EqualTo(JsonUtility.ToJson(calendar.Capture())));
+            var restored=new MarketCalendar(calendar.Capture());
+            CollectionAssert.AreEqual(calendar.Between(561,574).Select(e=>$"{e.id}:{e.effect.id}:{e.startDay}:{e.endDay}"),
+                restored.Between(561,574).Select(e=>$"{e.id}:{e.effect.id}:{e.startDay}:{e.endDay}"));
+            for(int week=0;week<80;week++)Assert.That(events.Count(e=>(e.startDay-1)/7==week),Is.InRange(2,3));
+        }
+        [Test,Category("CalendarFeedback")] public void MarketsRevealOnlyOnStartDayWithTheirWholeDurationAndStayVisibleInHistory()
+        {
+            var calendar=MarketCalendar.OverlapExample();
+            string before=JsonUtility.ToJson(calendar.Capture());
+            Assert.That(calendar.VisibleBetween(1,14,1),Is.Empty);
+            Assert.That(calendar.Segments(1,6).Any(s=>s.Event.id=="example-rise"),Is.False);
+            var revealed=calendar.Segments(1,7).Where(s=>s.Event.id=="example-rise").ToArray();
+            Assert.That(revealed.Sum(s=>s.Days),Is.EqualTo(3));
+            Assert.That(revealed.Length,Is.EqualTo(2),"Reveal the full cross-week bar on its start day.");
+            Assert.That(calendar.VisibleBetween(1,14,7).Any(e=>e.id=="example-fall"),Is.False);
+            Assert.That(calendar.VisibleBetween(1,14,8).Any(e=>e.id=="example-fall"));
+            Assert.That(calendar.VisibleBetween(1,14,10).Single(e=>e.id=="example-rise").StatusOn(10),Is.EqualTo("已结束"));
+            Assert.That(new MarketCalendar(calendar.Capture()).VisibleBetween(1,14,6).Any(e=>e.id=="example-rise"),Is.False);
+            CollectionAssert.AreEqual(JsonUtility.FromJson<MarketCalendarState>(before).events.Select(e=>JsonUtility.ToJson(e)),
+                calendar.Capture().events.Select(e=>JsonUtility.ToJson(e)));
+        }
         [Test] public void CrossWeekOverlapAndClippingNeverShareOccupiedLane()
         {
             var c=MarketCalendar.OverlapExample();

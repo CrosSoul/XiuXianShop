@@ -17,6 +17,29 @@ namespace XiuXianShop.Tests
         }
         [TearDown] public void Cleanup()=>UnityEngine.Object.DestroyImmediate(catalog);
         ShopSession Session()=>new ShopSession(catalog,customerSeed:17,calendar:MarketCalendar.OverlapExample());
+        [TestCase(5,10,20,-10)][TestCase(6,10,24,-14)][TestCase(7,12,20,-8)]
+        [TestCase(8,11,18,-7)][TestCase(10,10,20,-10)]
+        [Category("DP22")]
+        public void MixedTradeUsesOnlyActiveMarketEffectsAndPreservesHistory(int day,int sale,int buy,int net)
+        {
+            catalog.retailMarkup=0;catalog.Find("pill").baseValue=10;
+            catalog.baseSupplierChance=1;
+            foreach(var d in catalog.items)d.supplierAvailable=d.id=="pill";
+            var s=Session();Advance(s,day);
+            var own=s.Items[0];Assert.That(s.Move(own.Id,ContainerId.Display,0,0,0,false));
+            Assert.That(s.BeginBusiness());var offer=s.Offer;var goods=offer.SupplierItems.ToArray();
+            Assert.That(s.Move(own.Id,ContainerId.Counter,0,0,0,false));
+            var quote=s.PreviewTrade(true);
+            Assert.That(quote.CanConfirm,Is.True,quote.Reason);
+            Assert.That(quote.SaleTotal,Is.EqualTo(sale));Assert.That(quote.PurchaseTotal,Is.EqualTo(buy));
+            Assert.That(quote.Net,Is.EqualTo(net));Assert.That(quote.Lines.Count,Is.EqualTo(3));
+            int money=s.Money,budget=offer.RemainingBudget;
+            Assert.That(s.AcceptTrade(true));Assert.That(s.Money,Is.EqualTo(money+net));
+            Assert.That(offer.RemainingBudget,Is.EqualTo(budget-sale));
+            Assert.That(goods.All(i=>i.Owner==ItemOwner.Player && i.PurchaseValue==buy/2));
+            Assert.That(s.EndBusiness());Assert.That(s.Sleep());
+            Assert.That(goods.All(i=>i.PurchaseValue==buy/2));Assert.That(s.ValidateState(),Is.Null);
+        }
         static void Advance(ShopSession session,int day)
         {
             while(session.Day<day)
@@ -121,7 +144,8 @@ namespace XiuXianShop.Tests
         {
             catalog.baseSupplierChance=1;foreach(var d in catalog.items)d.supplierAvailable=d.id=="pill";
             var s=Session();Advance(s,6);Assert.That(s.BeginBusiness());Assert.That(s.Offer.Price,Is.EqualTo(24));
-            var bought=s.Offer.SupplierItem;Assert.That(s.AcceptTrade());Assert.That(bought.PurchaseValue,Is.EqualTo(24));
+            var bought=s.Offer.SupplierItem;Assert.That(s.Move(bought.Id,ContainerId.Counter,0,0,0,false));
+            Assert.That(s.AcceptTrade());Assert.That(bought.PurchaseValue,Is.EqualTo(24));
             Assert.That(s.EndBusiness());Assert.That(s.Sleep());Assert.That(s.Day,Is.EqualTo(7));
             string json=s.CaptureSave();var restored=ShopSession.RestoreSave(catalog,json);
             Assert.That(restored.Money,Is.EqualTo(96));Assert.That(restored.Rent,Is.EqualTo(20));Assert.That(restored.Day,Is.EqualTo(7));

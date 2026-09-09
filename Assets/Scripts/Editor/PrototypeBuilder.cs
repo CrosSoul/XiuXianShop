@@ -35,6 +35,26 @@ namespace XiuXianShop.Editor
         }
         [MenuItem("XiuXianShop/Validation/Start Repeatable Trading Day (resets Play session)",true)]
         static bool CanStartVerification()=>EditorApplication.isPlaying && Object.FindFirstObjectByType<ShopPrototype>()!=null;
+        [MenuItem("XiuXianShop/Validation/Start DP18 Mixed Trading Day (resets Play session)")]
+        public static void StartMixedTradingDay()
+        {
+            if(!CanStartVerification())return;
+            StartVerificationDay();
+            verificationCatalog.name="Temporary DP18 mixed trading catalog";
+            verificationCatalog.startingItems=new[]{"pill","pill","pill","pill","pill","jade"};
+            verificationCatalog.Find("pill").baseValue=10;
+            verificationCatalog.Find("herb").baseValue=15;verificationCatalog.Find("dew").baseValue=20;
+            foreach(var item in verificationCatalog.items)item.supplierAvailable=item.id=="herb" || item.id=="dew";
+            verificationCatalog.retailMarkup=0;verificationCatalog.priceTags=System.Array.Empty<PriceTag>();
+            verificationCatalog.baseSupplierChance=1;
+            verificationCatalog.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=60}};
+            var shop=Object.FindFirstObjectByType<ShopPrototype>();
+            // Use an isolated save path so this repeatable fixture cannot overwrite a player's save.
+            shop.StartVerificationSession(verificationCatalog,17);
+            shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP18VerificationSave.json");
+        }
+        [MenuItem("XiuXianShop/Validation/Start DP18 Mixed Trading Day (resets Play session)",true)]
+        static bool CanStartMixedTradingDay()=>CanStartVerification();
         [MenuItem("XiuXianShop/Validation/Toggle Sale Discount -30% (Play session)")]
         public static void ToggleQuoteTest()
         {

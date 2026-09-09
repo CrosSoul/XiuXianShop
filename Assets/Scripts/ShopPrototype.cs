@@ -223,7 +223,7 @@ namespace XiuXianShop
             selection.text=selected==null?"点击物品查看价值、标签与说明。\n仓库中的预估价值等于基础价值；放入谈判柜台后按本次报价显示。":ItemDescription(selected);
             var attraction=Session.Phase==DayPhase.Preparation?Session.PreviewAttraction():Session.TodayAttraction;
             string preferredCategory=attraction.BuyerCategory==ItemCategory.Unclassified?"随机类别":ShopCatalog.CategoryName(attraction.BuyerCategory);
-            displaySummary.text=Session.Phase==DayPhase.Preparation?$"每日 5 位 · 买家 {1-attraction.SupplierChance:P0} / 卖家 {attraction.SupplierChance:P0}\n{preferredCategory} · 资金 {attraction.MinimumBuyerBudget}–{attraction.MaximumBuyerBudget}\n基础价值 {attraction.DisplayValue} · 档位 ≥{attraction.BudgetTierMinimum}":$"今日买家 {Session.BuyersToday} / 卖家 {Session.SuppliersToday}\n已离场 {Session.ServedToday} · 待到访 {Session.RemainingCustomers}\n开门时的展示效果已锁定";
+            displaySummary.text=Session.Phase==DayPhase.Preparation?$"每日 5 位 · 仅求购 {1-attraction.SupplierChance:P0} / 携货求购 {attraction.SupplierChance:P0}\n{preferredCategory} · 资金 {attraction.MinimumBuyerBudget}–{attraction.MaximumBuyerBudget}\n基础价值 {attraction.DisplayValue} · 档位 ≥{attraction.BudgetTierMinimum}":$"今日仅求购 {Session.BuyersToday} / 携货求购 {Session.SuppliersToday}\n已离场 {Session.ServedToday} · 待到访 {Session.RemainingCustomers}\n开门时的展示效果已锁定";
             var offer=Session.Offer;
             bool canAccept=Session.CanAcceptTrade(out int total,out string tradeReason);
             bool closed=Session.Phase==DayPhase.Closed;
@@ -246,10 +246,10 @@ namespace XiuXianShop
                 customerTitle.text=$"{offer.CustomerName} · {(buying?"携货求购":"求购商品")}";
                 string reason=buying?(attraction.HasAdvertisement?$"收购牌 · {attraction.SupplierDescription}":"自然到访"):(attraction.BuyerCategory==ItemCategory.Unclassified?"自然到访":$"展示柜 · {preferredCategory}");
                 customerDetails.text=$"想要：{ShopCatalog.CategoryName(offer.RequestedCategory)} · 剩余资金：{offer.RemainingBudget}\n来货 {offer.SupplierItems.Count(i=>i.ForSale)} 件 · 总价值：{total} 灵石\n吸引原因：{reason}";
-                var basket=buying?offer.SupplierItems.Where(i=>i.ForSale).ToArray():Session.In(ContainerId.Counter).Where(i=>i.Owner==ItemOwner.Player).ToArray();
-                tradeDetails.text=string.Join("\n\n",basket.Select(i=>{var q=Session.Quote(i);return $"{i.Definition.title} × 1    报价 {q.Amount} 灵石\n基础 {q.BaseValue} · {q.Modifiers}";}));
-                if(basket.Length==0) tradeDetails.text="谈判柜台为空，拖入商品开始报价。";
-                tradeDetails.text+=$"\n\n合计 {basket.Length} 件 / {total} 灵石";
+                var quote=Session.PreviewTrade();
+                tradeDetails.text=string.Join("\n\n",quote.Lines.Select(l=>l.Description));
+                if(quote.Lines.Count==0)tradeDetails.text="谈判柜台为空。打开谈判可请求全部来货，或手动选入商品。";
+                tradeDetails.text+=$"\n\n合计 {quote.Lines.Count} 件 / {quote.Net} 灵石";
             }
             tradeStatus.text=closed?"收支已核对，可继续整理后进入下一天。":offer==null?tradeReason:$"本次总价 {total} 灵石\n{tradeReason}";
             tradeStatus.color=canAccept?new Color(.54f,.85f,.65f):gold;
@@ -396,9 +396,16 @@ namespace XiuXianShop
         public void EndItemDrag(Vector2 screen)
         {
             if(!IsDragging)return;
-            if(DropPosition(screen,out var target,out int x,out int y)) {localNotice=null;Session.Move(dragId,target,x,y,dragRotation,dragFlipped);}
+            bool openNegotiation=false;
+            if(DropPosition(screen,out var target,out int x,out int y))
+            {
+                localNotice=null;var item=Session.Find(dragId);
+                bool buying=item.ForSale && item.Container==ContainerId.CustomerCounter && target==ContainerId.Counter;
+                openNegotiation=Session.Move(dragId,target,x,y,dragRotation,dragFlipped) && buying;
+            }
             else localNotice="已返回原位：请将物品放在容器格子内。";
             ClearDrag();Refresh();
+            if(openNegotiation)NegotiationView.Open(false);
         }
         public void CancelDrag() { if(!IsDragging)return;localNotice="已取消拖动，物品保持原位。";ClearDrag();Refresh(); }
         void ClearDrag()

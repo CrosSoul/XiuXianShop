@@ -192,7 +192,7 @@ namespace XiuXianShop
                 effective.Insert(0, new PriceTag {id="retail",title="零售加价",percent=catalog.retailMarkup});
             return new PriceQuote(definition, effective);
         }
-        public PriceQuote Estimate(GridItem item) => item.Container == ContainerId.Counter ? Quote(item) :
+        public PriceQuote Estimate(GridItem item) => item.Container == ContainerId.Counter || item.ForSale ? Quote(item) :
             new PriceQuote(item.Definition, Array.Empty<PriceTag>());
 
         public bool Fits(GridItem item, ContainerId target, int x, int y, int rotation, bool flipped, ISet<int> ignored = null)
@@ -329,48 +329,75 @@ namespace XiuXianShop
         public string CounterSaleSummary => string.Join(" + ", In(ContainerId.Counter).Where(i=>i.Owner==ItemOwner.Player)
             .GroupBy(i=>new {i.Definition.title, Price=Quote(i).Amount}).Select(g=>$"{g.Key.title} {g.Key.Price}×{g.Count()}={g.Key.Price*g.Count()}"));
 
-        public bool CanAcceptTrade(out int total, out string reason)
+        public ShopTradeQuote PreviewTrade(bool requestAll=false)
         {
-            total=0; reason="";
-            if(Phase!=DayPhase.Open || Offer==null) {reason="当前没有可结算的交易。";return false;}
-            if(Offer.Direction==TradeDirection.CustomerSells)
-            {
-                var item=Find(Offer.ItemId);total=Offer.Price;
-                if(item==null) {reason="谈判柜台空间不足：腾出空间后自动摆入，或点击下一位跳过。";return false;}
-                if(item.Owner!=ItemOwner.Customer || item.Container!=ContainerId.Counter) {reason="顾客货物归属不正确。";return false;}
-                if(Money<total) {reason=$"灵石不足：需要 {total}，当前 {Money}。";return false;}
-                if(!FindSpace(item,ContainerId.Storage,out _,out _)) {reason="背包空间不足；先整理或旋转货物，不会扣款。";return false;}
-                reason="可收购：付款后货物进入背包。";return true;
-            }
-            var basket=In(ContainerId.Counter).Where(i=>i.Owner==ItemOwner.Player).ToArray();
-            long sum=basket.Sum(i=>(long)Quote(i).Amount);
-            if(sum>int.MaxValue-Money) {reason="本次金额超出可结算范围。"; return false;}
-            total=(int)sum;
-            if(basket.Length==0) {reason="柜台为空，请摆入要出售的物品。";return false;}
-            if(basket.Any(i=>!IsSaleItem(i.Definition))) {reason="柜台含不可出售的物品，请移出。";return false;}
-            var wrong=basket.FirstOrDefault(i=>i.Definition.category!=Offer.RequestedCategory);
-            if(wrong!=null) {reason=$"类别不符：{wrong.Definition.title}不是{ShopCatalog.CategoryName(Offer.RequestedCategory)}。";return false;}
-            if(total>Offer.RemainingBudget) {reason=$"顾客资金不足：总价 {total}，剩余预算 {Offer.RemainingBudget}。";return false;}
-            reason="交易成立，可确认出售柜台上的全部物品。";return true;
+            var basket=In(ContainerId.Counter).ToList();
+            if(requestAll && !basket.Any(i=>i.ForSale))basket.AddRange(In(ContainerId.CustomerCounter).Where(i=>i.ForSale));
+            var quote=new ShopTradeQuote {Lines=basket.Select(i=>new ShopTradeLine(i,Quote(i))).ToArray()};
+            quote.CanConfirm=ValidateTrade(quote,out string reason);quote.Reason=reason;return quote;
         }
 
-        public bool AcceptTrade()
+        bool ValidateTrade(ShopTradeQuote quote,out string reason)
         {
-            if(!CanAcceptTrade(out int total,out string reason)) return Fail(reason);
-            if(Offer.Direction==TradeDirection.CustomerBuys)
+            reason="当前没有可结算的交易。";
+            if(Phase!=DayPhase.Open || Offer==null)return false;
+            if(quote.Lines.Count==0){reason="柜台为空，请摆入商品或从谈判入口请求买入来货。";return false;}
+            if(quote.Lines.Select(l=>l.Item.Id).Distinct().Count()!=quote.Lines.Count || ValidateState()!=null)
+            {reason="物品位置或所有权无效，本次未成交。";return false;}
+            foreach(var line in quote.Lines)
             {
-                var basket=In(ContainerId.Counter).Where(i=>i.Owner==ItemOwner.Player).ToArray();
-                // Validate the entire basket above, then commit all items and money together.
-                foreach(var sold in basket) items.Remove(sold);
-                Money+=total;IncomeToday+=total;Offer.RemainingBudget-=total;Sales+=basket.Length;
-                return Success($"已出售 {basket.Length} 件，收入 {total}。顾客剩余预算 {Offer.RemainingBudget}，可继续交易或点击下一位。" );
+                var item=line.Item;
+                if(!IsSaleItem(item.Definition)){reason="柜台含不可出售的物品，请移出。";return false;}
+                if(line.Buying && !Offer.SupplierItems.Contains(item)){reason="这件来货不属于当前顾客。";return false;}
+                if(!line.Buying && item.Definition.category!=Offer.RequestedCategory)
+                {reason=$"类别不符：{item.Definition.title}不是{ShopCatalog.CategoryName(Offer.RequestedCategory)}。";return false;}
             }
-            var item=Find(Offer.ItemId);
-            string title=item.Definition.title;
-            FindSpace(item,ContainerId.Storage,out int x,out int y);
-            Money-=total;ExpensesToday+=total;item.PurchaseValue=total;item.Owner=ItemOwner.Player;Place(item,ContainerId.Storage,x,y,item.Rotation,item.Flipped);Purchases++;
-            LastCustomerResult=$"收购完成，支付 {total} 灵石；顾客仍在等待。";
-            return Success($"已收购 {title}，支付 {total} 灵石。可以继续交易或主动下一位。" );
+            if(quote.SaleTotal>Offer.RemainingBudget)
+            {reason=$"顾客资金不足：卖出总价 {quote.SaleTotal}，剩余预算 {Offer.RemainingBudget}。";return false;}
+            if(Money+quote.Net<0){reason=$"灵石不足：净支付 {-quote.Net}，当前 {Money}。";return false;}
+            if(Money+quote.Net>int.MaxValue || quote.SaleTotal>int.MaxValue-IncomeToday || quote.PurchaseTotal>int.MaxValue-ExpensesToday)
+            {reason="本次金额超出可结算范围。";return false;}
+            // Reserve every destination before changing ownership, inventory, or money.
+            var occupied=new HashSet<Vector2Int>(In(ContainerId.Storage).SelectMany(i=>i.Cells.Select(p=>p+new Vector2Int(i.X,i.Y))));
+            var size=Size(ContainerId.Storage);
+            foreach(var line in quote.Lines.Where(l=>l.Buying).OrderByDescending(l=>l.Item.Cells.Length).ThenBy(l=>l.Item.Id))
+            {
+                var item=line.Item;bool found=false;
+                for(int y=0;y<size.y && !found;y++)for(int x=0;x<size.x && !found;x++)
+                {
+                    var cells=item.Cells.Select(p=>p+new Vector2Int(x,y)).ToArray();
+                    if(cells.Any(p=>p.x<0 || p.y<0 || p.x>=size.x || p.y>=size.y || occupied.Contains(p)))continue;
+                    quote.PurchasePositions[item.Id]=new Vector2Int(x,y);occupied.UnionWith(cells);found=true;
+                }
+                if(!found){reason=$"背包空间不足：无法放下 {item.Definition.title}。请关闭后整理或旋转来货，整笔未成交。";return false;}
+            }
+            reason="交易成立；确认后统一收付，买入商品进入背包。";return true;
+        }
+
+        public bool CanAcceptTrade(out int total,out string reason)
+        {
+            var quote=PreviewTrade();total=(int)Math.Max(int.MinValue,Math.Min(int.MaxValue,quote.Net));reason=quote.Reason;return quote.CanConfirm;
+        }
+        public bool AcceptTrade(bool requestAll=false)
+        {
+            var quote=PreviewTrade(requestAll);
+            if(!quote.CanConfirm)return Fail(quote.Reason);
+            foreach(var line in quote.Lines)
+            {
+                var item=line.Item;
+                if(line.Buying)
+                {
+                    var position=quote.PurchasePositions[item.Id];
+                    item.Owner=ItemOwner.Player;item.PurchaseValue=line.Price.Amount;
+                    Place(item,ContainerId.Storage,position.x,position.y,item.Rotation,item.Flipped);Purchases++;
+                }
+                else {item.Owner=ItemOwner.Customer;items.Remove(item);Sales++;}
+            }
+            Money+=(int)quote.Net;IncomeToday+=(int)quote.SaleTotal;ExpensesToday+=(int)quote.PurchaseTotal;
+            Offer.RemainingBudget-=(int)quote.SaleTotal;
+            Offer.SupplierItems=Offer.SupplierItems.Where(i=>i.ForSale).ToArray();
+            LastCustomerResult=$"成交 {quote.Lines.Count} 件，净额 {quote.Net:+0;-0;0}。";
+            return Success($"{LastCustomerResult} 顾客剩余预算 {Offer.RemainingBudget}，可继续交易或主动下一位。");
         }
 
         public bool RejectTrade()

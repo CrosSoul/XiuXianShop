@@ -90,14 +90,19 @@ namespace XiuXianShop.Tests
             Assert.That(s.Move(customer.Id,ContainerId.Storage,5,3,0,false),Is.False);
             Assert.That(Snapshot(s),Is.EqualTo(before));
             Assert.That(s.Move(s.Items.First(i=>i.Definition.id=="jade").Id,ContainerId.Counter,3,2,0,false),Is.True);
-            Assert.That(s.AcceptTrade());Assert.That(s.In(ContainerId.Counter).Single().Definition.id,Is.EqualTo("jade"));Valid(s);
+            Assert.That(s.Move(customer.Id,ContainerId.Counter,0,0,0,false));
+            var jade=s.Items.First(i=>i.Definition.id=="jade");
+            // New mixed rules must validate the player's item too, not silently ignore it.
+            jade.Definition.category=ItemCategory.Unclassified;Assert.That(s.AcceptTrade(),Is.False);
+            Assert.That(s.Move(jade.Id,ContainerId.Storage,3,2,0,false));
+            Assert.That(s.AcceptTrade());Assert.That(customer.Owner,Is.EqualTo(ItemOwner.Player));Valid(s);
         }
 
         [Test] public void InsufficientMoneyCannotConsumeSupplyOrChargeAnything()
         {
             SuppliersOnly();
             catalog.startingMoney=0;var s=Session("sign");Display(s,s.Items[0]);s.BeginBusiness();
-            string before=Snapshot(s);Assert.That(s.AcceptTrade(),Is.False);Assert.That(Snapshot(s),Is.EqualTo(before));
+            string before=Snapshot(s);Assert.That(s.AcceptTrade(true),Is.False);Assert.That(s.Message,Does.Contain("灵石不足"));Assert.That(Snapshot(s),Is.EqualTo(before));
             Assert.That(s.Offer,Is.Not.Null);Valid(s);
         }
 
@@ -109,7 +114,7 @@ namespace XiuXianShop.Tests
             // Rotate the herb to match the vacated sign footprint; the next purchase has no free cell.
             s.BeginBusiness();Assert.That(s.Move(s.Offer.ItemId,ContainerId.Counter,0,0,2,false));Assert.That(s.AcceptTrade(),Is.True,s.Message);s.NextCustomer();
             Assert.That(s.Occupied(ContainerId.Storage),Is.EqualTo(70));
-            string before=Snapshot(s);Assert.That(s.AcceptTrade(),Is.False);Assert.That(Snapshot(s),Is.EqualTo(before));
+            string before=Snapshot(s);Assert.That(s.AcceptTrade(true),Is.False);Assert.That(s.Message,Does.Contain("空间不足"));Assert.That(Snapshot(s),Is.EqualTo(before));
             Assert.That(s.Find(s.Offer.ItemId).Owner,Is.EqualTo(ItemOwner.Customer));Valid(s);
         }
 
@@ -240,9 +245,9 @@ namespace XiuXianShop.Tests
             Assert.That(s.BeginBusiness());
             for(int i=0;i<5;i++)
             {
-                string id=s.Find(s.Offer.ItemId).Definition.id;
-                if(s.Items.Count(item=>item.Owner==ItemOwner.Player && item.Definition.id==id)<2) Assert.That(s.AcceptTrade(),Is.True,s.Message);
-                else Assert.That(s.RejectTrade());
+                foreach(var supply in s.Offer.SupplierItems.ToArray())
+                    if(s.Items.Count(item=>item.Owner==ItemOwner.Player && item.Definition.id==supply.Definition.id)<2)
+                    {Assert.That(s.Move(supply.Id,ContainerId.Counter,0,0,0,false));Assert.That(s.AcceptTrade(),Is.True,s.Message);}
                 if(i<4)Assert.That(s.NextCustomer());
             }
             Assert.That(s.Purchases,Is.EqualTo(4));Assert.That(s.Money,Is.EqualTo(110));

@@ -54,7 +54,7 @@ namespace XiuXianShop.Tests
             foreach(var d in catalog.items)d.supplierAvailable=d.id=="pill";
             var s=new ShopSession(catalog);s.SetPriceTag(Discount(-.2f));Assert.That(s.BeginBusiness());
             var item=s.Offer.SupplierItem;
-            Assert.That(s.Offer.Price,Is.EqualTo(16));Assert.That(s.AcceptTrade());
+            Assert.That(s.Offer.Price,Is.EqualTo(16));Stage(s,item);Assert.That(s.AcceptTrade());
             Assert.That(item.PurchaseValue,Is.EqualTo(16));Assert.That(s.Money,Is.EqualTo(104));
             Assert.That(s.Estimate(item).Amount,Is.EqualTo(20));s.RemovePriceTag("test-market");Stage(s,item);
             Assert.That(s.Estimate(item).Amount,Is.EqualTo(23));Assert.That(item.PurchaseValue,Is.EqualTo(16));
@@ -91,9 +91,10 @@ namespace XiuXianShop.Tests
             var s=new ShopSession(catalog);
             for(int i=0;i<20;i++)Assert.That(s.Move(s.Items[i].Id,ContainerId.Counter,i%5,i/5,0,false));
             Assert.That(s.BeginBusiness());Assert.That(s.Offer,Is.Not.Null);Assert.That(s.RemainingCustomers,Is.EqualTo(4));
-            Assert.That(s.CanAcceptTrade(out _,out string reason),Is.False);Assert.That(reason,Does.Contain("空间不足"));
+            Assert.That(s.In(ContainerId.CustomerCounter).Count(),Is.EqualTo(2));
+            Assert.That(s.CanMove(s.Offer.ItemId,ContainerId.Counter,0,0,0,false,out string reason),Is.False);Assert.That(reason,Does.Contain("放不下"));
             Assert.That(s.NextCustomer());Assert.That(s.RemainingCustomers,Is.EqualTo(3));Assert.That(s.Money,Is.EqualTo(120));
-            Assert.That(s.Items.Count,Is.EqualTo(20));Assert.That(s.ValidateState(),Is.Null);
+            Assert.That(s.Items.Count(i=>i.Owner==ItemOwner.Player),Is.EqualTo(20));Assert.That(s.ValidateState(),Is.Null);
         }
     }
 }

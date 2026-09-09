@@ -30,6 +30,12 @@
 
 自动 Play Mode 使用真实 Input System 鼠标和 UGUI 点击、拖动，包括五人整日、连续交易、净额正负零及取消失败；不等同开发者人工试玩或操作手感验收。Edit Mode 覆盖预算相等/不足、净资金不足、多件空间预留、无部分成交、实例唯一性、保存恢复及行情开始/结束/叠加对混合报价的影响。
 
-当前 Unity Test Framework 在关闭 Domain Reload 后重复进入 Play Mode 时，`PlayerTestAssemblyProvider.ResetStaticsOnLoad` 清空缓存但未将缓存置空，下一次运行可能返回 0 项。已定位源码并通过仅重置会话缓存恢复实际执行，没有修改第三方 Package。0 项不计通过。最终执行统计及运行图片在交付时补入。
+当前 Unity Test Framework 在关闭 Domain Reload 后重复进入 Play Mode 时，`PlayerTestAssemblyProvider.ResetStaticsOnLoad` 清空缓存但未将缓存置空，下一次运行可能返回 0 项。已定位源码并通过仅重置会话缓存恢复实际执行，没有修改第三方 Package。0 项不计通过。
+
+2026-09-09 最终实际结果：Edit Mode **85/85**（1.48 秒），Play Mode **18/18**（32.19 秒），均 0 失败、0 跳过、0 不确定。完整逐项结果见 [editmode.json](Evidence/DP18/editmode.json)、[playmode.json](Evidence/DP18/playmode.json)。此前两项旧 Play 用例因旧流程断言失败，更新为先手动选择来货及新版签名报价后，整组通过。
+
+实际场景截图已逐张查看：[独立柜台](Evidence/DP18/main.png)、[混合报价](Evidence/DP18/mixed.png)、[结算后](Evidence/DP18/settled.png)。截图采用 Play 会话，通过 MCP 调用实际入口和确认回调；测试 JSON 中的 Play 用例另使用真实鼠标、键盘与 UGUI。示例 +10−20−15=−25，资金120→95，预算60→50，买入2件、卖出1件，状态校验通过。
+
+最终 MCP 检查：Editor ready、stopped、无编译或 Domain Reload，Console Error=0、Warning=0（08:11 UTC）。未清空日志；排查期间曾有 MCP eval 超时产生的工具错误，不能将其冒称游戏错误或遗漏历史。场景保存状态将在提交前再次确认。未做 Player 构建、平台测试或开发者人工手感验收。
 
 正式规则入口以 Confluence 当前页面 ID 为准：G-02/G-08 `2293763`、G-05 `1310722`、验收案例 `950291`。本轮未重写正式 GDD，DP-17 保持独立待验收。

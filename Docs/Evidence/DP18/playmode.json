@@ -1,0 +1,139 @@
+{
+  "status": "completed",
+  "duration": 32.19,
+  "summary": {
+    "total": 18,
+    "passed": 18,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.ActualButtonsRunFiveRandomVisitorsAcrossTwoDays",
+      "Status": "Passed",
+      "Duration": 5.4666514,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.BuyerBudgetAndInvalidBasketControlRealConfirmButton",
+      "Status": "Passed",
+      "Duration": 3.0694492,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.CalendarDayChangesRefreshRealPricesBudgetAndSettlement",
+      "Status": "Passed",
+      "Duration": 2.5038726,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.CalendarRealClicksShowFourteenDatesOverlapDetailsAndBlockUnderlyingInput",
+      "Status": "Passed",
+      "Duration": 1.069195,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.CalendarSaveLoadButtonsRestoreActualFileAndDoNotRepeatRent",
+      "Status": "Passed",
+      "Duration": 1.9136014,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.CompleteDayBuysAndSellsWithPurchaseHistorySettlementAndNextDay",
+      "Status": "Passed",
+      "Duration": 2.6362604,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.CrowdedCalendarScrollKeepsAllEventRowsReachable",
+      "Status": "Passed",
+      "Duration": 0.5192398,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.CustomerGoodsUseIndependentCounterAndKeepOwnershipWhenMoved",
+      "Status": "Passed",
+      "Duration": 0.9680753,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.DynamicQuotesRefreshVisibleDetailsAndConfirmWithoutManualRefresh",
+      "Status": "Passed",
+      "Duration": 1.6191528,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.EmptyDisplayStillReceivesFiveAndRealDragsUpdateBudgetTierPreview",
+      "Status": "Passed",
+      "Duration": 2.0134172,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.FiveCustomerDayRunsPureMixedZeroNetFailuresAndContinuousTrade",
+      "Status": "Passed",
+      "Duration": 3.4655953,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.FlipButtonReflectsHorizontallyAfterRotation",
+      "Status": "Passed",
+      "Duration": 0.4477983,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.ManualSelectionOpensMixedModalAndEntryIncludesAllWithoutDuplicates",
+      "Status": "Passed",
+      "Duration": 1.1977131,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.NegotiationEntryCancelsAndConfirmsSaleWithoutChangingCustomer",
+      "Status": "Passed",
+      "Duration": 1.2327437,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.RealMouseAndKeyboardHandleShapesPreviewsAndRollback",
+      "Status": "Passed",
+      "Duration": 0.9762091,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.SavedSceneStartsFreshAndAllContainersAreVisible",
+      "Status": "Passed",
+      "Duration": 0.1559926,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.ThreeItemBasketAndOpenDisplayChangesWorkThroughRealDrags",
+      "Status": "Passed",
+      "Duration": 2.1021258,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.TwentyItemListScrollsAndSettlementResetsToTop",
+      "Status": "Passed",
+      "Duration": 0.7919884,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

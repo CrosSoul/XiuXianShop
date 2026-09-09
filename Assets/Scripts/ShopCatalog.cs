@@ -60,9 +60,9 @@ namespace XiuXianShop
         public float retailMarkup = .15f;
         [Tooltip("明确配置的常驻价格标签；有日期的市场标签由 Market Events 生成。")]
         public PriceTag[] priceTags = Array.Empty<PriceTag>();
-        [Tooltip("可调整原型事件：每周随机安排2–3次，每次1–3天；开局复制成会话配置。")]
+        [Tooltip("原型行情效果；月度频率、持续与冷却使用 MarketCalendar 的隔离测试值，尚非正式平衡。")]
         public MarketEventDefinition[] marketEvents = Array.Empty<MarketEventDefinition>();
-        [Min(1)] public int rentPeriod = 7;
+        [Min(1)] public int rentPeriod = 6;
         [Min(1)] public int firstRent = 20;
         [Tooltip("按生效类别展示基础价值总和选档，同档价值变化不改变资金范围。空展示柜按价值 0。")]
         public BuyerBudgetTier[] buyerBudgetTiers =

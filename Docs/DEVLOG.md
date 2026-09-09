@@ -255,3 +255,11 @@ M ProjectSettings/QualitySettings.asset
 - 让价以整笔差额记录，不分摊商品基础值或标签；成交消息保留报价/实收/少收，收入扣除未收到差额，买入历史价保留。
 - 实际Edit Mode 88/88、Play Mode19/19，0失败/跳过。修改受影响旧预算断言，补少收确认、零预算、旧提醒失效和重复点击用例。运行截图已查看，120→138、预算18→0、实收18。详细证据与步骤见DP23_BUDGET.md和Evidence/DP23。
 - 最终编译通过、Console Error0/Warning0、Editor ready/stopped。此前误在Play执行Edit请求的运行器错误已取消，未计通过也未清空日志。本轮独立提交，不推送，不将DP18或DP23标Done。
+
+
+## 2026-09-09 — DP-25 月度迁移
+
+- 基线209fbe2；开始时仅用户任务书未跟踪，保留。沿用DP17日历/行情与DP23结算，实现Turn/Year/Month、年度12格、每6回合收租。ShopCatalog资产仅通过Unity API改rentPeriod=6，金额不改。
+- 月度v2存档独立路径，v1明确拒绝且原文件/当前会话不变；不做破坏性迁移。行情3次/年、1–2回合持续、2回合冷却为明确隔离测试值，非正式平衡。
+- 本轮实际Edit91/91、Play19/19，0失败/跳过；首次Play失败及重跑原因见DP25_MONTHLY.md。运行截图已查看；跨年12→13、两次租金120→79、跨年持续条和实际旧档保护验证通过。
+- Console Error0/Warning0，场景无未保存修改；未清日志，未做Player构建或人工手感验收。独立提交供验收，不推送、不改Confluence、不将Jira标Done。

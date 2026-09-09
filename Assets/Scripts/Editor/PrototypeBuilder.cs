@@ -11,7 +11,7 @@ namespace XiuXianShop.Editor
         public const string CatalogPath="Assets/Data/ShopCatalog.asset";
         static ShopCatalog verificationCatalog;
         static bool discountEnabled;
-        [MenuItem("XiuXianShop/Validation/Start Repeatable Trading Day (resets Play session)")]
+        [MenuItem("XiuXianShop/Validation/Start Repeatable Trading Turn (resets Play session)")]
         public static void StartVerificationDay()
         {
             var shop=Object.FindFirstObjectByType<ShopPrototype>();
@@ -33,9 +33,9 @@ namespace XiuXianShop.Editor
             EditorApplication.playModeStateChanged-=CleanupVerification;
             EditorApplication.playModeStateChanged+=CleanupVerification;
         }
-        [MenuItem("XiuXianShop/Validation/Start Repeatable Trading Day (resets Play session)",true)]
+        [MenuItem("XiuXianShop/Validation/Start Repeatable Trading Turn (resets Play session)",true)]
         static bool CanStartVerification()=>EditorApplication.isPlaying && Object.FindFirstObjectByType<ShopPrototype>()!=null;
-        [MenuItem("XiuXianShop/Validation/Start DP18 Mixed Trading Day (resets Play session)")]
+        [MenuItem("XiuXianShop/Validation/Start DP18 Mixed Trading Turn (resets Play session)")]
         public static void StartMixedTradingDay()
         {
             if(!CanStartVerification())return;
@@ -53,7 +53,7 @@ namespace XiuXianShop.Editor
             shop.StartVerificationSession(verificationCatalog,17);
             shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP18VerificationSave.json");
         }
-        [MenuItem("XiuXianShop/Validation/Start DP18 Mixed Trading Day (resets Play session)",true)]
+        [MenuItem("XiuXianShop/Validation/Start DP18 Mixed Trading Turn (resets Play session)",true)]
         static bool CanStartMixedTradingDay()=>CanStartVerification();
         [MenuItem("XiuXianShop/Validation/Toggle Sale Discount -30% (Play session)")]
         public static void ToggleQuoteTest()
@@ -74,21 +74,21 @@ namespace XiuXianShop.Editor
             var shop=Object.FindFirstObjectByType<ShopPrototype>();
             shop.StartVerificationSession(verificationCatalog,0,MarketCalendar.OverlapExample());
             shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP17VerificationSave.json");
-            while(shop.Session.Day<6){shop.Session.BeginBusiness();shop.Session.EndBusiness();shop.Session.Sleep();}
+            while(shop.Session.Turn<6){shop.Session.BeginBusiness();shop.Session.EndBusiness();shop.Session.AdvanceTurn();}
             shop.Refresh();shop.CalendarView.Open();
         }
         [MenuItem("XiuXianShop/Validation/Start Calendar Overlap Example (resets Play session)",true)]
         static bool CanStartCalendarExample()=>CanStartVerification();
-        [MenuItem("XiuXianShop/Validation/Advance Calendar Example One Day (Play session)")]
+        [MenuItem("XiuXianShop/Validation/Advance Calendar Example One Turn (Play session)")]
         public static void AdvanceCalendarExample()
         {
             if(!CanStartVerification() || verificationCatalog==null)return;
             var shop=Object.FindFirstObjectByType<ShopPrototype>();
-            if(shop.Session.Phase==DayPhase.Preparation)shop.Session.BeginBusiness();
-            if(shop.Session.Phase==DayPhase.Open)shop.Session.EndBusiness();
-            shop.Session.Sleep();shop.Refresh();
+            if(shop.Session.Phase==TurnPhase.Preparation)shop.Session.BeginBusiness();
+            if(shop.Session.Phase==TurnPhase.Open)shop.Session.EndBusiness();
+            shop.Session.AdvanceTurn();shop.Refresh();
         }
-        [MenuItem("XiuXianShop/Validation/Advance Calendar Example One Day (Play session)",true)]
+        [MenuItem("XiuXianShop/Validation/Advance Calendar Example One Turn (Play session)",true)]
         static bool CanAdvanceCalendarExample()=>CanStartVerification() && verificationCatalog!=null;
         public static string InstallCalendarDefaults()
         {

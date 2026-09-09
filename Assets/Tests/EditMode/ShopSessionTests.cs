@@ -11,7 +11,7 @@ namespace XiuXianShop.Tests
         [SetUp] public void Setup() { catalog=ScriptableObject.CreateInstance<ShopCatalog>();catalog.SetPrototypeDefaults();catalog.retailMarkup=0;BuyersOnly(); }
         [TearDown] public void Teardown() { UnityEngine.Object.DestroyImmediate(catalog); }
         ShopSession Session(params string[] ids) {catalog.startingItems=ids;return new ShopSession(catalog);}
-        static string Snapshot(ShopSession s)=>s.Money+"|"+s.Day+"|"+string.Join(";",s.Items.OrderBy(i=>i.Id).Select(i=>$"{i.Id},{i.Definition.id},{i.Container},{i.Owner},{i.X},{i.Y},{i.Rotation},{i.Flipped}"));
+        static string Snapshot(ShopSession s)=>s.Money+"|"+s.Turn+"|"+string.Join(";",s.Items.OrderBy(i=>i.Id).Select(i=>$"{i.Id},{i.Definition.id},{i.Container},{i.Owner},{i.X},{i.Y},{i.Rotation},{i.Flipped}"));
         static void Valid(ShopSession s)=>Assert.That(s.ValidateState(),Is.Null);
         static void Display(ShopSession s,GridItem i,int x=0,int y=0) {Assert.That(s.Move(i.Id,ContainerId.Display,x,y,i.Rotation,i.Flipped),Is.True,s.Message);}
         void BuyersOnly(int budget=20) {catalog.baseSupplierChance=0;catalog.advertisementSupplierBonus=0;catalog.displayedGoodsBuyerBonus=0;catalog.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=budget}};catalog.buyerBudgetVariation=0;}
@@ -75,7 +75,7 @@ namespace XiuXianShop.Tests
         {
             var s=Session("pill","sign");Display(s,s.Items[0]);Assert.That(s.BeginBusiness());
             Assert.That(s.Offer.Direction,Is.EqualTo(TradeDirection.CustomerBuys));Assert.That(s.RemainingCustomers,Is.EqualTo(4));
-            Assert.That(s.EndBusiness());Assert.That(s.Sleep());
+            Assert.That(s.EndBusiness());Assert.That(s.AdvanceTurn());
             SuppliersOnly();
             var pill=s.Items.First(i=>i.Definition.id=="pill");Assert.That(s.Move(pill.Id,ContainerId.Storage,0,0,0,false));
             Display(s,s.Items.First(i=>i.Definition.id=="sign"));Assert.That(s.BeginBusiness());
@@ -128,9 +128,9 @@ namespace XiuXianShop.Tests
             Assert.That(s.Move(item.Id,ContainerId.Storage,0,0,0,false));Display(s,item);
             Assert.That(s.NextCustomer());Assert.That(s.StageSale());Assert.That(s.EndBusiness());
             Assert.That(item.Container,Is.EqualTo(ContainerId.Counter));
-            foreach(var phase in new[]{DayPhase.Closed,DayPhase.Preparation})
+            foreach(var phase in new[]{TurnPhase.Closed,TurnPhase.Preparation})
             {
-                if(phase==DayPhase.Preparation) Assert.That(s.Sleep());
+                if(phase==TurnPhase.Preparation) Assert.That(s.AdvanceTurn());
                 Assert.That(s.Phase,Is.EqualTo(phase));
                 Assert.That(s.Move(item.Id,ContainerId.Storage,0,0,0,false));Display(s,item);
                 Assert.That(s.Move(item.Id,ContainerId.Counter,0,0,0,false));
@@ -191,7 +191,7 @@ namespace XiuXianShop.Tests
             Assert.That(s.Money,Is.EqualTo(122));
             for(int n=0;n<4;n++) {Assert.That(s.NextCustomer());Assert.That(s.Offer.RequestedCategory,Is.EqualTo(ItemCategory.Material));Assert.That(s.Offer.RemainingBudget,Is.EqualTo(20));}
             Assert.That(s.NextCustomer());Assert.That(s.Offer,Is.Null);
-            s.EndBusiness();s.Sleep();s.BeginBusiness();Assert.That(s.Offer.RequestedCategory,Is.EqualTo(ItemCategory.Medicine));Valid(s);
+            s.EndBusiness();s.AdvanceTurn();s.BeginBusiness();Assert.That(s.Offer.RequestedCategory,Is.EqualTo(ItemCategory.Medicine));Valid(s);
         }
 
         [Test] public void RemovingSignAfterOpeningKeepsSuppliersAndFullCounterCanBeCleared()
@@ -200,7 +200,7 @@ namespace XiuXianShop.Tests
             var s=Session(new[]{"sign"}.Concat(Enumerable.Repeat("dew",20)).ToArray());var sign=s.Items[0];Display(s,sign);
             var dew=s.Items.Where(i=>i.Definition.id=="dew").ToArray();
             for(int n=0;n<20;n++)Assert.That(s.Move(dew[n].Id,ContainerId.Counter,n%5,n/5,0,false));
-            Assert.That(s.BeginBusiness(),Is.True);Assert.That(s.Phase,Is.EqualTo(DayPhase.Open));Assert.That(s.RemainingCustomers,Is.EqualTo(4));
+            Assert.That(s.BeginBusiness(),Is.True);Assert.That(s.Phase,Is.EqualTo(TurnPhase.Open));Assert.That(s.RemainingCustomers,Is.EqualTo(4));
             Assert.That(s.In(ContainerId.Counter).Count(),Is.EqualTo(20));
             Assert.That(s.In(ContainerId.CustomerCounter).Count(),Is.EqualTo(2));
             Assert.That(s.Purchases,Is.Zero,"Arrival never purchases goods, regardless of the random requested category.");
@@ -235,7 +235,7 @@ namespace XiuXianShop.Tests
         [Test] public void EmptyDisplayCanOpenButMissingIngredientsAndPrematureSleepFail()
         {
             var s=Session("jade");string before=Snapshot(s);
-            Assert.That(s.Craft(),Is.False);Assert.That(s.BeginBusiness(),Is.True);Assert.That(s.Sleep(),Is.False);
+            Assert.That(s.Craft(),Is.False);Assert.That(s.BeginBusiness(),Is.True);Assert.That(s.AdvanceTurn(),Is.False);
             Assert.That(Snapshot(s),Is.EqualTo(before));Valid(s);
         }
 
@@ -243,7 +243,7 @@ namespace XiuXianShop.Tests
         {
             catalog.baseSupplierChance=1;catalog.startingItems=new[]{"sign"};catalog.Find("cinnabar").supplierAvailable=false;
             var s=new ShopSession(catalog,customerSeed:0);Display(s,s.Items[0]);
-            // Day 1 obtains two complete ingredient sets through normal suppliers.
+            // Turn 1 obtains two complete ingredient sets through normal suppliers.
             Assert.That(s.BeginBusiness());
             for(int i=0;i<5;i++)
             {
@@ -253,13 +253,13 @@ namespace XiuXianShop.Tests
                 if(i<4)Assert.That(s.NextCustomer());
             }
             Assert.That(s.Purchases,Is.EqualTo(4));Assert.That(s.Money,Is.EqualTo(110));
-            Assert.That(s.Craft());Assert.That(s.Craft());Assert.That(s.EndBusiness());Assert.That(s.Sleep());
+            Assert.That(s.Craft());Assert.That(s.Craft());Assert.That(s.EndBusiness());Assert.That(s.AdvanceTurn());
             BuyersOnly();var pills=s.In(ContainerId.Storage).Where(i=>i.Definition.id=="pill").ToArray();
             Display(s,pills[0],2,0);Display(s,pills[1],4,0);Assert.That(s.BeginBusiness());
             for(int i=0;i<2;i++){Assert.That(s.StageSale());Assert.That(s.AcceptTrade());if(i==0)Assert.That(s.NextCustomer());}
-            Assert.That(s.Day,Is.EqualTo(2));Assert.That(s.Crafted,Is.EqualTo(2));Assert.That(s.Sales,Is.EqualTo(2));Assert.That(s.Money,Is.EqualTo(146));
+            Assert.That(s.Turn,Is.EqualTo(2));Assert.That(s.Crafted,Is.EqualTo(2));Assert.That(s.Sales,Is.EqualTo(2));Assert.That(s.Money,Is.EqualTo(146));
             Assert.That(s.Items.Count,Is.EqualTo(1));Assert.That(s.Items[0].Definition.id,Is.EqualTo("sign"));
-            Assert.That(s.EndBusiness());Assert.That(s.Sleep());Assert.That(s.Day,Is.EqualTo(3));Assert.That(s.HasFurnace);Valid(s);
+            Assert.That(s.EndBusiness());Assert.That(s.AdvanceTurn());Assert.That(s.Turn,Is.EqualTo(3));Assert.That(s.HasFurnace);Valid(s);
         }
 
         [TestCase(false,false,.4f)]
@@ -347,7 +347,7 @@ namespace XiuXianShop.Tests
                 if(a.Offer.Direction==TradeDirection.CustomerSells)Assert.That(a.Find(a.Offer.ItemId).Definition.id,Is.EqualTo(b.Find(b.Offer.ItemId).Definition.id));
                 a.NextCustomer();b.NextCustomer();
             }
-            Assert.That(a.TodayAttraction,Is.SameAs(captured));a.EndBusiness();a.Sleep();Assert.That(a.TodayAttraction,Is.Null);
+            Assert.That(a.TodayAttraction,Is.SameAs(captured));a.EndBusiness();a.AdvanceTurn();Assert.That(a.TodayAttraction,Is.Null);
             a.BeginBusiness();Assert.That(a.TodayAttraction.BuyerCategory,Is.EqualTo(ItemCategory.Container));Assert.That(a.BuyersToday+a.SuppliersToday,Is.EqualTo(5));
         }
 
@@ -364,8 +364,8 @@ namespace XiuXianShop.Tests
         [Test] public void SleepChargesPeriodicRentAndNeverMakesNegativeMoney()
         {
             catalog.startingMoney=5;var s=Session("sign");Display(s,s.Items[0]);
-            for(int day=1;day<=14;day++) {Assert.That(s.BeginBusiness());Assert.That(s.EndBusiness());Assert.That(s.Sleep());Valid(s);}
-            Assert.That(s.Day,Is.EqualTo(15));Assert.That(s.Money,Is.Zero);Assert.That(s.RentDebt,Is.EqualTo(36));Assert.That(s.Rent,Is.EqualTo(23));
+            for(int turn=1;turn<=14;turn++) {Assert.That(s.BeginBusiness());Assert.That(s.EndBusiness());Assert.That(s.AdvanceTurn());Valid(s);}
+            Assert.That(s.Turn,Is.EqualTo(15));Assert.That(s.Money,Is.Zero);Assert.That(s.RentDebt,Is.EqualTo(36));Assert.That(s.Rent,Is.EqualTo(23));
             Assert.That(s.RemainingCustomers,Is.Zero);Assert.That(s.Offer,Is.Null);Assert.That(s.Items.Count,Is.EqualTo(1));
         }
     }

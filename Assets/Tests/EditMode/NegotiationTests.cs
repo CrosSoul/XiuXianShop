@@ -140,7 +140,7 @@ namespace XiuXianShop.Tests
             Assert.That(s.AcceptTrade(true));Assert.That(s.Money,Is.EqualTo(90));
             var history=purchased.Select(i=>i.PurchaseValue).ToArray();s.RemovePriceTag("rise");
             CollectionAssert.AreEqual(history,purchased.Select(i=>i.PurchaseValue));
-            s.EndBusiness();s.Sleep();var restored=ShopSession.RestoreSave(catalog,s.CaptureSave());
+            s.EndBusiness();s.AdvanceTurn();var restored=ShopSession.RestoreSave(catalog,s.CaptureSave());
             CollectionAssert.AreEqual(history,purchased.Select(i=>restored.Find(i.Id).PurchaseValue));Assert.That(restored.ValidateState(),Is.Null);
         }
     }

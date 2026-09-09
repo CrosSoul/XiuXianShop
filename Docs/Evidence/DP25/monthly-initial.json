@@ -1,0 +1,27 @@
+{
+  "status": "completed",
+  "duration": 0.41,
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.LegacyDailySaveIsRejectedWithoutChangingSession",
+      "Status": "Passed",
+      "Duration": 0.0503271,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.MonthlyBoundaryAndRentAreSettledOnceAndRestored",
+      "Status": "Passed",
+      "Duration": 0.0218145,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

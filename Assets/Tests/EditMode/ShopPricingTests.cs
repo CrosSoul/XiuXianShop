@@ -84,7 +84,7 @@ namespace XiuXianShop.Tests
             var s=new ShopSession(catalog);OpenBuyer(s);Stage(s,s.Items[1]);s.AcceptTrade();
             Assert.That(s.EndBusiness());Assert.That(s.IncomeToday,Is.EqualTo(23));
             Assert.That(s.ExpensesToday,Is.Zero);Assert.That(s.BalanceChange,Is.EqualTo(23));Assert.That(s.OpeningMoney,Is.EqualTo(120));
-            int count=s.Items.Count;Assert.That(s.Sleep());Assert.That(s.Day,Is.EqualTo(2));Assert.That(s.OpeningMoney,Is.EqualTo(143));
+            int count=s.Items.Count;Assert.That(s.AdvanceTurn());Assert.That(s.Turn,Is.EqualTo(2));Assert.That(s.OpeningMoney,Is.EqualTo(143));
             Assert.That(s.IncomeToday,Is.Zero);Assert.That(s.BalanceChange,Is.Zero);Assert.That(s.Items.Count,Is.EqualTo(count));
         }
         [Test] public void FullCounterSupplierCanBeSkippedWithoutFreeItemsOrStuckQueue()

@@ -27,7 +27,7 @@ namespace XiuXianShop
         Text header, rent, phaseText, selection, customerTitle, customerDetails, notice, furnaceText, previewText, displaySummary, tradeDetails, tradeStatus, tradeHeading;
         int displayedPricingRevision;
         TradeOffer displayedOffer;
-        DayPhase displayedPhase;
+        TurnPhase displayedPhase;
         public int CustomerSeed { get; set; } = -1;
         Button beginButton, nextButton, endButton, sleepButton, craftButton, stageButton, acceptButton, rejectButton, rotateButton, flipButton, cancelButton;
         readonly Dictionary<ContainerId,RectTransform> grids=new Dictionary<ContainerId,RectTransform>();
@@ -129,7 +129,7 @@ namespace XiuXianShop
             tradeStatus=Label(content,"TradeStatus",1024,475,532,39,"",16,textColor);
             acceptButton=MakeButton("NegotiationOpen",1024,519,260,36,"打开谈判",()=>NegotiationView.Open(),true);
             rejectButton=MakeButton("RejectTrade",1296,519,260,36,"拒绝 / 不成交",()=>Run(()=>Session.RejectTrade()));
-            sleepButton=MakeButton("Sleep",1024,519,532,36,"结算完毕 · 睡觉进入下一天",()=>Run(()=>Session.Sleep()),true);
+            sleepButton=MakeButton("AdvanceTurn",1024,519,532,36,"结算完毕 · 推进下个月",()=>Run(()=>Session.AdvanceTurn()),true);
 
             notice=Label(content,"Notice",40,577,1516,24,"",16,gold);
             CreateGrid(ContainerId.Storage,24,618,756,358,44,663,43,"库存 / 自由整理");
@@ -211,34 +211,34 @@ namespace XiuXianShop
                 var view=DrawItem(grids[item.Container],item,item.Rotation,item.Flipped,cellSizes[item.Container],true);
                 view.anchoredPosition=new Vector2(item.X*cellSizes[item.Container],-item.Y*cellSizes[item.Container]); itemViews[item.Id]=view;
             }
-            header.text=$"第 {Session.Day} 天    |    灵石 {Session.Money}";
-            phaseText.text=Session.Phase==DayPhase.Preparation?"营业前 · 配置展示":Session.Phase==DayPhase.Open?"营业中 · 客源已确定":"已闭店 · 整理 / 炼丹";
-            rent.text=$"下次房租：第 {Session.NextRentDay} 天夜间 / {Session.Rent} 灵石\n待付房租 {Session.RentDebt}  ·  每 7 天结算，下期约涨 5%";
+            header.text=$"{Session.DateLabel}    |    灵石 {Session.Money}";
+            phaseText.text=Session.Phase==TurnPhase.Preparation?"营业前 · 配置展示":Session.Phase==TurnPhase.Open?"营业中 · 客源已确定":"已闭店 · 整理 / 炼丹";
+            rent.text=$"下次房租：第 {Session.NextRentTurn} 回合结束 / {Session.Rent} 灵石\n待付房租 {Session.RentDebt}  ·  每 6 回合结算，下期约涨 5%";
             foreach(var pair in gridTitles)
             {
-                string name=pair.Key==ContainerId.Storage?"背包 / 仓库":pair.Key==ContainerId.Display?"今日展示柜":pair.Key==ContainerId.CustomerCounter?"顾客柜台 / 来货":"谈判柜台";
+                string name=pair.Key==ContainerId.Storage?"背包 / 仓库":pair.Key==ContainerId.Display?"本月展示柜":pair.Key==ContainerId.CustomerCounter?"顾客柜台 / 来货":"谈判柜台";
                 var size=ShopSession.Size(pair.Key); pair.Value.text=$"{name}  {Session.Occupied(pair.Key)}/{size.x*size.y}";
             }
             var selected=Session.Find(selectedId);
             selection.text=selected==null?"点击物品查看价值、标签与说明。\n仓库中的预估价值等于基础价值；放入谈判柜台后按本次报价显示。":ItemDescription(selected);
-            var attraction=Session.Phase==DayPhase.Preparation?Session.PreviewAttraction():Session.TodayAttraction;
+            var attraction=Session.Phase==TurnPhase.Preparation?Session.PreviewAttraction():Session.TodayAttraction;
             string preferredCategory=attraction.BuyerCategory==ItemCategory.Unclassified?"随机类别":ShopCatalog.CategoryName(attraction.BuyerCategory);
-            displaySummary.text=Session.Phase==DayPhase.Preparation?$"每日 5 位 · 仅求购 {1-attraction.SupplierChance:P0} / 携货求购 {attraction.SupplierChance:P0}\n{preferredCategory} · 资金 {attraction.MinimumBuyerBudget}–{attraction.MaximumBuyerBudget}\n基础价值 {attraction.DisplayValue} · 档位 ≥{attraction.BudgetTierMinimum}":$"今日仅求购 {Session.BuyersToday} / 携货求购 {Session.SuppliersToday}\n已离场 {Session.ServedToday} · 待到访 {Session.RemainingCustomers}\n开门时的展示效果已锁定";
+            displaySummary.text=Session.Phase==TurnPhase.Preparation?$"每回合 5 位 · 仅求购 {1-attraction.SupplierChance:P0} / 携货求购 {attraction.SupplierChance:P0}\n{preferredCategory} · 资金 {attraction.MinimumBuyerBudget}–{attraction.MaximumBuyerBudget}\n基础价值 {attraction.DisplayValue} · 档位 ≥{attraction.BudgetTierMinimum}":$"本月仅求购 {Session.BuyersToday} / 携货求购 {Session.SuppliersToday}\n已离场 {Session.ServedToday} · 待到访 {Session.RemainingCustomers}\n开门时的展示效果已锁定";
             var offer=Session.Offer;
             bool canAccept=Session.CanAcceptTrade(out int total,out string tradeReason);
-            bool closed=Session.Phase==DayPhase.Closed;
-            tradeHeading.text=closed?"今日结算":"本次交易 · 清单可滚动";
+            bool closed=Session.Phase==TurnPhase.Closed;
+            tradeHeading.text=closed?"本月结算":"本次交易 · 清单可滚动";
             if(closed)
             {
-                customerTitle.text="今日已闭店";
-                customerDetails.text="营业结束，物品留在原位。\n查看右侧结算，睡觉后进入下一天。";
-                tradeDetails.text=$"第 {Session.Day} 天\n\n起始余额    {Session.OpeningMoney} 灵石\n本日收入    +{Session.IncomeToday}\n本日支出    −{Session.ExpensesToday}\n余额变化    {Session.BalanceChange:+0;-0;0}\n当前余额    {Session.Money} 灵石\n\n房租在睡觉时按既有规则处理。";
+                customerTitle.text="本月已闭店";
+                customerDetails.text="营业结束，物品留在原位。\n查看右侧结算，结束本回合后进入下个月。";
+                tradeDetails.text=$"{Session.DateLabel}\n\n起始余额    {Session.OpeningMoney} 灵石\n本月收入    +{Session.IncomeToday}\n本月支出    −{Session.ExpensesToday}\n余额变化    {Session.BalanceChange:+0;-0;0}\n当前余额    {Session.Money} 灵石\n\n房租在结束回合时按既有规则处理。";
             }
             else if(offer==null)
             {
-                customerTitle.text=Session.Phase==DayPhase.Open?(Session.RemainingCustomers>0?"等待下一位顾客":"今日顾客已全部离场"):"营业前 · 配置店铺";
-                customerDetails.text=Session.Phase==DayPhase.Open?$"{Session.LastCustomerResult}\n剩余 {Session.RemainingCustomers} 位，可呼叫下一位或闭店。":$"空展示柜也有客人 · 每日 5 位\n偏好：{preferredCategory} · 资金 {attraction.MinimumBuyerBudget}–{attraction.MaximumBuyerBudget}\n供货：{attraction.SupplierDescription}";
-                tradeDetails.text=Session.Phase==DayPhase.Open?"当前没有顾客。\n自有物品可以继续在三区域搬运。": "先把商品或收购牌放到左侧展示柜，再开始营业。\n\n玩家出售：基础价值 + 零售加价及有效标签。\n玩家收购：按卖家货物的当前报价付款。\n\n逐件报价求和，确认时按同一金额结算。";
+                customerTitle.text=Session.Phase==TurnPhase.Open?(Session.RemainingCustomers>0?"等待下一位顾客":"本月顾客已全部离场"):"营业前 · 配置店铺";
+                customerDetails.text=Session.Phase==TurnPhase.Open?$"{Session.LastCustomerResult}\n剩余 {Session.RemainingCustomers} 位，可呼叫下一位或闭店。":$"空展示柜也有客人 · 每回合 5 位\n偏好：{preferredCategory} · 资金 {attraction.MinimumBuyerBudget}–{attraction.MaximumBuyerBudget}\n供货：{attraction.SupplierDescription}";
+                tradeDetails.text=Session.Phase==TurnPhase.Open?"当前没有顾客。\n自有物品可以继续在三区域搬运。": "先把商品或收购牌放到左侧展示柜，再开始营业。\n\n玩家出售：基础价值 + 零售加价及有效标签。\n玩家收购：按卖家货物的当前报价付款。\n\n逐件报价求和，确认时按同一金额结算。";
             }
             else
             {
@@ -251,7 +251,7 @@ namespace XiuXianShop
                 if(quote.Lines.Count==0)tradeDetails.text="谈判柜台为空。打开谈判可请求全部来货，或手动选入商品。";
                 tradeDetails.text+=$"\n\n合计 {quote.Lines.Count} 件 / {quote.Net} 灵石";
             }
-            tradeStatus.text=closed?"收支已核对，可继续整理后进入下一天。":offer==null?tradeReason:$"本次总价 {total} 灵石\n{tradeReason}";
+            tradeStatus.text=closed?"收支已核对，可继续整理后进入下个月。":offer==null?tradeReason:$"本次总价 {total} 灵石\n{tradeReason}";
             tradeStatus.color=canAccept?new Color(.54f,.85f,.65f):gold;
             SetButtonTitle(acceptButton,"打开谈判 / 查看报价");
             SetButtonTitle(nextButton,offer==null?"呼叫下一位顾客":"送别并接待下一位");
@@ -265,10 +265,10 @@ namespace XiuXianShop
                 displayedOffer=offer;displayedPhase=Session.Phase;
             }
             notice.text=localNotice??Session.Message;
-            beginButton.interactable=Session.Phase==DayPhase.Preparation;
-            nextButton.interactable=Session.Phase==DayPhase.Open && (offer!=null || Session.RemainingCustomers>0);
-            endButton.interactable=Session.Phase==DayPhase.Open;
-            sleepButton.interactable=Session.Phase==DayPhase.Closed;
+            beginButton.interactable=Session.Phase==TurnPhase.Preparation;
+            nextButton.interactable=Session.Phase==TurnPhase.Open && (offer!=null || Session.RemainingCustomers>0);
+            endButton.interactable=Session.Phase==TurnPhase.Open;
+            sleepButton.interactable=Session.Phase==TurnPhase.Closed;
             stageButton.interactable=offer!=null;
             acceptButton.interactable=offer!=null;
             rejectButton.interactable=offer!=null;
@@ -300,7 +300,7 @@ namespace XiuXianShop
             selectedId=0;localNotice=null;Refresh();
         }
 
-        string PreparationSavePath => SavePath??System.IO.Path.Combine(Application.dataPath,"../UserSettings/ShopPreparation.json");
+        string PreparationSavePath => SavePath??System.IO.Path.Combine(Application.dataPath,"../UserSettings/ShopMonthlyPreparation-v2.json");
         public void SavePreparation()
         {
             try
@@ -310,18 +310,18 @@ namespace XiuXianShop
                 System.IO.File.WriteAllText(path+".tmp",json);
                 if(System.IO.File.Exists(path))System.IO.File.Replace(path+".tmp",path,null);
                 else System.IO.File.Move(path+".tmp",path);
-                CalendarMessage=$"已保存第 {Session.Day} 天营业准备。";
+                CalendarMessage=$"已保存{Session.DateLabel}营业准备。";
             }
             catch(Exception e){CalendarMessage="无法保存："+e.Message;}
         }
         public void LoadPreparation()
         {
-            if(Session.Phase!=DayPhase.Preparation){CalendarMessage="仅营业准备阶段可读档。";return;}
+            if(Session.Phase!=TurnPhase.Preparation){CalendarMessage="仅营业准备阶段可读档。";return;}
             try
             {
                 var restored=ShopSession.RestoreSave(catalog,System.IO.File.ReadAllText(PreparationSavePath));
                 CancelDrag();Session=restored;selectedId=0;localNotice=null;
-                CalendarMessage=$"已读取第 {Session.Day} 天营业准备，行情未重抽。";Refresh();
+                CalendarMessage=$"已读取{Session.DateLabel}营业准备，行情未重抽。";Refresh();
             }
             catch(Exception e){CalendarMessage="未读取，当前经营保留："+e.Message;}
         }

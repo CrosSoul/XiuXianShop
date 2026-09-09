@@ -6,9 +6,9 @@ namespace XiuXianShop
     [Serializable]
     public sealed class ShopSave
     {
-        public int version=1;
+        public int version=2;
         public string catalogSignature;
-        public int day, money, rent, debt, nextId, customerSeed, customerDraws;
+        public int turn, money, rent, debt, nextId, customerSeed, customerDraws;
         public int crafted, purchases, sales;
         public SavedShopItem[] items;
         public PriceTag[] tags;

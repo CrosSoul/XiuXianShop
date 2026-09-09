@@ -176,7 +176,7 @@ MonoBehaviour:
       category: 3
       playerSells: 1
       playerBuys: 1
-  rentPeriod: 7
+  rentPeriod: 6
   firstRent: 20
   buyerBudgetTiers:
   - minimumDisplayValue: 0

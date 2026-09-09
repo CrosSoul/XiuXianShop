@@ -103,7 +103,7 @@ namespace XiuXianShop.Tests
             yield return Click("NextCustomer");Assert.That(s.ServedToday,Is.EqualTo(5));Assert.That(s.Offer,Is.Null);
             yield return Click("EndBusiness");Assert.That(s.IncomeToday,Is.EqualTo(60));Assert.That(s.ExpensesToday,Is.EqualTo(75));
             Assert.That(s.BalanceChange,Is.EqualTo(-15));int count=s.Items.Count;
-            yield return Click("Sleep");Assert.That(s.Day,Is.EqualTo(2));Assert.That(s.Items.Count,Is.EqualTo(count));Assert.That(s.Money,Is.EqualTo(105));
+            yield return Click("AdvanceTurn");Assert.That(s.Turn,Is.EqualTo(2));Assert.That(s.Items.Count,Is.EqualTo(count));Assert.That(s.Money,Is.EqualTo(105));
             Assert.That(s.ValidateState(),Is.Null);LogAssert.NoUnexpectedReceived();
         }
         [UnityTest,Category("DP20")] public IEnumerator CustomerGoodsUseIndependentCounterAndKeepOwnershipWhenMoved()

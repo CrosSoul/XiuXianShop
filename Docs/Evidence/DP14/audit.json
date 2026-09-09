@@ -1,0 +1,291 @@
+{
+  "counts": {
+    "items": 60,
+    "recipes": 7,
+    "lines": 35
+  },
+  "pending": [],
+  "baseline": [
+    {
+      "id": "herb",
+      "state": "已生效",
+      "differences": {},
+      "reservedFields": {
+        "物品标签": "",
+        "资源路径": "",
+        "属性": "",
+        "材料形态": "草药",
+        "储存宽度": "",
+        "储存高度": ""
+      }
+    },
+    {
+      "id": "dew",
+      "state": "已生效",
+      "differences": {},
+      "reservedFields": {
+        "物品标签": "",
+        "资源路径": "",
+        "属性": "",
+        "材料形态": "",
+        "储存宽度": "",
+        "储存高度": ""
+      }
+    },
+    {
+      "id": "pill",
+      "state": "已生效",
+      "differences": {},
+      "reservedFields": {
+        "物品标签": "",
+        "资源路径": "",
+        "属性": "",
+        "材料形态": "",
+        "储存宽度": "",
+        "储存高度": ""
+      }
+    },
+    {
+      "id": "cinnabar",
+      "state": "已生效",
+      "differences": {},
+      "reservedFields": {
+        "物品标签": "",
+        "资源路径": "",
+        "属性": "",
+        "材料形态": "",
+        "储存宽度": "",
+        "储存高度": ""
+      }
+    },
+    {
+      "id": "jade",
+      "state": "草稿",
+      "differences": {
+        "category": {
+          "unity": "Container",
+          "confluence": "StorageContainer"
+        },
+        "description": {
+          "unity": "大件试摆物 · 2×2，占用四格。",
+          "confluence": "物品储存类玉匣；外部3×3占9格。只能放在仓库，点击打开可拖动的有限格子储存弹窗；内部尺寸待定。v3二级储存功能尚未实现。"
+        },
+        "cells": {
+          "unity": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "confluence": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ]
+        }
+      },
+      "reservedFields": {
+        "物品标签": "",
+        "资源路径": "",
+        "属性": "",
+        "材料形态": "",
+        "储存宽度": "",
+        "储存高度": ""
+      }
+    },
+    {
+      "id": "sword",
+      "state": "已生效",
+      "differences": {},
+      "reservedFields": {
+        "物品标签": "",
+        "资源路径": "",
+        "属性": "",
+        "材料形态": "",
+        "储存宽度": "",
+        "储存高度": ""
+      }
+    },
+    {
+      "id": "sign",
+      "state": "已生效",
+      "differences": {},
+      "reservedFields": {
+        "物品标签": "",
+        "资源路径": "",
+        "属性": "",
+        "材料形态": "",
+        "储存宽度": "",
+        "储存高度": ""
+      }
+    }
+  ],
+  "shapeIssues": [
+    {
+      "id": "stone_mid",
+      "state": "草稿",
+      "reason": "Unspecified shape"
+    },
+    {
+      "id": "stone_high",
+      "state": "草稿",
+      "reason": "Unspecified shape"
+    },
+    {
+      "id": "device_smelting_furnace",
+      "state": "草稿",
+      "reason": "Unspecified shape"
+    },
+    {
+      "id": "device_refining_table",
+      "state": "草稿",
+      "reason": "Unspecified shape"
+    },
+    {
+      "id": "device_talisman_table",
+      "state": "草稿",
+      "reason": "Unspecified shape"
+    },
+    {
+      "id": "device_cultivation_cushion",
+      "state": "草稿",
+      "reason": "Unspecified shape"
+    },
+    {
+      "id": "ingredient_spirit_rice",
+      "state": "草稿",
+      "reason": "Unspecified shape"
+    },
+    {
+      "id": "ingredient_spirit_vegetable",
+      "state": "草稿",
+      "reason": "Unspecified shape"
+    },
+    {
+      "id": "ingredient_spirit_beast_meat",
+      "state": "草稿",
+      "reason": "Unspecified shape"
+    },
+    {
+      "id": "food_spirit_rice",
+      "state": "草稿",
+      "reason": "Unspecified shape"
+    },
+    {
+      "id": "food_spirit_vegetable_soup",
+      "state": "草稿",
+      "reason": "Unspecified shape"
+    },
+    {
+      "id": "food_spirit_meat_stew",
+      "state": "草稿",
+      "reason": "Unspecified shape"
+    },
+    {
+      "id": "device_cooking_station",
+      "state": "草稿",
+      "reason": "Unspecified shape"
+    },
+    {
+      "id": "sign_ingredient_buy",
+      "state": "草稿",
+      "reason": "Unspecified shape"
+    }
+  ],
+  "recipe": {
+    "id": "recipe_pill_basic",
+    "state": "已生效",
+    "integration": "待接入",
+    "duration": "",
+    "device": "",
+    "unityStableRecipeId": null,
+    "lines": [
+      {
+        "_id": "1",
+        "条目名称": "回气丹｜凝气草",
+        "条目ID": "recipe_pill_basic:input:herb",
+        "所属配方ID": "recipe_pill_basic",
+        "用途": "原料",
+        "物品ID": "herb",
+        "数量": "1",
+        "备注": "",
+        "Notion来源": "https://app.notion.com/p/3d5533012698811481dcffe2ffb23ff2"
+      },
+      {
+        "_id": "2",
+        "条目名称": "回气丹｜灵露",
+        "条目ID": "recipe_pill_basic:input:dew",
+        "所属配方ID": "recipe_pill_basic",
+        "用途": "原料",
+        "物品ID": "dew",
+        "数量": "1",
+        "备注": "",
+        "Notion来源": "https://app.notion.com/p/3d5533012698819f9a13eab80b9499cc"
+      },
+      {
+        "_id": "3",
+        "条目名称": "回气丹｜产物",
+        "条目ID": "recipe_pill_basic:output:pill",
+        "所属配方ID": "recipe_pill_basic",
+        "用途": "产物",
+        "物品ID": "pill",
+        "数量": "1",
+        "备注": "",
+        "Notion来源": "https://app.notion.com/p/3d5533012698818fbf5aed28e908cac7"
+      }
+    ],
+    "fixedRecipeMatches": true
+  },
+  "applied": 0,
+  "stones": {
+    "stone_low": "草稿",
+    "stone_mid": "草稿",
+    "stone_high": "草稿"
+  },
+  "legacyStoneIds": []
+}

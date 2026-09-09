@@ -1,0 +1,330 @@
+{
+    "priceModelVersion": 1,
+    "items": [
+        {
+            "id": "herb",
+            "title": "凝气草",
+            "category": 2,
+            "description": "炼丹原料 · L 形。与灵露炼成回气丹。",
+            "color": {
+                "r": 0.36000001430511475,
+                "g": 0.7200000286102295,
+                "b": 0.5099999904632568,
+                "a": 1.0
+            },
+            "cells": [
+                {
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "x": 0,
+                    "y": 1
+                },
+                {
+                    "x": 1,
+                    "y": 1
+                }
+            ],
+            "baseValue": 3,
+            "supplierAvailable": true,
+            "purchasePrice": 4,
+            "salePrice": 3,
+            "procurementSign": false,
+            "advertisedCategory": 2
+        },
+        {
+            "id": "dew",
+            "title": "灵露",
+            "category": 2,
+            "description": "炼丹原料 · 单格。收购招牌带来稳定供货。",
+            "color": {
+                "r": 0.36000001430511475,
+                "g": 0.6700000166893005,
+                "b": 0.8799999952316284,
+                "a": 1.0
+            },
+            "cells": [
+                {
+                    "x": 0,
+                    "y": 0
+                }
+            ],
+            "baseValue": 2,
+            "supplierAvailable": true,
+            "purchasePrice": 3,
+            "salePrice": 2,
+            "procurementSign": false,
+            "advertisedCategory": 2
+        },
+        {
+            "id": "pill",
+            "title": "回气丹",
+            "category": 1,
+            "description": "炼丹成品 · 2×2 丹盒。以凝气草和灵露炼制，成交时按有效标签报价。",
+            "color": {
+                "r": 0.9300000071525574,
+                "g": 0.6800000071525574,
+                "b": 0.3100000023841858,
+                "a": 1.0
+            },
+            "cells": [
+                {
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "x": 1,
+                    "y": 0
+                },
+                {
+                    "x": 0,
+                    "y": 1
+                },
+                {
+                    "x": 1,
+                    "y": 1
+                }
+            ],
+            "baseValue": 18,
+            "supplierAvailable": true,
+            "purchasePrice": 20,
+            "salePrice": 18,
+            "procurementSign": false,
+            "advertisedCategory": 2
+        },
+        {
+            "id": "cinnabar",
+            "title": "朱砂",
+            "category": 2,
+            "description": "不规则试摆物 · T 形，旋转会改变占格。",
+            "color": {
+                "r": 0.8299999833106995,
+                "g": 0.41999998688697815,
+                "b": 0.38999998569488525,
+                "a": 1.0
+            },
+            "cells": [
+                {
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "x": 1,
+                    "y": 0
+                },
+                {
+                    "x": 2,
+                    "y": 0
+                },
+                {
+                    "x": 1,
+                    "y": 1
+                }
+            ],
+            "baseValue": 6,
+            "supplierAvailable": true,
+            "purchasePrice": 8,
+            "salePrice": 6,
+            "procurementSign": false,
+            "advertisedCategory": 2
+        },
+        {
+            "id": "jade",
+            "title": "玉匣",
+            "category": 4,
+            "description": "大件试摆物 · 2×2，占用四格。",
+            "color": {
+                "r": 0.5600000023841858,
+                "g": 0.7099999785423279,
+                "b": 0.6899999976158142,
+                "a": 1.0
+            },
+            "cells": [
+                {
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "x": 1,
+                    "y": 0
+                },
+                {
+                    "x": 0,
+                    "y": 1
+                },
+                {
+                    "x": 1,
+                    "y": 1
+                }
+            ],
+            "baseValue": 14,
+            "supplierAvailable": true,
+            "purchasePrice": 18,
+            "salePrice": 14,
+            "procurementSign": false,
+            "advertisedCategory": 2
+        },
+        {
+            "id": "sword",
+            "title": "木剑",
+            "category": 3,
+            "description": "长条试摆物 · 四格，竖放或横放。",
+            "color": {
+                "r": 0.6899999976158142,
+                "g": 0.550000011920929,
+                "b": 0.3700000047683716,
+                "a": 1.0
+            },
+            "cells": [
+                {
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "x": 0,
+                    "y": 1
+                },
+                {
+                    "x": 0,
+                    "y": 2
+                },
+                {
+                    "x": 0,
+                    "y": 3
+                }
+            ],
+            "baseValue": 10,
+            "supplierAvailable": true,
+            "purchasePrice": 14,
+            "salePrice": 10,
+            "procurementSign": false,
+            "advertisedCategory": 2
+        },
+        {
+            "id": "sign",
+            "title": "收购牌",
+            "category": 5,
+            "description": "材料广告牌 · 开门时提高卖家概率，并吸引出售材料的卖家；每日总客流仍为 5 位。不可出售。",
+            "color": {
+                "r": 0.6499999761581421,
+                "g": 0.5600000023841858,
+                "b": 0.8299999833106995,
+                "a": 1.0
+            },
+            "cells": [
+                {
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "x": 1,
+                    "y": 0
+                },
+                {
+                    "x": 1,
+                    "y": 1
+                }
+            ],
+            "baseValue": 0,
+            "supplierAvailable": false,
+            "purchasePrice": 0,
+            "salePrice": 0,
+            "procurementSign": true,
+            "advertisedCategory": 2
+        }
+    ],
+    "startingItems": [
+        "sign",
+        "herb",
+        "dew",
+        "pill",
+        "cinnabar",
+        "jade",
+        "sword"
+    ],
+    "herbId": "herb",
+    "dewId": "dew",
+    "productId": "pill",
+    "startingMoney": 120,
+    "retailMarkup": 0.15000000596046448,
+    "priceTags": [],
+    "marketEvents": [
+        {
+            "id": "medicine-demand",
+            "title": "丹药求购潮",
+            "description": "药坊求购增多，丹药出售报价暂时上涨。",
+            "effect": {
+                "id": "medicine-demand",
+                "title": "丹药求购潮",
+                "percent": 0.20000000298023224,
+                "category": 1,
+                "playerSells": true,
+                "playerBuys": false
+            }
+        },
+        {
+            "id": "medicine-supply",
+            "title": "丹药集中到货",
+            "description": "商队集中供货，丹药买卖报价暂时下降。",
+            "effect": {
+                "id": "medicine-supply",
+                "title": "丹药集中到货",
+                "percent": -0.10000000149011612,
+                "category": 1,
+                "playerSells": true,
+                "playerBuys": true
+            }
+        },
+        {
+            "id": "materials-supply",
+            "title": "灵材丰收",
+            "description": "灵材货源增加，收购材料报价暂时下降。",
+            "effect": {
+                "id": "materials-supply",
+                "title": "灵材丰收",
+                "percent": -0.20000000298023224,
+                "category": 2,
+                "playerSells": false,
+                "playerBuys": true
+            }
+        },
+        {
+            "id": "equipment-demand",
+            "title": "法器行情升温",
+            "description": "装备交易需求增加，装备买卖报价暂时上涨。",
+            "effect": {
+                "id": "equipment-demand",
+                "title": "法器行情升温",
+                "percent": 0.20000000298023224,
+                "category": 3,
+                "playerSells": true,
+                "playerBuys": true
+            }
+        }
+    ],
+    "rentPeriod": 7,
+    "firstRent": 20,
+    "buyerBudgetTiers": [
+        {
+            "minimumDisplayValue": 0,
+            "baseBudget": 20
+        },
+        {
+            "minimumDisplayValue": 30,
+            "baseBudget": 60
+        },
+        {
+            "minimumDisplayValue": 100,
+            "baseBudget": 150
+        },
+        {
+            "minimumDisplayValue": 300,
+            "baseBudget": 400
+        }
+    ],
+    "buyerBudgetVariation": 0.10000000149011612,
+    "baseSupplierChance": 0.4000000059604645,
+    "advertisementSupplierBonus": 0.4000000059604645,
+    "displayedGoodsBuyerBonus": 0.20000000298023224
+}

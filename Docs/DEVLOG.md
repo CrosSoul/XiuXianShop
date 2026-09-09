@@ -272,3 +272,10 @@ M ProjectSettings/QualitySettings.asset
 - 满格/非法分类保留原位置，禁止嵌套及储存物品交易；历史购买价值、实例ID与存档内部归属连续。v3新路径保留旧v2/日制文件，旧档明确拒绝而不静默重置。
 - Edit94/94、Play20/20；补强两件全部取回和实际v2拒绝保护后定向Play1/1。原始结果和已查看截图在Evidence/DP30，初始失败和修复见DP30_STORAGE.md。Console Error0/Warning0，未清日志，Editor ready/stopped；未Player构建或人工手感验收。
 - 交付独立提交，不推送，不改Confluence正式数据、不标Done、不启动DP31。试玩入口及未定边界见DP30_STORAGE.md。
+
+
+## 2026-09-10 — DP-30 开局测试入口补充
+
+- 根据用户反馈，通过Unity API在ShopCatalog资产追加现有test-storage-case测试定义和一件初始库存。直接Play即可获得外部3×3、内部10×10的储物匣；原7件物品和jade不变。仅测试用途、不参与交易，没有新建重复正式商品。
+- 更新开局物品数量断言为8；本次只验证正常开局与储物匣打开，不重复完整回归。
+- 本次正常场景开局Play自动测试1/1通过；再次正常Play确认仓库共8件物品，点击测试匣打开10×10窗口。Console Error0/Warning0，验证后退出Play。

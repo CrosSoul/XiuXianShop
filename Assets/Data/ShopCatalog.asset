@@ -25,6 +25,8 @@ MonoBehaviour:
     - {x: 1, y: 1}
     baseValue: 3
     supplierAvailable: 1
+    storageSize: {x: 0, y: 0}
+    compatibleEquipmentIds: []
     purchasePrice: 4
     salePrice: 3
     procurementSign: 0
@@ -38,6 +40,8 @@ MonoBehaviour:
     - {x: 0, y: 0}
     baseValue: 2
     supplierAvailable: 1
+    storageSize: {x: 0, y: 0}
+    compatibleEquipmentIds: []
     purchasePrice: 3
     salePrice: 2
     procurementSign: 0
@@ -54,6 +58,8 @@ MonoBehaviour:
     - {x: 1, y: 1}
     baseValue: 18
     supplierAvailable: 1
+    storageSize: {x: 0, y: 0}
+    compatibleEquipmentIds: []
     purchasePrice: 20
     salePrice: 18
     procurementSign: 0
@@ -70,6 +76,8 @@ MonoBehaviour:
     - {x: 1, y: 1}
     baseValue: 6
     supplierAvailable: 1
+    storageSize: {x: 0, y: 0}
+    compatibleEquipmentIds: []
     purchasePrice: 8
     salePrice: 6
     procurementSign: 0
@@ -86,6 +94,8 @@ MonoBehaviour:
     - {x: 1, y: 1}
     baseValue: 14
     supplierAvailable: 1
+    storageSize: {x: 0, y: 0}
+    compatibleEquipmentIds: []
     purchasePrice: 18
     salePrice: 14
     procurementSign: 0
@@ -102,6 +112,8 @@ MonoBehaviour:
     - {x: 0, y: 3}
     baseValue: 10
     supplierAvailable: 1
+    storageSize: {x: 0, y: 0}
+    compatibleEquipmentIds: []
     purchasePrice: 14
     salePrice: 10
     procurementSign: 0
@@ -117,9 +129,54 @@ MonoBehaviour:
     - {x: 1, y: 1}
     baseValue: 0
     supplierAvailable: 0
+    storageSize: {x: 0, y: 0}
+    compatibleEquipmentIds: []
     purchasePrice: 0
     salePrice: 0
     procurementSign: 1
+    advertisedCategory: 2
+  - id: test-storage-case
+    title: "\u50A8\u7269\u5323\uFF08\u6D4B\u8BD5\uFF09"
+    category: 6
+    description: "\u5F00\u5C40\u6D4B\u8BD5\u7528\u50A8\u7269\u5323\uFF1A\u70B9\u51FB\u6253\u5F0010\xD710\u5185\u90E8\u683C\u5B50\uFF0C\u652F\u6301\u653E\u5165\u548C\u53D6\u51FA\u666E\u901A\u7269\u54C1\u3002\u6682\u4E0D\u53C2\u4E0E\u4EA4\u6613\u3002"
+    color: {r: 0.48, g: 0.66, b: 0.62, a: 1}
+    cells:
+    - {x: 0, y: 0}
+    - {x: 1, y: 0}
+    - {x: 2, y: 0}
+    - {x: 0, y: 1}
+    - {x: 1, y: 1}
+    - {x: 2, y: 1}
+    - {x: 0, y: 2}
+    - {x: 1, y: 2}
+    - {x: 2, y: 2}
+    baseValue: 0
+    supplierAvailable: 0
+    storageSize: {x: 10, y: 10}
+    compatibleEquipmentIds: []
+    purchasePrice: 0
+    salePrice: 0
+    procurementSign: 0
+    advertisedCategory: 2
+  - id: test-portable
+    title: "\u8170\u5305\uFF08\u643A\u5E26\u6D4B\u8BD5\uFF09"
+    category: 8
+    description: "\u643A\u5E26\u529F\u80FD\u6D4B\u8BD5\u7528\uFF1A\u5916\u90E82\xD73\uFF0C\u5185\u90E83\xD73\uFF0C\u70B9\u51FB\u53EF\u9884\u88C5\u666E\u901A\u7269\u54C1\u3002"
+    color: {r: 0.67, g: 0.55, b: 0.39, a: 1}
+    cells:
+    - {x: 0, y: 0}
+    - {x: 1, y: 0}
+    - {x: 0, y: 1}
+    - {x: 1, y: 1}
+    - {x: 0, y: 2}
+    - {x: 1, y: 2}
+    baseValue: 0
+    supplierAvailable: 0
+    storageSize: {x: 3, y: 3}
+    compatibleEquipmentIds: []
+    purchasePrice: 0
+    salePrice: 0
+    procurementSign: 0
     advertisedCategory: 2
   startingItems:
   - sign
@@ -129,6 +186,8 @@ MonoBehaviour:
   - cinnabar
   - jade
   - sword
+  - test-storage-case
+  - test-portable
   herbId: herb
   dewId: dew
   productId: pill

@@ -1,3 +1,5 @@
+> 2026-09-10 用户反馈补充：正常Play开局现在直接提供一件“储物匣（测试）”（3×3 / 内部10×10），点击即可测试，无需Validation菜单。原7件商品保留。下方隔离菜单仍用于设备等分类测试；旧的“正常开局没有储物匣”描述已被本次更新取代。
+
 # DP-30 储存物品基础闭环
 
 2026-09-10；基线 `076fa29`（DP-25）。[DP-30](https://zzrzzrzzr11.atlassian.net/browse/DP-30) / [G-01](https://zzrzzrzzr11.atlassian.net/wiki/spaces/D/pages/1736718) / [数据规范](https://zzrzzrzzr11.atlassian.net/wiki/spaces/D/pages/688131)。交付待用户验收，不启动DP-31。

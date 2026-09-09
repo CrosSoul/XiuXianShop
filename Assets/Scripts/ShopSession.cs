@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace XiuXianShop
 {
-    public enum ContainerId { Storage, Display, Counter, CustomerCounter, Interior }
+    public enum ContainerId { Storage, Display, Counter, CustomerCounter, Interior, LeftHand, RightHand, CarriedPack }
     public enum TurnPhase { Preparation, Open, Closed }
     public enum ItemOwner { Player, Customer }
     public enum TradeDirection { CustomerBuys, CustomerSells }
@@ -57,7 +57,7 @@ namespace XiuXianShop
 
     // One small session owns the grid and economic mutations. UI never edits inventory directly.
     // Failed operations validate before committing: no money or items are consumed on failure.
-    public sealed class ShopSession
+    public sealed partial class ShopSession
     {
         public const int DailyCustomerCount = 5;
         readonly ShopCatalog catalog;
@@ -132,6 +132,7 @@ namespace XiuXianShop
         }
         public string CaptureSave()
         {
+            if(IsCarrying)throw new InvalidOperationException("请先结束携带状态再保存；当前版本不保存外出携带过程。" );
             if(Phase!=TurnPhase.Preparation)throw new InvalidOperationException("仅营业准备阶段可存档；请先闭店并结束回合。");
             return JsonUtility.ToJson(new ShopSave {catalogSignature=Hash128.Compute(JsonUtility.ToJson(catalog)).ToString(),
                 turn=Turn,money=Money,rent=Rent,debt=RentDebt,nextId=nextId,customerSeed=customerSeedValue,customerDraws=customerDraws,
@@ -204,6 +205,7 @@ namespace XiuXianShop
 
         public bool Fits(GridItem item, ContainerId target, int x, int y, int rotation, bool flipped, ISet<int> ignored = null, int storageItemId=0)
         {
+            if(IsHand(target))return !In(target).Any(i=>i.Id!=item.Id);
             Vector2Int size=GridSize(target,storageItemId);
             var cells=item.Definition.Shape(rotation,flipped).Select(p=>p+new Vector2Int(x,y)).ToArray();
             if (cells.Any(p=>p.x<0 || p.y<0 || p.x>=size.x || p.y>=size.y)) return false;
@@ -223,6 +225,7 @@ namespace XiuXianShop
         {
             var item=Find(id);
             reason="";
+            if(IsCarrying && id==CarriedPackId){reason="携带期间不能移动或更换已选背包，请先返回。";return false;}
             if (item==null) { reason="物品已不在这里。"; return false; }
             if (item.ForSale && target!=ContainerId.Counter && target!=ContainerId.CustomerCounter) { reason="这是顾客的货物；确认收购后才属于你。"; return false; }
             if (!item.ForSale && target==ContainerId.CustomerCounter) { reason="顾客柜台仅展示顾客来货；自有物品请放在仓库、展示柜或谈判柜台。"; return false; }
@@ -234,6 +237,17 @@ namespace XiuXianShop
         bool StoragePlacementAllowed(GridItem item,ContainerId target,int storageItemId,out string reason)
         {
             reason="";
+            if(IsHand(target))
+            {
+                if(!IsCarrying || item.ForSale || item.Id==CarriedPackId){reason="当前不能把该物品放入手持位。";return false;}
+                if(storageItemId!=0){reason="手持物不能同时位于容器内部。";return false;}
+                return true;
+            }
+            if(target==ContainerId.CarriedPack)
+            {
+                if(IsCarrying && item.Id==CarriedPackId && item.Definition.category==ItemCategory.PortableContainer && storageItemId==0)return true;
+                reason="便携储存必须通过出门选择界面确认。";return false;
+            }
             if(item.Definition.IsStorage && target!=ContainerId.Storage)
             {reason="储存物品只能放在仓库，暂不支持交易、丢弃或互相嵌套。";return false;}
             if(target!=ContainerId.Interior)
@@ -244,7 +258,7 @@ namespace XiuXianShop
                 return true;
             }
             var box=Find(storageItemId);
-            if(box==null || !box.Definition.IsStorage || box.Owner!=ItemOwner.Player || box.Container!=ContainerId.Storage ||
+            if(box==null || !box.Definition.IsStorage || box.Owner!=ItemOwner.Player || (box.Container!=ContainerId.Storage && !(box.Container==ContainerId.CarriedPack && box.Id==CarriedPackId && IsCarrying)) ||
                 box.Definition.storageSize.x<1 || box.Definition.storageSize.y<1)
             {reason="储存物品不存在或内部尺寸未配置。";return false;}
             if(item.Owner!=ItemOwner.Player){reason="顾客物品未成交，不能收入储存物品。";return false;}
@@ -261,7 +275,7 @@ namespace XiuXianShop
         public bool Move(int id, ContainerId target, int x, int y, int rotation, bool flipped, int storageItemId=0)
         {
             if (!CanMove(id,target,x,y,rotation,flipped,out string reason,storageItemId)) return Fail(reason);
-            var item=Find(id); Place(item,target,x,y,rotation,flipped);item.StorageItemId=storageItemId;
+            var item=Find(id); Place(item,target,IsHand(target)?0:x,IsHand(target)?0:y,rotation,flipped);item.StorageItemId=storageItemId;
             TryPlaceSupplierItems();
             return Success($"已摆放 {item.Definition.title}。" );
         }
@@ -303,6 +317,7 @@ namespace XiuXianShop
 
         public bool BeginBusiness()
         {
+            if(IsCarrying)return Fail("请先结束携带状态再营业。" );
             if (Phase!=TurnPhase.Preparation) return Fail("本月已经营业过；闭店后推进下个月。" );
             var attraction=PreviewAttraction();
             var categories=catalog.items.Where(IsSaleItem).Select(d=>d.category).Distinct().OrderBy(c=>(int)c).ToArray();
@@ -471,6 +486,7 @@ namespace XiuXianShop
         }
         public bool AdvanceTurn()
         {
+            if(IsCarrying)return Fail("请先结束携带状态再推进月份。" );
             if(Phase!=TurnPhase.Closed) return Fail("请先开始并结束本回合营业，再结束回合。" );
             int due=RentDebt;
             if(Turn%catalog.rentPeriod==0) { due+=Rent; Rent=(int)Math.Ceiling(Rent*1.05); }
@@ -488,7 +504,7 @@ namespace XiuXianShop
             foreach(var item in items)
             {
                 if(!StoragePlacementAllowed(item,item.Container,item.StorageItemId,out var storageError))return storageError;
-                if(!Fits(item,item.Container,item.X,item.Y,item.Rotation,item.Flipped,storageItemId:item.StorageItemId)) return "Invalid grid placement: "+item.Id;
+                if(item.Container!=ContainerId.CarriedPack && !Fits(item,item.Container,item.X,item.Y,item.Rotation,item.Flipped,storageItemId:item.StorageItemId)) return "Invalid grid placement: "+item.Id;
                 if(item.ForSale && (Offer==null || !Offer.SupplierItems.Contains(item) ||
                     (item.Container!=ContainerId.Counter && item.Container!=ContainerId.CustomerCounter))) return "Orphaned customer item";
                 if(!item.ForSale && item.Container==ContainerId.CustomerCounter)return "Player item on customer counter";

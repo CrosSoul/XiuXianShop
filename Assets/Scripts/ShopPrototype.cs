@@ -61,6 +61,11 @@ namespace XiuXianShop
             if(Session!=null && displayedPricingRevision!=Session.PricingRevision && !IsDragging) Refresh();
             var keyboard=Keyboard.current;
             if(keyboard==null || Session==null) return;
+            if(carrySelection!=null)
+            {
+                if(keyboard.escapeKey.wasPressedThisFrame)CloseCarrySelection();
+                return;
+            }
             if(CalendarView!=null && CalendarView.IsOpen)
             {
                 if(keyboard.escapeKey.wasPressedThisFrame)CalendarView.Close();
@@ -100,6 +105,7 @@ namespace XiuXianShop
             Card("Header",24,20,1552,66,panel);
             Label(content,"ShopName",44,30,190,44,"栖云当铺",30,gold);
             MakeButton("CalendarOpen",240,33,100,38,"日历",()=>{CancelDrag();CalendarView.Open();});
+            MakeButton("CarryOpen",720,74,240,34,"出门携带",OpenCarrySelection);
             header=Label(content,"Resources",350,34,380,34,"",24,textColor);
             phaseText=Label(content,"Phase",754,35,310,32,"",22,gold);
             rent=Label(content,"Rent",1110,31,445,44,"",15,muted);
@@ -208,8 +214,10 @@ namespace XiuXianShop
             itemViews.Clear();
             foreach(var item in Session.Items)
             {
-                if(item.Container==ContainerId.Interior && (storageWindow==null || item.StorageItemId!=openStorageId))continue;
-                var view=DrawItem(grids[item.Container],item,item.Rotation,item.Flipped,cellSizes[item.Container],true);
+                if(!grids.ContainsKey(item.Container) || (item.Container==ContainerId.Interior && item.StorageItemId!=openStorageId))continue;
+                float itemCell=cellSizes[item.Container];
+                if(ShopSession.IsHand(item.Container))itemCell/=Mathf.Max(item.Cells.Max(p=>p.x)+1,item.Cells.Max(p=>p.y)+1);
+                var view=DrawItem(grids[item.Container],item,item.Rotation,item.Flipped,itemCell,true);
                 view.anchoredPosition=new Vector2(item.X*cellSizes[item.Container],-item.Y*cellSizes[item.Container]); itemViews[item.Id]=view;
             }
             header.text=$"{Session.DateLabel}    |    灵石 {Session.Money}";
@@ -298,7 +306,7 @@ namespace XiuXianShop
         // Explicit developer/test entry. The Editor menu supplies a temporary catalog clone.
         public void StartVerificationSession(ShopCatalog configuration,int seed,MarketCalendar calendar=null)
         {
-            CloseStorage();CancelDrag();catalog=configuration;Session=new ShopSession(catalog,customerSeed:seed,calendar:calendar);
+            CloseCarryPanel();CloseCarrySelection();CloseStorage();CancelDrag();catalog=configuration;Session=new ShopSession(catalog,customerSeed:seed,calendar:calendar);
             CalendarMessage=null;CalendarView.Close();NegotiationView.Close();
             selectedId=0;localNotice=null;Refresh();
         }
@@ -319,6 +327,7 @@ namespace XiuXianShop
         }
         public void LoadPreparation()
         {
+            if(Session.IsCarrying){CalendarMessage="请先结束携带状态再读取存档。";return;}
             if(Session.Phase!=TurnPhase.Preparation){CalendarMessage="仅营业准备阶段可读档。";return;}
             try
             {
@@ -370,10 +379,10 @@ namespace XiuXianShop
             var shape=Session.Find(dragId).Definition.Shape(dragRotation,dragFlipped);
             int offsetX=Mathf.Clamp(grabCell.x,0,shape.Max(p=>p.x)),offsetY=Mathf.Clamp(grabCell.y,0,shape.Max(p=>p.y));
             foreach(var pair in grids.OrderByDescending(p=>p.Key==ContainerId.Interior))
-                if(pair.Value.gameObject.activeInHierarchy && (pair.Key==ContainerId.Interior || storageWindow==null || !RectTransformUtility.RectangleContainsScreenPoint(storageWindow,screen,null)) && RectTransformUtility.RectangleContainsScreenPoint(pair.Value,screen,null))
+                if(pair.Value.gameObject.activeInHierarchy && (pair.Key==ContainerId.Interior || storageWindow==null || !RectTransformUtility.RectangleContainsScreenPoint(storageWindow,screen,null)) && (carryWindow==null || pair.Key==ContainerId.Interior || ShopSession.IsHand(pair.Key) || !RectTransformUtility.RectangleContainsScreenPoint(carryWindow,screen,null)) && carrySelection==null && RectTransformUtility.RectangleContainsScreenPoint(pair.Value,screen,null))
                 {
                     RectTransformUtility.ScreenPointToLocalPointInRectangle(pair.Value,screen,null,out var p);
-                    container=pair.Key; x=Mathf.FloorToInt(p.x/cellSizes[container])-offsetX; y=Mathf.FloorToInt(-p.y/cellSizes[container])-offsetY; return true;
+                    container=pair.Key; if(ShopSession.IsHand(container)){x=y=0;return true;} x=Mathf.FloorToInt(p.x/cellSizes[container])-offsetX; y=Mathf.FloorToInt(-p.y/cellSizes[container])-offsetY; return true;
                 }
             container=ContainerId.Storage;x=y=0;return false;
         }
@@ -390,7 +399,7 @@ namespace XiuXianShop
                 var color=valid?new Color(.35f,.92f,.54f,.64f):new Color(1f,.27f,.29f,.65f);
                 float cell=cellSizes[target];
                 preview=Rect(grids[target],"PlacementPreview",x*cell,y*cell,1,1);
-                foreach(var p in Session.Find(dragId).Definition.Shape(dragRotation,dragFlipped)) Image(Rect(preview,"PreviewCell",p.x*cell+2,p.y*cell+2,cell-5,cell-5),color);
+                foreach(var p in ShopSession.IsHand(target)?new[]{Vector2Int.zero}:Session.Find(dragId).Definition.Shape(dragRotation,dragFlipped)) Image(Rect(preview,"PreviewCell",p.x*cell+2,p.y*cell+2,cell-5,cell-5),color);
                 previewText.text=PreviewMessage;previewText.color=color;
             }
             else {PreviewMessage="格子外不能放置，松开将返回原位。";previewText.text=PreviewMessage;previewText.color=gold;}

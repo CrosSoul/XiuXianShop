@@ -65,6 +65,7 @@ namespace XiuXianShop.Tests
         Vector2 ItemPoint(GridItem item)
         {
             var first=item.Cells.OrderBy(p=>p.y).ThenBy(p=>p.x).First();
+            if(ShopSession.IsHand(item.Container)){var view=shop.ItemView(item.Id);float cell=view.rect.width/(item.Cells.Max(p=>p.x)+1);return RectTransformUtility.WorldToScreenPoint(null,view.TransformPoint(new Vector3((first.x+.5f)*cell,-(first.y+.5f)*cell,0)));}
             return shop.CellScreenPosition(item.Container,item.X+first.x,item.Y+first.y);
         }
         IEnumerator StartDrag(GridItem item,Vector2 target)
@@ -118,7 +119,7 @@ namespace XiuXianShop.Tests
             yield return Key(UnityEngine.InputSystem.Key.R);Assert.That(shop.PreviewMessage,Does.Contain("可以放置"));yield return MouseAt(destination,false);
             Assert.That(sword.Rotation,Is.EqualTo(1));Assert.That(sword.Y,Is.EqualTo(3));
             yield return Drag(sword,ContainerId.Display,4,3);
-            Assert.That(sword.X,Is.Zero);Assert.That(sword.Y,Is.EqualTo(3));Assert.That(s.Items.Count,Is.EqualTo(7));
+            Assert.That(sword.X,Is.Zero);Assert.That(sword.Y,Is.EqualTo(3));Assert.That(s.Items.Count,Is.EqualTo(9));
             // A visible rotate button must use the same validation (vertical sword cannot fit here).
             yield return Click("Rotate");Assert.That(sword.Rotation,Is.EqualTo(1));
             yield return StartDrag(sword,shop.CellScreenPosition(ContainerId.Storage,2,4));
@@ -178,7 +179,7 @@ namespace XiuXianShop.Tests
 
         [UnityTest] public IEnumerator SavedSceneStartsFreshAndAllContainersAreVisible()
         {
-            Assert.That(shop.Session.Turn,Is.EqualTo(1));Assert.That(shop.Session.Money,Is.EqualTo(120));Assert.That(shop.Session.Items.Count,Is.EqualTo(7));
+            Assert.That(shop.Session.Turn,Is.EqualTo(1));Assert.That(shop.Session.Money,Is.EqualTo(120));Assert.That(shop.Session.Items.Count,Is.EqualTo(9));
             Assert.That(shop.Session.Offer,Is.Null);
             foreach(ContainerId id in new[]{ContainerId.Storage,ContainerId.Display,ContainerId.Counter,ContainerId.CustomerCounter})
             { var size=ShopSession.Size(id);foreach(var p in new[]{shop.CellScreenPosition(id,0,0),shop.CellScreenPosition(id,size.x-1,size.y-1)})

@@ -59,8 +59,12 @@ namespace XiuXianShop.Tests
             Assert.That(session.FindSpace(bought,ContainerId.Storage,out _,out _),Is.False);
             Assert.That(session.Move(bought.Id,ContainerId.Storage,0,0,0,false),Is.False);
             Assert.That(bought.StorageItemId,Is.EqualTo(box.Id));Assert.That(session.Find(bought.Id),Is.SameAs(bought));
+            Assert.That(session.EndBusiness());Assert.That(session.BeginCarrying(0));
+            Assert.That(session.Move(bought.Id,ContainerId.LeftHand,0,0,0,false));
+            Assert.That(session.EndCarrying(),Is.False);Assert.That(bought.PurchaseValue,Is.EqualTo(history));
+            Assert.That(session.Move(bought.Id,ContainerId.Interior,0,0,0,false,box.Id));Assert.That(session.EndCarrying());
             session.SetPriceTag(new PriceTag{id="test",title="测试",percent=.2f,category=ItemCategory.Material,playerBuys=true,playerSells=true});
-            Assert.That(session.EndBusiness());Assert.That(session.AdvanceTurn());
+            Assert.That(session.AdvanceTurn());
             var restored=ShopSession.RestoreSave(catalog,session.CaptureSave());
             Assert.That(restored.Find(bought.Id).PurchaseValue,Is.EqualTo(history));
             Assert.That(restored.Find(bought.Id).StorageItemId,Is.EqualTo(box.Id));Assert.That(restored.ValidateState(),Is.Null);

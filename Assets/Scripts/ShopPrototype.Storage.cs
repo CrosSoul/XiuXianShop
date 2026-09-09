@@ -11,6 +11,7 @@ namespace XiuXianShop
 
         public void OpenStorage(int id)
         {
+            if(Session.IsCarrying){localNotice="携带期间请使用携带面板，不能打开或切换其他储存窗口。";return;}
             var box=Session.Find(id);
             if(!box.Definition.IsStorage || box.ForSale || box.Container!=ContainerId.Storage)return;
             var size=box.Definition.storageSize;

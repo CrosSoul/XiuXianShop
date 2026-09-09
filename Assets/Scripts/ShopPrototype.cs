@@ -10,7 +10,7 @@ using UnityEngine.UI;
 namespace XiuXianShop
 {
     // A fixed-view prototype screen. All inventory rules live in ShopSession, not in UI objects.
-    public sealed class ShopPrototype : MonoBehaviour
+    public sealed partial class ShopPrototype : MonoBehaviour
     {
         [SerializeField] ShopCatalog catalog;
         public ShopSession Session { get; private set; }
@@ -208,6 +208,7 @@ namespace XiuXianShop
             itemViews.Clear();
             foreach(var item in Session.Items)
             {
+                if(item.Container==ContainerId.Interior && (storageWindow==null || item.StorageItemId!=openStorageId))continue;
                 var view=DrawItem(grids[item.Container],item,item.Rotation,item.Flipped,cellSizes[item.Container],true);
                 view.anchoredPosition=new Vector2(item.X*cellSizes[item.Container],-item.Y*cellSizes[item.Container]); itemViews[item.Id]=view;
             }
@@ -288,19 +289,21 @@ namespace XiuXianShop
         public void Run(Func<bool> action) { if(IsDragging) {localNotice="请先放下物品，或按 Esc 取消拖动。";notice.text=localNotice;return;} localNotice=null; action(); Refresh(); }
         public void SelectItem(int id)
         {
-            if(IsDragging)return;selectedId=id;localNotice=null;Refresh();
+            if(IsDragging)return;selectedId=id;localNotice=null;
+            if(Session.Find(id).Definition.IsStorage)OpenStorage(id);
+            Refresh();
             Canvas.ForceUpdateCanvases();selection.GetComponentInParent<ScrollRect>().verticalNormalizedPosition=1;
         }
 
         // Explicit developer/test entry. The Editor menu supplies a temporary catalog clone.
         public void StartVerificationSession(ShopCatalog configuration,int seed,MarketCalendar calendar=null)
         {
-            CancelDrag();catalog=configuration;Session=new ShopSession(catalog,customerSeed:seed,calendar:calendar);
+            CloseStorage();CancelDrag();catalog=configuration;Session=new ShopSession(catalog,customerSeed:seed,calendar:calendar);
             CalendarMessage=null;CalendarView.Close();NegotiationView.Close();
             selectedId=0;localNotice=null;Refresh();
         }
 
-        string PreparationSavePath => SavePath??System.IO.Path.Combine(Application.dataPath,"../UserSettings/ShopMonthlyPreparation-v2.json");
+        string PreparationSavePath => SavePath??System.IO.Path.Combine(Application.dataPath,"../UserSettings/ShopStoragePreparation-v3.json");
         public void SavePreparation()
         {
             try
@@ -320,7 +323,7 @@ namespace XiuXianShop
             try
             {
                 var restored=ShopSession.RestoreSave(catalog,System.IO.File.ReadAllText(PreparationSavePath));
-                CancelDrag();Session=restored;selectedId=0;localNotice=null;
+                CloseStorage();CancelDrag();Session=restored;selectedId=0;localNotice=null;
                 CalendarMessage=$"已读取{Session.DateLabel}营业准备，行情未重抽。";Refresh();
             }
             catch(Exception e){CalendarMessage="未读取，当前经营保留："+e.Message;}
@@ -366,8 +369,8 @@ namespace XiuXianShop
         {
             var shape=Session.Find(dragId).Definition.Shape(dragRotation,dragFlipped);
             int offsetX=Mathf.Clamp(grabCell.x,0,shape.Max(p=>p.x)),offsetY=Mathf.Clamp(grabCell.y,0,shape.Max(p=>p.y));
-            foreach(var pair in grids)
-                if(RectTransformUtility.RectangleContainsScreenPoint(pair.Value,screen,null))
+            foreach(var pair in grids.OrderByDescending(p=>p.Key==ContainerId.Interior))
+                if(pair.Value.gameObject.activeInHierarchy && (pair.Key==ContainerId.Interior || storageWindow==null || !RectTransformUtility.RectangleContainsScreenPoint(storageWindow,screen,null)) && RectTransformUtility.RectangleContainsScreenPoint(pair.Value,screen,null))
                 {
                     RectTransformUtility.ScreenPointToLocalPointInRectangle(pair.Value,screen,null,out var p);
                     container=pair.Key; x=Mathf.FloorToInt(p.x/cellSizes[container])-offsetX; y=Mathf.FloorToInt(-p.y/cellSizes[container])-offsetY; return true;
@@ -382,7 +385,7 @@ namespace XiuXianShop
             if(preview!=null) {preview.gameObject.SetActive(false);Destroy(preview.gameObject);}
             if(DropPosition(screen,out var target,out int x,out int y))
             {
-                bool valid=Session.CanMove(dragId,target,x,y,dragRotation,dragFlipped,out string reason);
+                bool valid=Session.CanMove(dragId,target,x,y,dragRotation,dragFlipped,out string reason,target==ContainerId.Interior?openStorageId:0);
                 PreviewMessage=valid?"可以放置 · 松开鼠标确认":reason;
                 var color=valid?new Color(.35f,.92f,.54f,.64f):new Color(1f,.27f,.29f,.65f);
                 float cell=cellSizes[target];
@@ -401,7 +404,7 @@ namespace XiuXianShop
             {
                 localNotice=null;var item=Session.Find(dragId);
                 bool buying=item.ForSale && item.Container==ContainerId.CustomerCounter && target==ContainerId.Counter;
-                openNegotiation=Session.Move(dragId,target,x,y,dragRotation,dragFlipped) && buying;
+                openNegotiation=Session.Move(dragId,target,x,y,dragRotation,dragFlipped,target==ContainerId.Interior?openStorageId:0) && buying;
             }
             else localNotice="已返回原位：请将物品放在容器格子内。";
             ClearDrag();Refresh();
@@ -418,13 +421,13 @@ namespace XiuXianShop
         public void RotateSelected()
         {
             if(IsDragging) {dragRotation=(dragRotation+1)%4;RebuildGhost();DragItem(pointer);return;}
-            var item=Session.Find(selectedId); if(item!=null)Run(()=>Session.Move(item.Id,item.Container,item.X,item.Y,(item.Rotation+1)%4,item.Flipped));
+            var item=Session.Find(selectedId); if(item!=null)Run(()=>Session.Move(item.Id,item.Container,item.X,item.Y,(item.Rotation+1)%4,item.Flipped,item.StorageItemId));
         }
         public void FlipSelected()
         {
             // Reflect in screen/grid space even after a quarter-turn: F R = R^-1 F.
             if(IsDragging) {dragRotation=(4-dragRotation)%4;dragFlipped=!dragFlipped;RebuildGhost();DragItem(pointer);return;}
-            var item=Session.Find(selectedId);if(item!=null)Run(()=>Session.Move(item.Id,item.Container,item.X,item.Y,(4-item.Rotation)%4,!item.Flipped));
+            var item=Session.Find(selectedId);if(item!=null)Run(()=>Session.Move(item.Id,item.Container,item.X,item.Y,(4-item.Rotation)%4,!item.Flipped,item.StorageItemId));
         }
     }
 }

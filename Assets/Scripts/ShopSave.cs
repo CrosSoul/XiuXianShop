@@ -6,7 +6,7 @@ namespace XiuXianShop
     [Serializable]
     public sealed class ShopSave
     {
-        public int version=2;
+        public int version=3;
         public string catalogSignature;
         public int turn, money, rent, debt, nextId, customerSeed, customerDraws;
         public int crafted, purchases, sales;
@@ -20,7 +20,7 @@ namespace XiuXianShop
         public int id;
         public string definitionId;
         public ContainerId container;
-        public int x,y,rotation;
+        public int x,y,rotation,storageItemId;
         public bool flipped,hasPurchaseValue;
         public int purchaseValue;
     }

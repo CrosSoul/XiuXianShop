@@ -40,7 +40,7 @@ namespace XiuXianShop
             message=Label(root,"CalendarMessage",100,803,1396,28,"点击持续条查看完整名称与价格效果；重叠事件分行显示。",17,gold);
             save=Button(root,"CalendarSave",100,852,188,40,"保存营业准备",()=>{shop.SavePreparation();Refresh();});
             load=Button(root,"CalendarLoad",302,852,188,40,"读取营业准备",()=>{shop.LoadPreparation();Show(MarketCalendar.YearStart(shop.Session.Turn));});
-            Label(root,"CalendarSaveHint",518,852,960,44,"仅营业准备阶段存取月度存档；旧日制存档保留，不自动转换。",17,ink);
+            Label(root,"CalendarSaveHint",518,852,960,44,"仅营业准备阶段存取储存版 v3；旧月度 v2 / 日制存档保留，不自动转换。",17,ink);
             gameObject.SetActive(false);
         }
         public void Open() {gameObject.SetActive(true);transform.SetAsLastSibling();Show(MarketCalendar.YearStart(shop.Session.Turn));}

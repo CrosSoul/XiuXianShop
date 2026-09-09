@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace XiuXianShop
 {
-    public enum ContainerId { Storage, Display, Counter, CustomerCounter }
+    public enum ContainerId { Storage, Display, Counter, CustomerCounter, Interior }
     public enum TurnPhase { Preparation, Open, Closed }
     public enum ItemOwner { Player, Customer }
     public enum TradeDirection { CustomerBuys, CustomerSells }
@@ -16,6 +16,7 @@ namespace XiuXianShop
         public ItemDefinition Definition { get; internal set; }
         public ContainerId Container { get; internal set; }
         public ItemOwner Owner { get; internal set; }
+        public int StorageItemId { get; internal set; }
         public int X { get; internal set; }
         public int Y { get; internal set; }
         public int Rotation { get; internal set; }
@@ -135,14 +136,15 @@ namespace XiuXianShop
             return JsonUtility.ToJson(new ShopSave {catalogSignature=Hash128.Compute(JsonUtility.ToJson(catalog)).ToString(),
                 turn=Turn,money=Money,rent=Rent,debt=RentDebt,nextId=nextId,customerSeed=customerSeedValue,customerDraws=customerDraws,
                 crafted=Crafted,purchases=Purchases,sales=Sales,calendar=Calendar.Capture(),tags=priceTags.Values.Select(t=>t.Copy()).ToArray(),
-                items=items.Select(i=>new SavedShopItem{id=i.Id,definitionId=i.Definition.id,container=i.Container,x=i.X,y=i.Y,
+                items=items.Select(i=>new SavedShopItem{id=i.Id,definitionId=i.Definition.id,container=i.Container,storageItemId=i.StorageItemId,x=i.X,y=i.Y,
                     rotation=i.Rotation,flipped=i.Flipped,hasPurchaseValue=i.PurchaseValue.HasValue,purchaseValue=i.PurchaseValue??0}).ToArray()},true);
         }
         public static ShopSession RestoreSave(ShopCatalog catalog,string json)
         {
             var save=JsonUtility.FromJson<ShopSave>(json);
             if(save!=null && save.version==1)throw new ArgumentException("这是旧日制存档，不能将日序号直接转换为月份。原文件保留，请使用月度新存档。");
-            if(save==null || save.version!=2 || save.catalogSignature!=Hash128.Compute(JsonUtility.ToJson(catalog)).ToString())
+            if(save!=null && save.version==2)throw new ArgumentException("这是旧月度 v2 存档，原文件保留；储存物品版本使用独立 v3 存档。" );
+            if(save==null || save.version!=3 || save.catalogSignature!=Hash128.Compute(JsonUtility.ToJson(catalog)).ToString())
                 throw new ArgumentException("存档版本或商品配置不匹配，当前会话未改变。");
             if(save.turn<1 || save.money<0 || save.rent<1 || save.debt<0 || save.nextId<1 || save.items==null || save.tags==null ||
                 save.customerDraws<0 || save.customerDraws>10000000)throw new ArgumentException("存档数据不完整或无效。");
@@ -157,7 +159,7 @@ namespace XiuXianShop
             {
                 if(i==null || i.id<1 || i.id>=save.nextId || !Enum.IsDefined(typeof(ContainerId),i.container) ||
                     i.rotation<0 || i.rotation>3 || (i.hasPurchaseValue && i.purchaseValue<1))throw new ArgumentException("存档物品数据无效。");
-                session.items.Add(new GridItem {Id=i.id,Definition=catalog.Find(i.definitionId),Owner=ItemOwner.Player,Container=i.container,
+                session.items.Add(new GridItem {Id=i.id,Definition=catalog.Find(i.definitionId),Owner=ItemOwner.Player,Container=i.container,StorageItemId=i.storageItemId,
                     X=i.x,Y=i.y,Rotation=i.rotation,Flipped=i.flipped,PurchaseValue=i.hasPurchaseValue?(int?)i.purchaseValue:null});
             }
             string error=session.ValidateState();if(error!=null)throw new ArgumentException("存档库存无效："+error);
@@ -169,7 +171,8 @@ namespace XiuXianShop
         public static Vector2Int Size(ContainerId container)
             => container == ContainerId.Storage ? new Vector2Int(10,7) : container == ContainerId.Display ? new Vector2Int(6,4) : new Vector2Int(5,4);
         public GridItem Find(int id) => items.FirstOrDefault(i=>i.Id==id);
-        public IEnumerable<GridItem> In(ContainerId container) => items.Where(i=>i.Container==container);
+        public IEnumerable<GridItem> In(ContainerId container, int storageItemId=0) => items.Where(i=>i.Container==container && i.StorageItemId==storageItemId);
+        public Vector2Int GridSize(ContainerId container,int storageItemId=0) => container==ContainerId.Interior ? Find(storageItemId).Definition.storageSize : Size(container);
         public int Occupied(ContainerId container) => In(container).Sum(i=>i.Cells.Length);
         GridItem NewItem(ItemDefinition def, ItemOwner owner) => new GridItem{Id=nextId++, Definition=def, Owner=owner};
         bool Fail(string message) { Message=message; return false; }
@@ -199,12 +202,12 @@ namespace XiuXianShop
         public PriceQuote Estimate(GridItem item) => item.Container == ContainerId.Counter || item.ForSale ? Quote(item) :
             new PriceQuote(item.Definition, Array.Empty<PriceTag>());
 
-        public bool Fits(GridItem item, ContainerId target, int x, int y, int rotation, bool flipped, ISet<int> ignored = null)
+        public bool Fits(GridItem item, ContainerId target, int x, int y, int rotation, bool flipped, ISet<int> ignored = null, int storageItemId=0)
         {
-            Vector2Int size=Size(target);
+            Vector2Int size=GridSize(target,storageItemId);
             var cells=item.Definition.Shape(rotation,flipped).Select(p=>p+new Vector2Int(x,y)).ToArray();
             if (cells.Any(p=>p.x<0 || p.y<0 || p.x>=size.x || p.y>=size.y)) return false;
-            var occupied=new HashSet<Vector2Int>(In(target).Where(i=>i.Id!=item.Id && (ignored==null || !ignored.Contains(i.Id)))
+            var occupied=new HashSet<Vector2Int>(In(target,storageItemId).Where(i=>i.Id!=item.Id && (ignored==null || !ignored.Contains(i.Id)))
                 .SelectMany(i=>i.Cells.Select(p=>p+new Vector2Int(i.X,i.Y))));
             return !cells.Any(occupied.Contains);
         }
@@ -216,26 +219,54 @@ namespace XiuXianShop
             x=y=0; return false;
         }
 
-        public bool CanMove(int id, ContainerId target, int x, int y, int rotation, bool flipped, out string reason)
+        public bool CanMove(int id, ContainerId target, int x, int y, int rotation, bool flipped, out string reason, int storageItemId=0)
         {
             var item=Find(id);
             reason="";
             if (item==null) { reason="物品已不在这里。"; return false; }
             if (item.ForSale && target!=ContainerId.Counter && target!=ContainerId.CustomerCounter) { reason="这是顾客的货物；确认收购后才属于你。"; return false; }
             if (!item.ForSale && target==ContainerId.CustomerCounter) { reason="顾客柜台仅展示顾客来货；自有物品请放在仓库、展示柜或谈判柜台。"; return false; }
-            if (!Fits(item,target,x,y,rotation,flipped)) { reason="放不下：不能越界，也不能覆盖其他物品。"; return false; }
+            if (!StoragePlacementAllowed(item,target,storageItemId,out reason)) return false;
+            if (!Fits(item,target,x,y,rotation,flipped,storageItemId:storageItemId)) { reason="放不下：不能越界，也不能覆盖其他物品。"; return false; }
             return true;
         }
 
-        public bool Move(int id, ContainerId target, int x, int y, int rotation, bool flipped)
+        bool StoragePlacementAllowed(GridItem item,ContainerId target,int storageItemId,out string reason)
         {
-            if (!CanMove(id,target,x,y,rotation,flipped,out string reason)) return Fail(reason);
-            var item=Find(id); Place(item,target,x,y,rotation,flipped);
+            reason="";
+            if(item.Definition.IsStorage && target!=ContainerId.Storage)
+            {reason="储存物品只能放在仓库，暂不支持交易、丢弃或互相嵌套。";return false;}
+            if(target!=ContainerId.Interior)
+            {
+                if(storageItemId!=0){reason="根层物品不能带有储存物品引用。";return false;}
+                if(item.Definition.category==ItemCategory.ProductionEquipment && target!=ContainerId.Storage)
+                {reason="生产设备只能放在仓库或兼容设备匣。";return false;}
+                return true;
+            }
+            var box=Find(storageItemId);
+            if(box==null || !box.Definition.IsStorage || box.Owner!=ItemOwner.Player || box.Container!=ContainerId.Storage ||
+                box.Definition.storageSize.x<1 || box.Definition.storageSize.y<1)
+            {reason="储存物品不存在或内部尺寸未配置。";return false;}
+            if(item.Owner!=ItemOwner.Player){reason="顾客物品未成交，不能收入储存物品。";return false;}
+            bool equipment=item.Definition.category==ItemCategory.ProductionEquipment;
+            if(box.Definition.category==ItemCategory.EquipmentContainer)
+            {
+                if(!equipment || !box.Definition.compatibleEquipmentIds.Contains(item.Definition.id))
+                {reason="设备匣只接纳兼容的生产设备。";return false;}
+            }
+            else if(equipment){reason="普通及便携储存不接纳生产设备。";return false;}
+            return true;
+        }
+
+        public bool Move(int id, ContainerId target, int x, int y, int rotation, bool flipped, int storageItemId=0)
+        {
+            if (!CanMove(id,target,x,y,rotation,flipped,out string reason,storageItemId)) return Fail(reason);
+            var item=Find(id); Place(item,target,x,y,rotation,flipped);item.StorageItemId=storageItemId;
             TryPlaceSupplierItems();
             return Success($"已摆放 {item.Definition.title}。" );
         }
         static void Place(GridItem item, ContainerId target, int x, int y, int rotation, bool flipped)
-        { item.Container=target; item.X=x; item.Y=y; item.Rotation=((rotation%4)+4)%4; item.Flipped=flipped; }
+        { item.Container=target; item.StorageItemId=0; item.X=x; item.Y=y; item.Rotation=((rotation%4)+4)%4; item.Flipped=flipped; }
 
         public DisplayAttraction PreviewAttraction()
         {
@@ -267,7 +298,7 @@ namespace XiuXianShop
                 Supplies=hasAdvertisement?supplies:allSupplies
             };
         }
-        static bool IsSaleItem(ItemDefinition definition) => !definition.procurementSign && definition.baseValue>0
+        static bool IsSaleItem(ItemDefinition definition) => !definition.IsStorage && definition.category!=ItemCategory.ProductionEquipment && !definition.procurementSign && definition.baseValue>0
             && definition.category!=ItemCategory.Unclassified && definition.category!=ItemCategory.BusinessSign;
 
         public bool BeginBusiness()
@@ -325,7 +356,7 @@ namespace XiuXianShop
         public bool StageSale()
         {
             if (Offer==null) return Fail("当前没有待摆放的出售商品。" );
-            foreach(var item in items.Where(i=>i.Owner==ItemOwner.Player && i.Container!=ContainerId.Counter && !i.Definition.procurementSign && i.Definition.category==Offer.RequestedCategory))
+            foreach(var item in items.Where(i=>i.Owner==ItemOwner.Player && i.Container!=ContainerId.Counter && i.Container!=ContainerId.Interior && !i.Definition.IsStorage && i.Definition.category!=ItemCategory.ProductionEquipment && !i.Definition.procurementSign && i.Definition.category==Offer.RequestedCategory))
                 if(FindSpace(item,ContainerId.Counter,out int x,out int y)) return Move(item.Id,ContainerId.Counter,x,y,item.Rotation,item.Flipped);
             return Fail("没有可摆放的同类商品，或柜台空间不足。也可以手动拖入任意物品。" );
         }
@@ -456,7 +487,8 @@ namespace XiuXianShop
             if(items.Select(i=>i.Id).Distinct().Count()!=items.Count) return "Duplicate IDs";
             foreach(var item in items)
             {
-                if(!Fits(item,item.Container,item.X,item.Y,item.Rotation,item.Flipped)) return "Invalid grid placement: "+item.Id;
+                if(!StoragePlacementAllowed(item,item.Container,item.StorageItemId,out var storageError))return storageError;
+                if(!Fits(item,item.Container,item.X,item.Y,item.Rotation,item.Flipped,storageItemId:item.StorageItemId)) return "Invalid grid placement: "+item.Id;
                 if(item.ForSale && (Offer==null || !Offer.SupplierItems.Contains(item) ||
                     (item.Container!=ContainerId.Counter && item.Container!=ContainerId.CustomerCounter))) return "Orphaned customer item";
                 if(!item.ForSale && item.Container==ContainerId.CustomerCounter)return "Player item on customer counter";

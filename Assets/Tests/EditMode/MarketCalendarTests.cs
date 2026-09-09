@@ -29,7 +29,7 @@ namespace XiuXianShop.Tests
         }
         [Test,Category("DP25")] public void LegacyDailySaveIsRejectedWithoutChangingSession()
         {
-            var s=Session();string current=s.CaptureSave();string old=current.Replace("\"version\": 2","\"version\": 1");
+            var s=Session();string current=s.CaptureSave();string old=current.Replace("\"version\": 3","\"version\": 1");
             Assert.That(old,Is.Not.EqualTo(current));
             Assert.That(()=>ShopSession.RestoreSave(catalog,old),Throws.ArgumentException.With.Message.Contains("旧日制"));
             Assert.That(s.CaptureSave(),Is.EqualTo(current));

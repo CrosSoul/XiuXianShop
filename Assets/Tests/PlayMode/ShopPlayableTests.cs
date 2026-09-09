@@ -180,7 +180,7 @@ namespace XiuXianShop.Tests
         {
             Assert.That(shop.Session.Turn,Is.EqualTo(1));Assert.That(shop.Session.Money,Is.EqualTo(120));Assert.That(shop.Session.Items.Count,Is.EqualTo(7));
             Assert.That(shop.Session.Offer,Is.Null);
-            foreach(ContainerId id in System.Enum.GetValues(typeof(ContainerId)))
+            foreach(ContainerId id in new[]{ContainerId.Storage,ContainerId.Display,ContainerId.Counter,ContainerId.CustomerCounter})
             { var size=ShopSession.Size(id);foreach(var p in new[]{shop.CellScreenPosition(id,0,0),shop.CellScreenPosition(id,size.x-1,size.y-1)})
                 {Assert.That(p.x,Is.InRange(0,Screen.width));Assert.That(p.y,Is.InRange(0,Screen.height));} }
             foreach(string button in new[]{"BeginBusiness","Craft","Rotate","Flip","AdvanceTurn","NegotiationOpen"})Assert.That(shop.FindButton(button),Is.Not.Null);

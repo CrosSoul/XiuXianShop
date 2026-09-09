@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace XiuXianShop
 {
-    public enum ItemCategory { Unclassified, Medicine, Material, Equipment, Container, BusinessSign }
+    public enum ItemCategory { Unclassified, Medicine, Material, Equipment, Container, BusinessSign, StorageContainer, EquipmentContainer, PortableContainer, ProductionEquipment }
 
     [Serializable]
     public sealed class BuyerBudgetTier
@@ -27,6 +27,11 @@ namespace XiuXianShop
         [Min(0), Tooltip("商品固有价值；成交报价在此基础上按标签计算。")]
         public int baseValue;
         public bool supplierAvailable = true;
+        [Tooltip("储存物品内部格子尺寸；0 表示尚未配置，不能打开。外部形状仍由 cells 决定。")]
+        public Vector2Int storageSize;
+        [Tooltip("设备储存可接纳的生产设备稳定 ID；只配置已确认或隔离测试的兼容项。")]
+        public string[] compatibleEquipmentIds = Array.Empty<string>();
+        public bool IsStorage => category==ItemCategory.StorageContainer || category==ItemCategory.EquipmentContainer || category==ItemCategory.PortableContainer;
         // Retained only for one-time migration of existing assets, never read by trading.
         [HideInInspector] public int purchasePrice;
         [HideInInspector] public int salePrice;
@@ -81,6 +86,19 @@ namespace XiuXianShop
         [Range(0,1), Tooltip("有可售商品展示时增加的买家概率（从卖家概率中扣除）。")]
         public float displayedGoodsBuyerBonus = .2f;
         public ItemDefinition Find(string id) => items.First(d => d.id == id);
+        // Explicit isolated fixture; never writes the catalog asset or imports draft goods.
+        public void SetStorageVerificationDefaults()
+        {
+            SetPrototypeDefaults();
+            Vector2Int[] Rectangle(int w,int h) => Enumerable.Range(0,w*h).Select(i=>new Vector2Int(i%w,i/w)).ToArray();
+            items=items.Concat(new[]{
+                new ItemDefinition{id="test-storage-case",title="储物匣（隔离验证）",category=ItemCategory.StorageContainer,cells=Rectangle(3,3),storageSize=new Vector2Int(10,10),supplierAvailable=false},
+                new ItemDefinition{id="test-equipment-case",title="设备匣（暂定6×6）",category=ItemCategory.EquipmentContainer,cells=Rectangle(3,3),storageSize=new Vector2Int(6,6),compatibleEquipmentIds=new[]{"test-production"},supplierAvailable=false},
+                new ItemDefinition{id="test-production",title="生产设备（分类测试）",category=ItemCategory.ProductionEquipment,cells=Rectangle(2,2),supplierAvailable=false},
+                new ItemDefinition{id="test-portable",title="便携储存（分类测试）",category=ItemCategory.PortableContainer,cells=Rectangle(2,3),storageSize=new Vector2Int(3,3),supplierAvailable=false}
+            }).ToArray();
+            startingItems=new[]{"test-storage-case","herb","sword","pill","test-equipment-case","test-production","test-portable"};
+        }
         public static string CategoryName(ItemCategory category)
         {
             switch(category)
@@ -90,6 +108,10 @@ namespace XiuXianShop
                 case ItemCategory.Equipment: return "装备";
                 case ItemCategory.Container: return "容器";
                 case ItemCategory.BusinessSign: return "业务招牌";
+                case ItemCategory.StorageContainer: return "物品储存";
+                case ItemCategory.EquipmentContainer: return "设备储存";
+                case ItemCategory.PortableContainer: return "便携储存";
+                case ItemCategory.ProductionEquipment: return "生产设备";
                 default: return "未分类";
             }
         }

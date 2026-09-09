@@ -77,6 +77,15 @@ namespace XiuXianShop.Editor
             while(shop.Session.Turn<6){shop.Session.BeginBusiness();shop.Session.EndBusiness();shop.Session.AdvanceTurn();}
             shop.Refresh();shop.CalendarView.Open();
         }
+        [MenuItem("XiuXianShop/Validation/Start DP30 Storage Example (resets Play session)")]
+        public static void StartStorageExample()
+        {
+            if(!CanStartVerification())return;
+            StartVerificationDay();verificationCatalog.SetStorageVerificationDefaults();
+            var shop=Object.FindFirstObjectByType<ShopPrototype>();
+            shop.StartVerificationSession(verificationCatalog,17);
+            shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP30VerificationSave.json");
+        }
         [MenuItem("XiuXianShop/Validation/Start Calendar Overlap Example (resets Play session)",true)]
         static bool CanStartCalendarExample()=>CanStartVerification();
         [MenuItem("XiuXianShop/Validation/Advance Calendar Example One Turn (Play session)")]

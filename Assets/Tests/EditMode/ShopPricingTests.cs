@@ -42,7 +42,7 @@ namespace XiuXianShop.Tests
             var s=new ShopSession(catalog);OpenBuyer(s);var basket=s.Items.ToArray();
             Stage(s,basket[0]);Stage(s,basket[1],2);
             Assert.That(s.Move(basket[2].Id,ContainerId.Counter,0,2,0,false));
-            Assert.That(s.CanAcceptTrade(out int total,out _),Is.False);Assert.That(total,Is.EqualTo(69));
+            Assert.That(s.CanAcceptTrade(out int total,out _),Is.True);Assert.That(total,Is.EqualTo(69));
             s.SetPriceTag(Discount());Assert.That(s.CanAcceptTrade(out total,out _));Assert.That(total,Is.EqualTo(51));
             Assert.That(s.AcceptTrade());Assert.That(s.Offer.RemainingBudget,Is.EqualTo(9));Assert.That(s.Money,Is.EqualTo(171));
             Assert.That(s.IncomeToday,Is.EqualTo(51));Assert.That(s.Items,Is.Empty);
@@ -58,7 +58,10 @@ namespace XiuXianShop.Tests
             Assert.That(item.PurchaseValue,Is.EqualTo(16));Assert.That(s.Money,Is.EqualTo(104));
             Assert.That(s.Estimate(item).Amount,Is.EqualTo(20));s.RemovePriceTag("test-market");Stage(s,item);
             Assert.That(s.Estimate(item).Amount,Is.EqualTo(23));Assert.That(item.PurchaseValue,Is.EqualTo(16));
-            Assert.That(s.AcceptTrade(),Is.False);Assert.That(s.ExpensesToday,Is.EqualTo(16));
+            // This item is now owned by the player; it may be sold if the current category allows it.
+            bool expected=s.PreviewTrade().CanConfirm && !s.PreviewTrade().NeedsConcession;
+            Assert.That(s.AcceptTrade(),Is.EqualTo(expected));Assert.That(s.ExpensesToday,Is.EqualTo(16));
+            Assert.That(item.PurchaseValue,Is.EqualTo(16));
         }
         [Test] public void DisplaySnapshotUsesBaseValuesAndDoesNotRecalculateFromQuotes()
         {

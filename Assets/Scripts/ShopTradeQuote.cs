@@ -21,6 +21,13 @@ namespace XiuXianShop
         public long SaleTotal => Lines.Where(l=>!l.Buying).Sum(l=>(long)l.Price.Amount);
         public long PurchaseTotal => Lines.Where(l=>l.Buying).Sum(l=>(long)l.Price.Amount);
         public long Net => SaleTotal-PurchaseTotal;
+        public int CustomerBudget { get; internal set; }
+        public long Shortfall => System.Math.Max(0,Net-CustomerBudget);
+        public long ActualNet => Net-Shortfall;
+        public bool NeedsConcession => Shortfall>0;
+        internal TradeOffer Customer;
+        internal string Context;
+        public bool Matches(ShopTradeQuote other) => other!=null && Customer==other.Customer && Context==other.Context;
         public bool CanConfirm { get; internal set; }
         public string Reason { get; internal set; }
         internal readonly Dictionary<int,Vector2Int> PurchasePositions=new Dictionary<int,Vector2Int>();

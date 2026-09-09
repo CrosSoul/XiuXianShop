@@ -333,7 +333,11 @@ namespace XiuXianShop
         {
             var basket=In(ContainerId.Counter).ToList();
             if(requestAll && !basket.Any(i=>i.ForSale))basket.AddRange(In(ContainerId.CustomerCounter).Where(i=>i.ForSale));
-            var quote=new ShopTradeQuote {Lines=basket.Select(i=>new ShopTradeLine(i,Quote(i))).ToArray()};
+            var quote=new ShopTradeQuote {Lines=basket.Select(i=>new ShopTradeLine(i,Quote(i))).ToArray(),Customer=Offer,CustomerBudget=Offer?.RemainingBudget??0};
+            // Approval is tied to the complete current state, never just the displayed total.
+            quote.Context=$"{requestAll}/{Phase}/{Money}/{Offer?.RemainingBudget}/{Offer?.RequestedCategory}/{PricingRevision}|"+
+                string.Join(";",items.Select(i=>$"{i.Id}:{i.Owner}:{i.Container}:{i.X}:{i.Y}:{i.Rotation}:{i.Flipped}"))+"|"+
+                string.Join(";",quote.Lines.Select(l=>$"{l.Item.Id}:{l.Buying}:{l.Price.Amount}:{l.Price.Modifiers}"));
             quote.CanConfirm=ValidateTrade(quote,out string reason);quote.Reason=reason;return quote;
         }
 
@@ -352,10 +356,8 @@ namespace XiuXianShop
                 if(!line.Buying && item.Definition.category!=Offer.RequestedCategory)
                 {reason=$"类别不符：{item.Definition.title}不是{ShopCatalog.CategoryName(Offer.RequestedCategory)}。";return false;}
             }
-            if(quote.SaleTotal>Offer.RemainingBudget)
-            {reason=$"顾客资金不足：卖出总价 {quote.SaleTotal}，剩余预算 {Offer.RemainingBudget}。";return false;}
             if(Money+quote.Net<0){reason=$"灵石不足：净支付 {-quote.Net}，当前 {Money}。";return false;}
-            if(Money+quote.Net>int.MaxValue || quote.SaleTotal>int.MaxValue-IncomeToday || quote.PurchaseTotal>int.MaxValue-ExpensesToday)
+            if(Money+quote.ActualNet>int.MaxValue || quote.SaleTotal-quote.Shortfall>int.MaxValue-IncomeToday || quote.PurchaseTotal>int.MaxValue-ExpensesToday)
             {reason="本次金额超出可结算范围。";return false;}
             // Reserve every destination before changing ownership, inventory, or money.
             var occupied=new HashSet<Vector2Int>(In(ContainerId.Storage).SelectMany(i=>i.Cells.Select(p=>p+new Vector2Int(i.X,i.Y))));
@@ -371,17 +373,19 @@ namespace XiuXianShop
                 }
                 if(!found){reason=$"背包空间不足：无法放下 {item.Definition.title}。请关闭后整理或旋转来货，整笔未成交。";return false;}
             }
-            reason="交易成立；确认后统一收付，买入商品进入背包。";return true;
+            reason=quote.NeedsConcession?$"顾客预算不足：继续交易将少收{quote.Shortfall}灵石，实际净收{quote.ActualNet}；需再次确认。":"交易成立；确认后统一收付，买入商品进入背包。";return true;
         }
 
         public bool CanAcceptTrade(out int total,out string reason)
         {
             var quote=PreviewTrade();total=(int)Math.Max(int.MinValue,Math.Min(int.MaxValue,quote.Net));reason=quote.Reason;return quote.CanConfirm;
         }
-        public bool AcceptTrade(bool requestAll=false)
+        public bool AcceptTrade(bool requestAll=false,ShopTradeQuote concessionApproval=null)
         {
             var quote=PreviewTrade(requestAll);
             if(!quote.CanConfirm)return Fail(quote.Reason);
+            if(concessionApproval!=null && !quote.Matches(concessionApproval))return Fail("交易条件已变化，请重新确认；本次未成交。");
+            if(quote.NeedsConcession && concessionApproval==null)return Fail(quote.Reason);
             foreach(var line in quote.Lines)
             {
                 var item=line.Item;
@@ -393,10 +397,10 @@ namespace XiuXianShop
                 }
                 else {item.Owner=ItemOwner.Customer;items.Remove(item);Sales++;}
             }
-            Money+=(int)quote.Net;IncomeToday+=(int)quote.SaleTotal;ExpensesToday+=(int)quote.PurchaseTotal;
-            Offer.RemainingBudget-=(int)quote.SaleTotal;
+            Money+=(int)quote.ActualNet;IncomeToday+=(int)(quote.SaleTotal-quote.Shortfall);ExpensesToday+=(int)quote.PurchaseTotal;
+            Offer.RemainingBudget-=(int)Math.Max(0,quote.ActualNet);
             Offer.SupplierItems=Offer.SupplierItems.Where(i=>i.ForSale).ToArray();
-            LastCustomerResult=$"成交 {quote.Lines.Count} 件，净额 {quote.Net:+0;-0;0}。";
+            LastCustomerResult=$"成交 {quote.Lines.Count} 件，报价净额 {quote.Net:+0;-0;0}，实际净额 {quote.ActualNet:+0;-0;0}，少收 {quote.Shortfall}。";
             return Success($"{LastCustomerResult} 顾客剩余预算 {Offer.RemainingBudget}，可继续交易或主动下一位。");
         }
 

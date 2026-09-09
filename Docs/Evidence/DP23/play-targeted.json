@@ -1,0 +1,20 @@
+{
+  "status": "completed",
+  "duration": 1.33,
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.ConcessionDialogCancelsInvalidatesAndSettlesOnce",
+      "Status": "Passed",
+      "Duration": 1.3058429,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

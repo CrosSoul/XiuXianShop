@@ -35,6 +35,39 @@ namespace XiuXianShop.Tests
         static GridItem StageOwn(ShopSession s)
         {var item=s.Items.First(i=>!i.ForSale && i.Definition.id=="pill");Assert.That(s.Move(item.Id,ContainerId.Counter,0,0,0,false));return item;}
 
+        [Test,Category("DP23")] public void FinalNetRatherThanSaleSubtotalConsumesCustomerBudget()
+        {
+            catalog.Find("pill").baseValue=21;catalog.Find("herb").baseValue=1;catalog.Find("dew").baseValue=2;
+            var s=Session(120,18);StageOwn(s);
+            Assert.That(s.PreviewTrade(true).Net,Is.EqualTo(18));Assert.That(s.AcceptTrade(true),Is.True,s.Message);
+            Assert.That(s.Money,Is.EqualTo(138));Assert.That(s.Offer.RemainingBudget,Is.Zero);
+        }
+        [TestCase(18,7)][TestCase(0,25)][Category("DP23")]
+        public void ConcessionNeedsCurrentExplicitApprovalAndRecordsOnlyActualIncome(int budget,int discount)
+        {
+            catalog.startingItems=new[]{"pill","pill"};catalog.Find("pill").baseValue=25;var s=Session(120,Math.Max(1,budget));
+            if(budget==0)
+            {
+                catalog.Find("pill").baseValue=1;StageOwn(s);Assert.That(s.AcceptTrade());
+                catalog.Find("pill").baseValue=25;
+            }
+            int cash=s.Money,income=s.IncomeToday;var item=StageOwn(s);string before=Snapshot(s);
+            var quote=s.PreviewTrade();Assert.That(quote.CanConfirm);Assert.That(quote.Shortfall,Is.EqualTo(discount));
+            Assert.That(s.AcceptTrade(),Is.False);Assert.That(Snapshot(s),Is.EqualTo(before));
+            Assert.That(s.AcceptTrade(false,quote));Assert.That(s.Money,Is.EqualTo(cash+budget));
+            Assert.That(s.IncomeToday,Is.EqualTo(income+budget));Assert.That(s.Offer.RemainingBudget,Is.Zero);
+            Assert.That(item.Definition.baseValue,Is.EqualTo(25));Assert.That(s.LastCustomerResult,Does.Contain($"少收 {discount}"));
+            before=Snapshot(s);Assert.That(s.AcceptTrade(false,quote),Is.False);Assert.That(Snapshot(s),Is.EqualTo(before));
+        }
+        [Test,Category("DP23")] public void PriceOrBasketChangesInvalidateConcessionApproval()
+        {
+            catalog.Find("pill").baseValue=25;var s=Session(120,18);var item=StageOwn(s);var approval=s.PreviewTrade();
+            s.SetPriceTag(new PriceTag{id="changed",title="变化",percent=.2f});var before=Snapshot(s);
+            Assert.That(s.AcceptTrade(false,approval),Is.False);Assert.That(Snapshot(s),Is.EqualTo(before));
+            approval=s.PreviewTrade();Assert.That(s.Move(item.Id,ContainerId.Counter,1,0,0,false));before=Snapshot(s);
+            Assert.That(s.AcceptTrade(false,approval),Is.False);Assert.That(Snapshot(s),Is.EqualTo(before));
+        }
+
         [TestCase(10,25,-25,0)][TestCase(35,0,0,0)][TestCase(45,0,10,10)]
         public void MixedPositiveNegativeAndZeroNetSettleAtomically(int sale,int cash,int net,int balance)
         {
@@ -43,14 +76,14 @@ namespace XiuXianShop.Tests
             for(int i=0;i<3;i++){var q=s.PreviewTrade(true);Assert.That(q.CanConfirm,Is.True,q.Reason);Assert.That(q.Net,Is.EqualTo(net));Assert.That(q.Lines.Count,Is.EqualTo(3));}
             Assert.That(Snapshot(s),Is.EqualTo(before),"Opening and re-opening do not transact.");
             Assert.That(s.AcceptTrade(true),Is.True,s.Message);Assert.That(s.Money,Is.EqualTo(balance));
-            Assert.That(s.IncomeToday,Is.EqualTo(sale));Assert.That(s.ExpensesToday,Is.EqualTo(35));Assert.That(offer.RemainingBudget,Is.Zero);
+            Assert.That(s.IncomeToday,Is.EqualTo(sale));Assert.That(s.ExpensesToday,Is.EqualTo(35));Assert.That(offer.RemainingBudget,Is.EqualTo(sale-Math.Max(0,net)));
             Assert.That(s.Find(sold.Id),Is.Null);Assert.That(sold.Owner,Is.EqualTo(ItemOwner.Customer));
             foreach(var item in purchased){Assert.That(item.ForSale,Is.False);Assert.That(item.Container,Is.EqualTo(ContainerId.Storage));Assert.That(item.PurchaseValue,Is.EqualTo(item.Definition.baseValue));}
             Assert.That(s.Offer,Is.SameAs(offer));Assert.That(s.ServedToday,Is.Zero);Assert.That(s.ValidateState(),Is.Null);
             before=Snapshot(s);Assert.That(s.AcceptTrade(true),Is.False);Assert.That(Snapshot(s),Is.EqualTo(before));
         }
-        [TestCase(24,10,"灵石不足")][TestCase(100,9,"顾客资金不足")]
-        public void GrossCustomerBudgetAndNetPlayerFundsBothGateTheWholeTrade(int cash,int budget,string message)
+        [TestCase(24,10,"灵石不足")]
+        public void NetPlayerFundsGateTheWholeTrade(int cash,int budget,string message)
         {
             var s=Session(cash,budget);StageOwn(s);string before=Snapshot(s);
             Assert.That(s.PreviewTrade(true).Net,Is.EqualTo(-25));Assert.That(s.AcceptTrade(true),Is.False);

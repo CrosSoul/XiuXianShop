@@ -153,7 +153,7 @@ namespace XiuXianShop.Tests
             }
             Assert.That(buyer.RemainingBudget,Is.EqualTo(remaining));Assert.That(s.ServedToday,Is.Zero);
             Assert.That(s.StageSale());string before=Snapshot(s);
-            Assert.That(s.CanAcceptTrade(out _,out string reason),Is.False);Assert.That(reason,Does.Contain("资金不足"));
+            Assert.That(s.CanAcceptTrade(out _,out string reason),Is.True);Assert.That(reason,Does.Contain("预算不足"));
             Assert.That(s.AcceptTrade(),Is.False);Assert.That(Snapshot(s),Is.EqualTo(before));
             Assert.That(buyer.RemainingBudget,Is.EqualTo(remaining));Assert.That(s.Money,Is.EqualTo(120+18*sales));
             Assert.That(s.NextCustomer());Assert.That(s.Offer,Is.Not.SameAs(buyer));Assert.That(s.Offer.RemainingBudget,Is.EqualTo(budget));Assert.That(s.ServedToday,Is.EqualTo(1));
@@ -201,7 +201,9 @@ namespace XiuXianShop.Tests
             var dew=s.Items.Where(i=>i.Definition.id=="dew").ToArray();
             for(int n=0;n<20;n++)Assert.That(s.Move(dew[n].Id,ContainerId.Counter,n%5,n/5,0,false));
             Assert.That(s.BeginBusiness(),Is.True);Assert.That(s.Phase,Is.EqualTo(DayPhase.Open));Assert.That(s.RemainingCustomers,Is.EqualTo(4));
-            Assert.That(s.CanAcceptTrade(out _,out _),Is.False);
+            Assert.That(s.In(ContainerId.Counter).Count(),Is.EqualTo(20));
+            Assert.That(s.In(ContainerId.CustomerCounter).Count(),Is.EqualTo(2));
+            Assert.That(s.Purchases,Is.Zero,"Arrival never purchases goods, regardless of the random requested category.");
             Assert.That(s.Move(sign.Id,ContainerId.Storage,0,0,0,false));
             foreach(var item in dew) {Assert.That(s.FindSpace(item,ContainerId.Storage,out int x,out int y));Assert.That(s.Move(item.Id,ContainerId.Storage,x,y,0,false));}
             Assert.That(s.NextCustomer());Assert.That(s.SupplyAdvertisedToday);Assert.That(s.Offer.Direction,Is.EqualTo(TradeDirection.CustomerSells));

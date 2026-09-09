@@ -9,6 +9,29 @@ namespace XiuXianShop.Tests
 {
     public sealed partial class ShopPlayableTests
     {
+        [UnityTest,Category("DP23")] public IEnumerator ConcessionDialogCancelsInvalidatesAndSettlesOnce()
+        {
+            yield return RestartWithTestCatalog(c=>
+            {
+                c.startingItems=new[]{"pill","pill"};c.retailMarkup=0;c.Find("pill").baseValue=25;
+                c.baseSupplierChance=0;c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
+                c.buyerBudgetVariation=0;c.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=18}};
+            },17);
+            var s=shop.Session;yield return Drag(s.Items[0],ContainerId.Display,0,0);yield return Click("BeginBusiness");
+            var item=s.Items[1];yield return Drag(item,ContainerId.Counter,0,0);yield return Click("NegotiationOpen");
+            yield return Click("NegotiationConfirm");Assert.That(CalendarText("ConcessionText"),Does.Contain("少收7灵石"));
+            Assert.That(s.Money,Is.EqualTo(120));yield return Click("ConcessionCancel");Assert.That(item.Owner,Is.EqualTo(ItemOwner.Player));
+            yield return Click("NegotiationConfirm");s.SetPriceTag(new PriceTag{id="refresh",title="重新报价",percent=.2f});
+            yield return null;yield return null;
+            Assert.That(shop.FindButton("ConcessionContinue").gameObject.activeInHierarchy,Is.False);
+            shop.FindButton("ConcessionContinue").onClick.Invoke();Assert.That(s.Money,Is.EqualTo(120));
+            s.RemovePriceTag("refresh");yield return null;yield return null;
+            yield return Click("NegotiationConfirm");yield return Click("ConcessionContinue");
+            Assert.That(s.Money,Is.EqualTo(138));Assert.That(s.IncomeToday,Is.EqualTo(18));Assert.That(s.Offer.RemainingBudget,Is.Zero);
+            Assert.That(s.Find(item.Id),Is.Null);Assert.That(shop.NegotiationView.IsOpen,Is.False);
+            shop.FindButton("ConcessionContinue").onClick.Invoke();Assert.That(s.Money,Is.EqualTo(138));
+            Assert.That(s.ValidateState(),Is.Null);LogAssert.NoUnexpectedReceived();
+        }
         [UnityTest,Category("DP21")] public IEnumerator ManualSelectionOpensMixedModalAndEntryIncludesAllWithoutDuplicates()
         {
             yield return RestartWithTestCatalog(c=>
@@ -32,7 +55,7 @@ namespace XiuXianShop.Tests
             Assert.That(CalendarText("NegotiationTotal"),Does.Contain("-6"));Assert.That(CalendarText("NegotiationLines"),Does.Contain("买入 −18"));
             yield return Click("NegotiationConfirm");Assert.That(s.Money,Is.EqualTo(money-6));
             Assert.That(goods[1].ForSale,Is.False);Assert.That(goods[1].PurchaseValue,Is.EqualTo(18));Assert.That(goods[0].ForSale);
-            Assert.That(s.Offer,Is.SameAs(offer));Assert.That(offer.RemainingBudget,Is.EqualTo(88));
+            Assert.That(s.Offer,Is.SameAs(offer));Assert.That(offer.RemainingBudget,Is.EqualTo(100));
             shop.FindButton("NegotiationConfirm").onClick.Invoke();Assert.That(s.Money,Is.EqualTo(money-6),"A duplicate callback on a closed modal cannot buy more goods.");
             yield return Click("NegotiationOpen");Assert.That(CalendarText("NegotiationTotal"),Does.Contain("-18"));
             yield return Click("NegotiationConfirm");Assert.That(s.Purchases,Is.EqualTo(2));Assert.That(s.Money,Is.EqualTo(money-24));
@@ -62,7 +85,7 @@ namespace XiuXianShop.Tests
             var current=s.Offer;yield return Drag(own[2],ContainerId.Counter,0,0);yield return Click("NegotiationOpen");
             Assert.That(CalendarText("NegotiationTotal"),Does.Contain("-20"));yield return Click("NegotiationConfirm");Assert.That(s.Money,Is.EqualTo(95));
             yield return Drag(own[3],ContainerId.Counter,0,0);yield return Click("NegotiationOpen");yield return Click("NegotiationConfirm");
-            Assert.That(s.Offer,Is.SameAs(current));Assert.That(s.Money,Is.EqualTo(105));Assert.That(current.RemainingBudget,Is.EqualTo(80));
+            Assert.That(s.Offer,Is.SameAs(current));Assert.That(s.Money,Is.EqualTo(105));Assert.That(current.RemainingBudget,Is.EqualTo(90));
             yield return Click("NextCustomer");
             // Visitor 4: invalid category and insufficient net funds, neither operation changes anything.
             yield return Drag(jade,ContainerId.Counter,0,0);yield return Click("NegotiationOpen");

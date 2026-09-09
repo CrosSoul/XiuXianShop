@@ -155,7 +155,11 @@ namespace XiuXianShop.Tests
                         if(item!=null)
                         {
                             Assert.That(s.FindSpace(item,ContainerId.Counter,out int x,out int y));yield return Drag(item,ContainerId.Counter,x,y);
-                            if(s.CanAcceptTrade(out int price,out _)) {expectedMoney+=price;yield return Click("AcceptTrade");}
+                            if(s.CanAcceptTrade(out _,out _))
+                            {
+                                expectedMoney+=(int)s.PreviewTrade().ActualNet;yield return Click("AcceptTrade");
+                                if(shop.FindButton("ConcessionContinue").gameObject.activeInHierarchy)yield return Click("ConcessionContinue");
+                            }
                             else {Assert.That(s.FindSpace(item,ContainerId.Storage,out x,out y));yield return Drag(item,ContainerId.Storage,x,y);}
                         }
                     }
@@ -262,7 +266,7 @@ namespace XiuXianShop.Tests
             yield return Click("BeginBusiness");yield return Click("EndBusiness");yield return Click("Sleep");
             Assert.That(DetailText,Does.Contain("预估价值 27"));Assert.That(DetailText,Does.Contain("+20%"));
             yield return Click("BeginBusiness");yield return Drag(s.Items[2],ContainerId.Counter,2,0);
-            Assert.That(CustomerText,Does.Contain("54 灵石"));yield return CheckConfirm(false);
+            Assert.That(CustomerText,Does.Contain("54 灵石"));yield return CheckConfirm(true);
             yield return Click("EndBusiness");yield return Click("Sleep");
             Assert.That(DetailText,Does.Contain("预估价值 25"));Assert.That(DetailText,Does.Contain("-10%"));
             yield return Click("BeginBusiness");Assert.That(CustomerText,Does.Contain("50 灵石"));yield return CheckConfirm(true);
@@ -338,7 +342,7 @@ namespace XiuXianShop.Tests
             yield return Drag(pills[0],ContainerId.Counter,0,0);
             Assert.That(DetailText,Does.Contain("预估价值 23"));Assert.That(DetailText,Does.Contain("+15%"));
             yield return Drag(pills[1],ContainerId.Counter,2,0);yield return Drag(pills[2],ContainerId.Counter,0,2);
-            Assert.That(CustomerText,Does.Contain("合计 3 件 / 69"));yield return CheckConfirm(false);
+            Assert.That(CustomerText,Does.Contain("合计 3 件 / 69"));yield return CheckConfirm(true);
             s.SetPriceTag(new PriceTag{id="market-test",title="测试降价",percent=-.3f});
             yield return null;yield return null;
             Assert.That(CustomerText,Does.Contain("合计 3 件 / 51"));Assert.That(DetailText,Does.Contain("预估价值 17"));
@@ -428,7 +432,10 @@ namespace XiuXianShop.Tests
             yield return Drag(pills[1],ContainerId.Counter,0,0);yield return Click("AcceptTrade");
             Assert.That(buyer.RemainingBudget,Is.EqualTo(4));
             yield return Drag(pills[0],ContainerId.Counter,0,0);
-            yield return CheckConfirm(false);Assert.That(CustomerText,Does.Contain("资金不足"));
+            yield return CheckConfirm(true);Assert.That(CustomerText,Does.Contain("预算不足"));
+            yield return Click("NegotiationOpen");yield return Click("NegotiationConfirm");
+            Assert.That(CalendarText("ConcessionText"),Does.Contain("少收14灵石"));
+            yield return Click("ConcessionCancel");yield return Click("NegotiationClose");
             yield return Click("NextCustomer");Assert.That(s.Offer.RemainingBudget,Is.EqualTo(40));
             Assert.That(pills[0].Container,Is.EqualTo(ContainerId.Counter));yield return CheckConfirm(true);
             // Leaving and closing never move unsold player goods behind the player's back.

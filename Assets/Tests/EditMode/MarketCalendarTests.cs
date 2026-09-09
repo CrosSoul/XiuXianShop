@@ -35,7 +35,7 @@ namespace XiuXianShop.Tests
             Assert.That(quote.Net,Is.EqualTo(net));Assert.That(quote.Lines.Count,Is.EqualTo(3));
             int money=s.Money,budget=offer.RemainingBudget;
             Assert.That(s.AcceptTrade(true));Assert.That(s.Money,Is.EqualTo(money+net));
-            Assert.That(offer.RemainingBudget,Is.EqualTo(budget-sale));
+            Assert.That(offer.RemainingBudget,Is.EqualTo(budget-System.Math.Max(0,net)));
             Assert.That(goods.All(i=>i.Owner==ItemOwner.Player && i.PurchaseValue==buy/2));
             Assert.That(s.EndBusiness());Assert.That(s.Sleep());
             Assert.That(goods.All(i=>i.PurchaseValue==buy/2));Assert.That(s.ValidateState(),Is.Null);
@@ -132,7 +132,8 @@ namespace XiuXianShop.Tests
             Assert.That(s.Move(s.Items[0].Id,ContainerId.Counter,0,0,0,false));
             Assert.That(s.Move(s.Items[1].Id,ContainerId.Counter,2,0,0,false));
             Assert.That(s.Move(s.Items[2].Id,ContainerId.Counter,0,2,0,false));
-            Assert.That(s.CanAcceptTrade(out int total,out _),Is.False);Assert.That(total,Is.EqualTo(75));
+            Assert.That(s.CanAcceptTrade(out int total,out _),Is.True);Assert.That(total,Is.EqualTo(75));
+            Assert.That(s.PreviewTrade().Shortfall,Is.EqualTo(25));Assert.That(s.AcceptTrade(),Is.False);
             Assert.That(s.Move(s.Items[2].Id,ContainerId.Storage,0,0,0,false));
             Assert.That(s.CanAcceptTrade(out total,out _));Assert.That(total,Is.EqualTo(50));
             var quote=s.Quote(s.Items[0]);Assert.That(quote.Modifiers,Does.Contain("+20%"));Assert.That(quote.Modifiers,Does.Contain("-10%"));

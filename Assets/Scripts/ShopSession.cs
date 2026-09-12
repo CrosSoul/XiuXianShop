@@ -22,6 +22,9 @@ namespace XiuXianShop
         public int Rotation { get; internal set; }
         public bool Flipped { get; internal set; }
         public int? PurchaseValue { get; internal set; }
+        public int SpiritUnits { get; internal set; }
+        public decimal BaseValue => Definition.spiritResource == null ? Definition.baseValue :
+            Definition.spiritResource.ContainerPrice + (decimal)SpiritUnits / Definition.spiritResource.UnitsPerEquivalent;
         public bool ForSale => Owner==ItemOwner.Customer;
         public Vector2Int[] Cells => Definition.Shape(Rotation, Flipped);
     }
@@ -45,7 +48,7 @@ namespace XiuXianShop
     public sealed class DisplayAttraction
     {
         public ItemCategory BuyerCategory { get; internal set; }
-        public int DisplayValue { get; internal set; }
+        public decimal DisplayValue { get; internal set; }
         public int BudgetTierMinimum { get; internal set; }
         public int MinimumBuyerBudget { get; internal set; }
         public int MaximumBuyerBudget { get; internal set; }
@@ -138,7 +141,8 @@ namespace XiuXianShop
                 turn=Turn,money=Money,rent=Rent,debt=RentDebt,nextId=nextId,customerSeed=customerSeedValue,customerDraws=customerDraws,
                 crafted=Crafted,purchases=Purchases,sales=Sales,calendar=Calendar.Capture(),tags=priceTags.Values.Select(t=>t.Copy()).ToArray(),
                 items=items.Select(i=>new SavedShopItem{id=i.Id,definitionId=i.Definition.id,container=i.Container,storageItemId=i.StorageItemId,x=i.X,y=i.Y,
-                    rotation=i.Rotation,flipped=i.Flipped,hasPurchaseValue=i.PurchaseValue.HasValue,purchaseValue=i.PurchaseValue??0}).ToArray()},true);
+                    rotation=i.Rotation,flipped=i.Flipped,hasPurchaseValue=i.PurchaseValue.HasValue,purchaseValue=i.PurchaseValue??0,
+                    hasSpiritResource=i.Definition.spiritResource!=null,spiritUnits=i.SpiritUnits}).ToArray()},true);
         }
         public static ShopSession RestoreSave(ShopCatalog catalog,string json)
         {
@@ -160,8 +164,10 @@ namespace XiuXianShop
             {
                 if(i==null || i.id<1 || i.id>=save.nextId || !Enum.IsDefined(typeof(ContainerId),i.container) ||
                     i.rotation<0 || i.rotation>3 || (i.hasPurchaseValue && i.purchaseValue<1))throw new ArgumentException("存档物品数据无效。");
-                session.items.Add(new GridItem {Id=i.id,Definition=catalog.Find(i.definitionId),Owner=ItemOwner.Player,Container=i.container,StorageItemId=i.storageItemId,
-                    X=i.x,Y=i.y,Rotation=i.rotation,Flipped=i.flipped,PurchaseValue=i.hasPurchaseValue?(int?)i.purchaseValue:null});
+                var definition=catalog.Find(i.definitionId);
+                if(i.hasSpiritResource!=(definition.spiritResource!=null))throw new ArgumentException("存档灵气配置不匹配。");
+                session.items.Add(new GridItem {Id=i.id,Definition=definition,Owner=ItemOwner.Player,Container=i.container,StorageItemId=i.storageItemId,
+                    X=i.x,Y=i.y,Rotation=i.rotation,Flipped=i.flipped,PurchaseValue=i.hasPurchaseValue?(int?)i.purchaseValue:null,SpiritUnits=i.spiritUnits});
             }
             string error=session.ValidateState();if(error!=null)throw new ArgumentException("存档库存无效："+error);
             session.Calendar.Between(MarketCalendar.YearStart(session.Turn),MarketCalendar.YearStart(session.Turn)+11);
@@ -175,7 +181,7 @@ namespace XiuXianShop
         public IEnumerable<GridItem> In(ContainerId container, int storageItemId=0) => items.Where(i=>i.Container==container && i.StorageItemId==storageItemId);
         public Vector2Int GridSize(ContainerId container,int storageItemId=0) => container==ContainerId.Interior ? Find(storageItemId).Definition.storageSize : Size(container);
         public int Occupied(ContainerId container) => In(container).Sum(i=>i.Cells.Length);
-        GridItem NewItem(ItemDefinition def, ItemOwner owner) => new GridItem{Id=nextId++, Definition=def, Owner=owner};
+        GridItem NewItem(ItemDefinition def, ItemOwner owner) => new GridItem{Id=nextId++, Definition=def, Owner=owner,SpiritUnits=def.spiritResource?.CapacityUnits??0};
         bool Fail(string message) { Message=message; return false; }
         bool Success(string message) { Message=message; return true; }
 
@@ -190,18 +196,20 @@ namespace XiuXianShop
         public PriceQuote Quote(GridItem item)
         {
             var direction = item.Owner == ItemOwner.Player ? TradeDirection.CustomerBuys : TradeDirection.CustomerSells;
-            return Quote(item.Definition, direction);
+            return Quote(item.Definition, direction, item.BaseValue);
         }
         public PriceQuote Quote(ItemDefinition definition, TradeDirection direction)
+            => Quote(definition,direction,definition.FullBaseValue);
+        PriceQuote Quote(ItemDefinition definition, TradeDirection direction, decimal baseValue)
         {
             var effective = priceTags.Values.Concat(Calendar.ActiveTags(Turn)).Where(t => (t.category == ItemCategory.Unclassified || t.category == definition.category) &&
                 (direction == TradeDirection.CustomerBuys ? t.playerSells : t.playerBuys)).Select(t=>t.Copy()).ToList();
             if(direction == TradeDirection.CustomerBuys)
                 effective.Insert(0, new PriceTag {id="retail",title="零售加价",percent=catalog.retailMarkup});
-            return new PriceQuote(definition, effective);
+            return new PriceQuote(definition, effective, baseValue);
         }
         public PriceQuote Estimate(GridItem item) => item.Container == ContainerId.Counter || item.ForSale ? Quote(item) :
-            new PriceQuote(item.Definition, Array.Empty<PriceTag>());
+            new PriceQuote(item.Definition, Array.Empty<PriceTag>(),item.BaseValue);
 
         public bool Fits(GridItem item, ContainerId target, int x, int y, int rotation, bool flipped, ISet<int> ignored = null, int storageItemId=0)
         {
@@ -285,8 +293,8 @@ namespace XiuXianShop
         public DisplayAttraction PreviewAttraction()
         {
             var display=In(ContainerId.Display).Where(i=>i.Owner==ItemOwner.Player).ToArray();
-            var dominant=display.Where(i=>IsSaleItem(i.Definition)).GroupBy(i=>i.Definition.category)
-                .Select(g=>new {Category=g.Key,Value=g.Sum(i=>i.Definition.baseValue)})
+            var dominant=display.Where(i=>IsSaleItem(i.Definition) && i.BaseValue>0).GroupBy(i=>i.Definition.category)
+                .Select(g=>new {Category=g.Key,Value=g.Sum(i=>i.BaseValue)})
                 .OrderByDescending(g=>g.Value).ThenBy(g=>(int)g.Category).FirstOrDefault();
             var advertised=display.Where(i=>i.Definition.procurementSign).Select(i=>i.Definition.advertisedCategory).Distinct().ToArray();
             // Select definitions by the sign's category, not a hard-coded herb/dew schedule.
@@ -295,7 +303,7 @@ namespace XiuXianShop
             bool hasAdvertisement=supplies.Length>0;
             float supplierChance=Mathf.Clamp01(catalog.baseSupplierChance+(hasAdvertisement?catalog.advertisementSupplierBonus:0)-(dominant!=null?catalog.displayedGoodsBuyerBonus:0));
             if(allSupplies.Length==0) supplierChance=0;
-            int value=dominant?.Value??0;
+            decimal value=dominant?.Value??0;
             var tier=(catalog.buyerBudgetTiers??Array.Empty<BuyerBudgetTier>()).Where(t=>t!=null && t.minimumDisplayValue<=value)
                 .OrderByDescending(t=>t.minimumDisplayValue).FirstOrDefault();
             int baseBudget=Math.Max(1,tier?.baseBudget??20);
@@ -312,7 +320,7 @@ namespace XiuXianShop
                 Supplies=hasAdvertisement?supplies:allSupplies
             };
         }
-        static bool IsSaleItem(ItemDefinition definition) => !definition.IsStorage && definition.category!=ItemCategory.ProductionEquipment && !definition.procurementSign && definition.baseValue>0
+        static bool IsSaleItem(ItemDefinition definition) => !definition.IsStorage && definition.category!=ItemCategory.ProductionEquipment && !definition.procurementSign && definition.FullBaseValue>0
             && definition.category!=ItemCategory.Unclassified && definition.category!=ItemCategory.BusinessSign;
 
         public bool BeginBusiness()
@@ -503,6 +511,8 @@ namespace XiuXianShop
             if(items.Select(i=>i.Id).Distinct().Count()!=items.Count) return "Duplicate IDs";
             foreach(var item in items)
             {
+                var resource=item.Definition.spiritResource;
+                if(resource==null ? item.SpiritUnits!=0 : item.SpiritUnits<0 || item.SpiritUnits>resource.CapacityUnits || (item.SpiritUnits==0 && !resource.Reusable))return "Invalid spirit resource: "+item.Id;
                 if(!StoragePlacementAllowed(item,item.Container,item.StorageItemId,out var storageError))return storageError;
                 if(item.Container!=ContainerId.CarriedPack && !Fits(item,item.Container,item.X,item.Y,item.Rotation,item.Flipped,storageItemId:item.StorageItemId)) return "Invalid grid placement: "+item.Id;
                 if(item.ForSale && (Offer==null || !Offer.SupplierItems.Contains(item) ||

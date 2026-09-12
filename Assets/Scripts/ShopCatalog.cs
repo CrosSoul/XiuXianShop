@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace XiuXianShop
 {
-    public enum ItemCategory { Unclassified, Medicine, Material, Equipment, Container, BusinessSign, StorageContainer, EquipmentContainer, PortableContainer, ProductionEquipment }
+    public enum ItemCategory { Unclassified, Medicine, Material, Equipment, Container, BusinessSign, StorageContainer, EquipmentContainer, PortableContainer, ProductionEquipment, StoneLow, StoneMid, StoneHigh }
 
     [Serializable]
     public sealed class BuyerBudgetTier
@@ -26,6 +26,9 @@ namespace XiuXianShop
         public Vector2Int[] cells;
         [Min(0), Tooltip("商品固有价值；成交报价在此基础上按标签计算。")]
         public int baseValue;
+        [SerializeReference, Tooltip("隐藏资源能力；未配置时是普通物品。与玩家可见类别、格子储存分开。")]
+        public SpiritResourceDefinition spiritResource;
+        public decimal FullBaseValue => spiritResource == null ? baseValue : spiritResource.ContainerPrice + (decimal)spiritResource.CapacityUnits / spiritResource.UnitsPerEquivalent;
         public bool supplierAvailable = true;
         [Tooltip("储存物品内部格子尺寸；0 表示尚未配置，不能打开。外部形状仍由 cells 决定。")]
         public Vector2Int storageSize;
@@ -112,6 +115,9 @@ namespace XiuXianShop
                 case ItemCategory.EquipmentContainer: return "设备储存";
                 case ItemCategory.PortableContainer: return "便携储存";
                 case ItemCategory.ProductionEquipment: return "生产设备";
+                case ItemCategory.StoneLow: return "下品灵石";
+                case ItemCategory.StoneMid: return "中品灵石";
+                case ItemCategory.StoneHigh: return "上品灵石";
                 default: return "未分类";
             }
         }

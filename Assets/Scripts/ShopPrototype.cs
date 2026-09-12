@@ -290,6 +290,12 @@ namespace XiuXianShop
         {
             var q=Session.Estimate(item);
             string history=item.PurchaseValue.HasValue?$" · 购买价值 {item.PurchaseValue.Value}":"";
+            if(item.Definition.spiritResource!=null)
+            {
+                var r=item.Definition.spiritResource;
+                history+=$"\n剩余灵气 {(decimal)item.SpiritUnits/r.UnitsPerEquivalent:0.##} / {(decimal)r.CapacityUnits/r.UnitsPerEquivalent:0.##}";
+                if(item.SpiritUnits==0)history+=" · 空壳";
+            }
             return $"{item.Definition.title} · {ShopCatalog.CategoryName(item.Definition.category)} · {(item.Owner==ItemOwner.Player?"自有":"顾客所有")} · 占 {item.Cells.Length} 格\n基础价值 {q.BaseValue} · 预估价值 {q.Amount}{history}\n{q.Modifiers}\n{item.Definition.description}";
         }
         int Count(string definitionId)=>Session.In(ContainerId.Storage).Count(i=>i.Definition.id==definitionId && i.Owner==ItemOwner.Player);

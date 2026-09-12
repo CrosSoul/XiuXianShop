@@ -86,6 +86,32 @@ namespace XiuXianShop.Editor
             shop.StartVerificationSession(verificationCatalog,17);
             shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP30VerificationSave.json");
         }
+        [MenuItem("XiuXianShop/Validation/Start DP33 Spirit Stones (resets Play session)")]
+        public static void StartSpiritExample()
+        {
+            if(!CanStartVerification())return;
+            StartVerificationDay();SpiritStoneVerification.Configure(verificationCatalog);
+            var shop=Object.FindFirstObjectByType<ShopPrototype>();
+            shop.StartVerificationSession(verificationCatalog,33);
+            shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP33VerificationSave.json");
+        }
+        [MenuItem("XiuXianShop/Validation/DP33 Consume Half of Each Stone")]
+        public static void ConsumeSpiritExample()=>ChangeSpiritExample(false);
+        [MenuItem("XiuXianShop/Validation/DP33 Refill Reusable Stones")]
+        public static void RefillSpiritExample()=>ChangeSpiritExample(true);
+        static void ChangeSpiritExample(bool refill)
+        {
+            if(!CanStartVerification())return;
+            var shop=Object.FindFirstObjectByType<ShopPrototype>();
+            if(shop.SavePath!=System.IO.Path.Combine(Application.dataPath,"../Temp/DP33VerificationSave.json"))return;
+            foreach(var item in System.Linq.Enumerable.ToArray(shop.Session.Items))
+            {
+                var r=item.Definition.spiritResource;if(r==null)continue;
+                if(refill){if(r.Reusable && item.SpiritUnits<r.CapacityUnits)shop.Session.RefillSpirit(item.Id,r.CapacityUnits-item.SpiritUnits);}
+                else if(item.SpiritUnits>0)shop.Session.ConsumeSpirit(item.Id,System.Math.Min(item.SpiritUnits,r.CapacityUnits/2));
+            }
+            shop.Refresh();
+        }
         [MenuItem("XiuXianShop/Validation/Start Calendar Overlap Example (resets Play session)",true)]
         static bool CanStartCalendarExample()=>CanStartVerification();
         [MenuItem("XiuXianShop/Validation/Advance Calendar Example One Turn (Play session)")]

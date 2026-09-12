@@ -23,13 +23,14 @@ namespace XiuXianShop
     // One immutable calculation is shared by UI, validation and settlement.
     public sealed class PriceQuote
     {
-        public int BaseValue { get; }
+        public decimal BaseValue { get; }
         public decimal RawValue { get; }
         public int Amount { get; }
         public string Modifiers { get; }
-        public PriceQuote(ItemDefinition definition, IEnumerable<PriceTag> tags)
+        public PriceQuote(ItemDefinition definition, IEnumerable<PriceTag> tags) : this(definition, tags, definition.FullBaseValue) { }
+        public PriceQuote(ItemDefinition definition, IEnumerable<PriceTag> tags, decimal baseValue)
         {
-            BaseValue = definition.baseValue;
+            BaseValue = baseValue;
             var effective = tags.ToArray();
             decimal percent = effective.Sum(t => (decimal)t.percent);
             RawValue = BaseValue * (1 + percent);

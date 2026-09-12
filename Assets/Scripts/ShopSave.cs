@@ -23,5 +23,7 @@ namespace XiuXianShop
         public int x,y,rotation,storageItemId;
         public bool flipped,hasPurchaseValue;
         public int purchaseValue;
+        public bool hasSpiritResource;
+        public int spiritUnits;
     }
 }

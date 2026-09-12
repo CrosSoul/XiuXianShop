@@ -53,5 +53,18 @@ namespace XiuXianShop.Tests
             Assert.That(session.Move(dew.Id,ContainerId.Interior,0,0,0,false,pack.Id));
             Assert.That(session.EndCarrying());Assert.That(session.ValidateState(),Is.Null);
         }
+        [Test] public void HandHoldingLoadedContainerPreservesItsContentsAndValidState()
+        {
+            var box=Item("test-storage-case");var herb=Item("herb");
+            Assert.That(session.Move(herb.Id,ContainerId.Interior,0,0,0,false,box.Id));
+            Assert.That(session.BeginCarrying(0));
+            Assert.That(session.Move(box.Id,ContainerId.LeftHand,0,0,0,false));
+            Assert.That(session.ValidateState(),Is.Null);
+            Assert.That(session.In(ContainerId.Interior,box.Id).Single(),Is.SameAs(herb));
+            Assert.That(session.EndCarrying());
+            Assert.That(session.Find(box.Id),Is.SameAs(box));
+            Assert.That(session.In(ContainerId.Interior,box.Id).Single(),Is.SameAs(herb));
+            Assert.That(session.ValidateState(),Is.Null);
+        }
     }
 }

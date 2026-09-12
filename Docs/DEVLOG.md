@@ -1,5 +1,13 @@
 # XiuXianShop 开发日志
 
+## 2026-09-12 — DP-31 携带基础收尾
+
+- 续接时main/ebeff13工作区干净；保留该提交中的携带基础、储物匣与测试腰包开局配置。补修手持已装物容器后，其内容状态校验错误的问题，并增加针对性回归。
+- 已完成实际实例选择、取消、无包、左右手各一实例、有限内部格子、内容连续与收起重开；不新增旅行、物流、装备、负重或存档框架。携带中保存/读取需先返回；满仓返回失败保留全部状态，最终策略未定。
+- 本轮实际Edit Mode 98/98、Play Mode 22/22，均0失败/跳过。正常Play开局9件含储物匣及腰包，左右手搬运成功且实例总数不变。两张运行截图已查看，原始测试结果位于Docs/Evidence/DP31。没有Player构建、平台测试或人工验收。
+- 本轮Unity MCP工具不可用，使用已安装Unity CLI连接现有Pipeline。最终Console Error0/Warning0，未清日志；Editor ready/stopped、无编译/Domain Reload，ShopPrototype场景dirty=false。
+- 更新DP31_CARRY.md及当前试玩/计划入口；Confluence未修改。提交本地收尾后将DP-31交付Ready for Review，不标Done、不自动推送。最终提交SHA与远端状态由Jira交付评论记录。
+
 ## 2026-09-09 — DP-14 首轮 Confluence 数据核对
 
 - 基线7296f95（DP23独立提交），仅新增读取快照、只读核对脚本、六项解析校验测试与报告，未改Unity资产/运行代码。DP23准确提交信息为7296f95，未推送。

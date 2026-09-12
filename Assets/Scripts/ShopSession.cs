@@ -258,7 +258,7 @@ namespace XiuXianShop
                 return true;
             }
             var box=Find(storageItemId);
-            if(box==null || !box.Definition.IsStorage || box.Owner!=ItemOwner.Player || (box.Container!=ContainerId.Storage && !(box.Container==ContainerId.CarriedPack && box.Id==CarriedPackId && IsCarrying)) ||
+            if(box==null || !box.Definition.IsStorage || box.Owner!=ItemOwner.Player || (box.Container!=ContainerId.Storage && !(IsCarrying && (IsHand(box.Container) || (box.Container==ContainerId.CarriedPack && box.Id==CarriedPackId)))) ||
                 box.Definition.storageSize.x<1 || box.Definition.storageSize.y<1)
             {reason="储存物品不存在或内部尺寸未配置。";return false;}
             if(item.Owner!=ItemOwner.Player){reason="顾客物品未成交，不能收入储存物品。";return false;}

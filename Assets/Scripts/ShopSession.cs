@@ -75,6 +75,10 @@ namespace XiuXianShop
         public IReadOnlyList<GridItem> Items => items;
         public ShopCatalog Catalog => catalog;
         public int Money { get; private set; }
+        public int Stamina { get; private set; }
+        public int MaximumStamina => catalog.maximumStamina;
+        public bool HasStaminaOverflowCustomer { get; private set; }
+        public int CustomerCountThisTurn => DailyCustomerCount + (HasStaminaOverflowCustomer ? 1 : 0);
         public int Turn { get; private set; } = 1;
         public int Year => (Turn-1)/12+1;
         public int Month => (Turn-1)%12+1;
@@ -106,6 +110,8 @@ namespace XiuXianShop
         public ShopSession(ShopCatalog catalog, bool seed = true, int? customerSeed = null, MarketCalendar calendar = null)
         {
             this.catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
+            if(catalog.maximumStamina<1 || catalog.staminaRecoveryPerTurn<0)throw new ArgumentException("体力配置无效。");
+            Stamina=catalog.maximumStamina;
             customerSeedValue=customerSeed??Guid.NewGuid().GetHashCode();
             customerRandom = new System.Random(customerSeedValue);
             Calendar=calendar??new MarketCalendar(catalog.marketEvents,customerSeed??Guid.NewGuid().GetHashCode());
@@ -139,6 +145,7 @@ namespace XiuXianShop
             if(Phase!=TurnPhase.Preparation)throw new InvalidOperationException("仅营业准备阶段可存档；请先闭店并结束回合。");
             return JsonUtility.ToJson(new ShopSave {catalogSignature=Hash128.Compute(JsonUtility.ToJson(catalog)).ToString(),
                 turn=Turn,money=Money,rent=Rent,debt=RentDebt,nextId=nextId,customerSeed=customerSeedValue,customerDraws=customerDraws,
+                hasStaminaState=true,stamina=Stamina,staminaOverflowCustomer=HasStaminaOverflowCustomer,
                 crafted=Crafted,purchases=Purchases,sales=Sales,calendar=Calendar.Capture(),tags=priceTags.Values.Select(t=>t.Copy()).ToArray(),
                 items=items.Select(i=>new SavedShopItem{id=i.Id,definitionId=i.Definition.id,container=i.Container,storageItemId=i.StorageItemId,x=i.X,y=i.Y,
                     rotation=i.Rotation,flipped=i.Flipped,hasPurchaseValue=i.PurchaseValue.HasValue,purchaseValue=i.PurchaseValue??0,
@@ -154,6 +161,8 @@ namespace XiuXianShop
             if(save.turn<1 || save.money<0 || save.rent<1 || save.debt<0 || save.nextId<1 || save.items==null || save.tags==null ||
                 save.customerDraws<0 || save.customerDraws>10000000)throw new ArgumentException("存档数据不完整或无效。");
             var session=new ShopSession(catalog,false,save.customerSeed,new MarketCalendar(save.calendar));
+            if(!save.hasStaminaState || save.stamina<0 || save.stamina>catalog.maximumStamina)throw new ArgumentException("存档体力状态缺失或无效，当前会话未改变。");
+            session.Stamina=save.stamina;session.HasStaminaOverflowCustomer=save.staminaOverflowCustomer;
             session.Turn=save.turn;session.Money=save.money;session.OpeningMoney=save.money;session.Rent=save.rent;session.RentDebt=save.debt;
             session.nextId=save.nextId;session.Crafted=save.crafted;session.Purchases=save.purchases;session.Sales=save.sales;
             for(int i=0;i<save.customerDraws;i++)session.customerRandom.NextDouble();
@@ -332,7 +341,7 @@ namespace XiuXianShop
             if(categories.Length==0) return Fail("商品配置缺少可售类别，无法生成顾客。请检查 ShopCatalog。" );
             queue.Clear(); ServedToday=0;BuyersToday=0;SuppliersToday=0;
             TodayAttraction=attraction;
-            for(int n=0;n<DailyCustomerCount;n++)
+            for(int n=0;n<CustomerCountThisTurn;n++)
             {
                 var category=attraction.BuyerCategory==ItemCategory.Unclassified?categories[DrawCustomerNumber(0,categories.Length)]:attraction.BuyerCategory;
                 int budget=DrawCustomerNumber(attraction.MinimumBuyerBudget,attraction.MaximumBuyerBudget+1);
@@ -500,12 +509,16 @@ namespace XiuXianShop
             if(Turn%catalog.rentPeriod==0) { due+=Rent; Rent=(int)Math.Ceiling(Rent*1.05); }
             int paid=Math.Min(Money,due); Money-=paid; RentDebt=due-paid;
             Turn++; Phase=TurnPhase.Preparation; ServedToday=0;TodayAttraction=null;BuyersToday=0;SuppliersToday=0; queue.Clear();
+            long recovered=(long)Stamina+catalog.staminaRecoveryPerTurn;
+            HasStaminaOverflowCustomer=recovered>MaximumStamina;
+            Stamina=(int)Math.Min(MaximumStamina,recovered);
             OpeningMoney=Money;IncomeToday=0;ExpensesToday=0;LastCustomerResult="新的一月，尚未接待顾客。";
             Calendar.Between(MarketCalendar.YearStart(Turn),MarketCalendar.YearStart(Turn)+11);PricingRevision++;
             return Success($"{DateLabel}。库存、灵石和丹炉已保留。"+(due>0?$" 支付房租 {paid}，待付 {RentDebt}。":"本月重新配置展示，再次经营。"));
         }
         public string ValidateState()
         {
+            if(Stamina<0 || Stamina>MaximumStamina)return "Invalid stamina";
             if(Money<0 || RentDebt<0) return "Negative money or debt";
             if(Offer!=null && Offer.RemainingBudget<0) return "Negative customer budget";
             if(items.Select(i=>i.Id).Distinct().Count()!=items.Count) return "Duplicate IDs";

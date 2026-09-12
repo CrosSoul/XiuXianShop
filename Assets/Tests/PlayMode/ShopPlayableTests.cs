@@ -136,8 +136,9 @@ namespace XiuXianShop.Tests
             int expectedMoney=120;
             for(int turn=1;turn<=2;turn++)
             {
-                yield return Click("BeginBusiness");Assert.That(s.BuyersToday+s.SuppliersToday,Is.EqualTo(5));
-                for(int n=0;n<5;n++)
+                int expectedCustomers=s.CustomerCountThisTurn;
+                yield return Click("BeginBusiness");Assert.That(s.BuyersToday+s.SuppliersToday,Is.EqualTo(expectedCustomers));
+                for(int n=0;n<expectedCustomers;n++)
                 {
                     Assert.That(s.Offer,Is.Not.Null);
                     if(s.Offer.Direction==TradeDirection.CustomerSells)
@@ -167,7 +168,7 @@ namespace XiuXianShop.Tests
                     Assert.That(s.Money,Is.EqualTo(expectedMoney));
                     if(n<4 || s.Offer!=null)yield return Click("NextCustomer");
                 }
-                Assert.That(s.Offer,Is.Null);Assert.That(s.ServedToday,Is.EqualTo(5));Assert.That(shop.FindButton("NextCustomer").interactable,Is.False);
+                Assert.That(s.Offer,Is.Null);Assert.That(s.ServedToday,Is.EqualTo(expectedCustomers));Assert.That(shop.FindButton("NextCustomer").interactable,Is.False);
                 yield return Click("EndBusiness");
                 while(s.In(ContainerId.Storage).Any(i=>i.Definition.id=="herb") && s.In(ContainerId.Storage).Any(i=>i.Definition.id=="dew"))
                 {int previous=s.Crafted;yield return Click("Craft");if(previous==s.Crafted)break;}

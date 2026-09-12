@@ -64,6 +64,12 @@ namespace XiuXianShop
         public string dewId = "dew";
         public string productId = "pill";
         [Min(0)] public int startingMoney = 120;
+        [Min(1), Tooltip("营业外体力上限；当前原型开局为满体力。")]
+        public int maximumStamina = 100;
+        [Min(0), Tooltip("推进到新回合时恢复的体力；严格溢出才获得本月额外顾客。")]
+        public int staminaRecoveryPerTurn = 30;
+        [Min(0), Tooltip("仅Validation模拟活动使用的体力成本，不是炼丹或外出正式成本。")]
+        public int staminaTestActivityCost = 20;
         [Tooltip("玩家出售时默认零售加价；0.15 表示 +15%。")]
         public float retailMarkup = .15f;
         [Tooltip("明确配置的常驻价格标签；有日期的市场标签由 Market Events 生成。")]
@@ -147,7 +153,7 @@ namespace XiuXianShop
                 Def("cinnabar", "朱砂", "不规则试摆物 · T 形，旋转会改变占格。", new Color(.83f,.42f,.39f), 8, 6, new[]{P(0,0),P(1,0),P(2,0),P(1,1)}),
                 Def("jade", "玉匣", "大件试摆物 · 2×2，占用四格。", new Color(.56f,.71f,.69f), 18, 14, new[]{P(0,0),P(1,0),P(0,1),P(1,1)}),
                 Def("sword", "木剑", "长条试摆物 · 四格，竖放或横放。", new Color(.69f,.55f,.37f), 14, 10, new[]{P(0,0),P(0,1),P(0,2),P(0,3)}),
-                Def("sign", "收购牌", "材料广告牌 · 开门时提高卖家概率，并吸引出售材料的卖家；每日总客流仍为 5 位。不可出售。", new Color(.65f,.56f,.83f), 0, 0, new[]{P(0,0),P(1,0),P(1,1)}, true)
+                Def("sign", "收购牌", "材料广告牌 · 开门时提高卖家概率，并吸引出售材料的卖家；基础客流5位，体力溢出奖励另计。不可出售。", new Color(.65f,.56f,.83f), 0, 0, new[]{P(0,0),P(1,0),P(1,1)}, true)
             };
         }
         static Vector2Int P(int x, int y) => new Vector2Int(x,y);

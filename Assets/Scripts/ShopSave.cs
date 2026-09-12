@@ -10,6 +10,8 @@ namespace XiuXianShop
         public string catalogSignature;
         public int turn, money, rent, debt, nextId, customerSeed, customerDraws;
         public int crafted, purchases, sales;
+        public bool hasStaminaState,staminaOverflowCustomer;
+        public int stamina;
         public SavedShopItem[] items;
         public PriceTag[] tags;
         public MarketCalendarState calendar;

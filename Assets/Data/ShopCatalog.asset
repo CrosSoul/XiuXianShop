@@ -24,6 +24,8 @@ MonoBehaviour:
     - {x: 0, y: 1}
     - {x: 1, y: 1}
     baseValue: 3
+    spiritResource:
+      rid: -2
     supplierAvailable: 1
     storageSize: {x: 0, y: 0}
     compatibleEquipmentIds: []
@@ -39,6 +41,8 @@ MonoBehaviour:
     cells:
     - {x: 0, y: 0}
     baseValue: 2
+    spiritResource:
+      rid: -2
     supplierAvailable: 1
     storageSize: {x: 0, y: 0}
     compatibleEquipmentIds: []
@@ -57,6 +61,8 @@ MonoBehaviour:
     - {x: 0, y: 1}
     - {x: 1, y: 1}
     baseValue: 18
+    spiritResource:
+      rid: -2
     supplierAvailable: 1
     storageSize: {x: 0, y: 0}
     compatibleEquipmentIds: []
@@ -75,6 +81,8 @@ MonoBehaviour:
     - {x: 2, y: 0}
     - {x: 1, y: 1}
     baseValue: 6
+    spiritResource:
+      rid: -2
     supplierAvailable: 1
     storageSize: {x: 0, y: 0}
     compatibleEquipmentIds: []
@@ -93,6 +101,8 @@ MonoBehaviour:
     - {x: 0, y: 1}
     - {x: 1, y: 1}
     baseValue: 14
+    spiritResource:
+      rid: -2
     supplierAvailable: 1
     storageSize: {x: 0, y: 0}
     compatibleEquipmentIds: []
@@ -111,6 +121,8 @@ MonoBehaviour:
     - {x: 0, y: 2}
     - {x: 0, y: 3}
     baseValue: 10
+    spiritResource:
+      rid: -2
     supplierAvailable: 1
     storageSize: {x: 0, y: 0}
     compatibleEquipmentIds: []
@@ -121,13 +133,15 @@ MonoBehaviour:
   - id: sign
     title: "\u6536\u8D2D\u724C"
     category: 5
-    description: "\u6750\u6599\u5E7F\u544A\u724C \xB7 \u5F00\u95E8\u65F6\u63D0\u9AD8\u5356\u5BB6\u6982\u7387\uFF0C\u5E76\u5438\u5F15\u51FA\u552E\u6750\u6599\u7684\u5356\u5BB6\uFF1B\u6BCF\u65E5\u603B\u5BA2\u6D41\u4ECD\u4E3A 5 \u4F4D\u3002\u4E0D\u53EF\u51FA\u552E\u3002"
+    description: "\u6750\u6599\u5E7F\u544A\u724C \xB7 \u5F00\u95E8\u65F6\u63D0\u9AD8\u5356\u5BB6\u6982\u7387\uFF0C\u5E76\u5438\u5F15\u51FA\u552E\u6750\u6599\u7684\u5356\u5BB6\uFF1B\u57FA\u7840\u5BA2\u6D415\u4F4D\uFF0C\u4F53\u529B\u6EA2\u51FA\u5956\u52B1\u53E6\u8BA1\u3002\u4E0D\u53EF\u51FA\u552E\u3002"
     color: {r: 0.65, g: 0.56, b: 0.83, a: 1}
     cells:
     - {x: 0, y: 0}
     - {x: 1, y: 0}
     - {x: 1, y: 1}
     baseValue: 0
+    spiritResource:
+      rid: -2
     supplierAvailable: 0
     storageSize: {x: 0, y: 0}
     compatibleEquipmentIds: []
@@ -151,6 +165,8 @@ MonoBehaviour:
     - {x: 1, y: 2}
     - {x: 2, y: 2}
     baseValue: 0
+    spiritResource:
+      rid: -2
     supplierAvailable: 0
     storageSize: {x: 10, y: 10}
     compatibleEquipmentIds: []
@@ -171,6 +187,8 @@ MonoBehaviour:
     - {x: 0, y: 2}
     - {x: 1, y: 2}
     baseValue: 0
+    spiritResource:
+      rid: -2
     supplierAvailable: 0
     storageSize: {x: 3, y: 3}
     compatibleEquipmentIds: []
@@ -192,6 +210,9 @@ MonoBehaviour:
   dewId: dew
   productId: pill
   startingMoney: 120
+  maximumStamina: 100
+  staminaRecoveryPerTurn: 30
+  staminaTestActivityCost: 20
   retailMarkup: 0.15
   priceTags: []
   marketEvents:
@@ -250,3 +271,8 @@ MonoBehaviour:
   baseSupplierChance: 0.4
   advertisementSupplierBonus: 0.4
   displayedGoodsBuyerBonus: 0.2
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }

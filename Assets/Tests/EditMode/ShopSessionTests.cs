@@ -79,7 +79,7 @@ namespace XiuXianShop.Tests
             SuppliersOnly();
             var pill=s.Items.First(i=>i.Definition.id=="pill");Assert.That(s.Move(pill.Id,ContainerId.Storage,0,0,0,false));
             Display(s,s.Items.First(i=>i.Definition.id=="sign"));Assert.That(s.BeginBusiness());
-            Assert.That(s.Offer.Direction,Is.EqualTo(TradeDirection.CustomerSells));Assert.That(s.RemainingCustomers,Is.EqualTo(4));Valid(s);
+            Assert.That(s.Offer.Direction,Is.EqualTo(TradeDirection.CustomerSells));Assert.That(s.RemainingCustomers,Is.EqualTo(5));Valid(s);
         }
 
         [Test] public void CounterAcceptsPlayerGoodsButPreventsCustomerTheft()
@@ -348,7 +348,7 @@ namespace XiuXianShop.Tests
                 a.NextCustomer();b.NextCustomer();
             }
             Assert.That(a.TodayAttraction,Is.SameAs(captured));a.EndBusiness();a.AdvanceTurn();Assert.That(a.TodayAttraction,Is.Null);
-            a.BeginBusiness();Assert.That(a.TodayAttraction.BuyerCategory,Is.EqualTo(ItemCategory.Container));Assert.That(a.BuyersToday+a.SuppliersToday,Is.EqualTo(5));
+            a.BeginBusiness();Assert.That(a.TodayAttraction.BuyerCategory,Is.EqualTo(ItemCategory.Container));Assert.That(a.BuyersToday+a.SuppliersToday,Is.EqualTo(6));
         }
 
         [Test] public void AdvertisementSelectsItsConfiguredCategoryAndDuplicatesDoNotStackProbability()

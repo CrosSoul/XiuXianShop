@@ -11,6 +11,13 @@ namespace XiuXianShop.Editor
         public const string CatalogPath="Assets/Data/ShopCatalog.asset";
         static ShopCatalog verificationCatalog;
         static bool discountEnabled;
+        [MenuItem("XiuXianShop/Validation/DP45 Spend Configured Test Stamina (Play session)")]
+        public static void SpendTestStamina()
+        {
+            if(!CanStartVerification())return;
+            var shop=Object.FindFirstObjectByType<ShopPrototype>();
+            shop.Run(()=>shop.Session.TrySpendStamina(shop.Catalog.staminaTestActivityCost));
+        }
         [MenuItem("XiuXianShop/Validation/Start Repeatable Trading Turn (resets Play session)")]
         public static void StartVerificationDay()
         {

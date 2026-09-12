@@ -26,6 +26,7 @@ namespace XiuXianShop
         RectTransform content, ghost, preview;
         Text header, rent, phaseText, selection, customerTitle, customerDetails, notice, furnaceText, previewText, displaySummary, tradeDetails, tradeStatus, tradeHeading;
         int displayedPricingRevision;
+        Text staminaText;
         TradeOffer displayedOffer;
         TurnPhase displayedPhase;
         public int CustomerSeed { get; set; } = -1;
@@ -106,6 +107,7 @@ namespace XiuXianShop
             Label(content,"ShopName",44,30,190,44,"栖云当铺",30,gold);
             MakeButton("CalendarOpen",240,33,100,38,"日历",()=>{CancelDrag();CalendarView.Open();});
             MakeButton("CarryOpen",720,74,240,34,"出门携带",OpenCarrySelection);
+            staminaText=Label(content,"Stamina",44,81,660,26,"",17,gold);
             header=Label(content,"Resources",350,34,380,34,"",24,textColor);
             phaseText=Label(content,"Phase",754,35,310,32,"",22,gold);
             rent=Label(content,"Rent",1110,31,445,44,"",15,muted);
@@ -221,6 +223,8 @@ namespace XiuXianShop
                 view.anchoredPosition=new Vector2(item.X*cellSizes[item.Container],-item.Y*cellSizes[item.Container]); itemViews[item.Id]=view;
             }
             header.text=$"{Session.DateLabel}    |    灵石 {Session.Money}";
+            staminaText.text=$"体力 {Session.Stamina}/{Session.MaximumStamina} · 每月恢复 {catalog.staminaRecoveryPerTurn}"+
+                (Session.HasStaminaOverflowCustomer?" · 本月溢出客流 +1":" · 营业不消耗体力");
             phaseText.text=Session.Phase==TurnPhase.Preparation?"营业前 · 配置展示":Session.Phase==TurnPhase.Open?"营业中 · 客源已确定":"已闭店 · 整理 / 炼丹";
             rent.text=$"下次房租：第 {Session.NextRentTurn} 回合结束 / {Session.Rent} 灵石\n待付房租 {Session.RentDebt}  ·  每 6 回合结算，下期约涨 5%";
             foreach(var pair in gridTitles)
@@ -232,7 +236,7 @@ namespace XiuXianShop
             selection.text=selected==null?"点击物品查看价值、标签与说明。\n仓库中的预估价值等于基础价值；放入谈判柜台后按本次报价显示。":ItemDescription(selected);
             var attraction=Session.Phase==TurnPhase.Preparation?Session.PreviewAttraction():Session.TodayAttraction;
             string preferredCategory=attraction.BuyerCategory==ItemCategory.Unclassified?"随机类别":ShopCatalog.CategoryName(attraction.BuyerCategory);
-            displaySummary.text=Session.Phase==TurnPhase.Preparation?$"每回合 5 位 · 仅求购 {1-attraction.SupplierChance:P0} / 携货求购 {attraction.SupplierChance:P0}\n{preferredCategory} · 资金 {attraction.MinimumBuyerBudget}–{attraction.MaximumBuyerBudget}\n基础价值 {attraction.DisplayValue} · 档位 ≥{attraction.BudgetTierMinimum}":$"本月仅求购 {Session.BuyersToday} / 携货求购 {Session.SuppliersToday}\n已离场 {Session.ServedToday} · 待到访 {Session.RemainingCustomers}\n开门时的展示效果已锁定";
+            displaySummary.text=Session.Phase==TurnPhase.Preparation?$"本回合 {Session.CustomerCountThisTurn} 位 · 仅求购 {1-attraction.SupplierChance:P0} / 携货求购 {attraction.SupplierChance:P0}\n{preferredCategory} · 资金 {attraction.MinimumBuyerBudget}–{attraction.MaximumBuyerBudget}\n基础价值 {attraction.DisplayValue} · 档位 ≥{attraction.BudgetTierMinimum}":$"本月仅求购 {Session.BuyersToday} / 携货求购 {Session.SuppliersToday}\n已离场 {Session.ServedToday} · 待到访 {Session.RemainingCustomers}\n开门时的展示效果已锁定";
             var offer=Session.Offer;
             bool canAccept=Session.CanAcceptTrade(out int total,out string tradeReason);
             bool closed=Session.Phase==TurnPhase.Closed;
@@ -246,7 +250,7 @@ namespace XiuXianShop
             else if(offer==null)
             {
                 customerTitle.text=Session.Phase==TurnPhase.Open?(Session.RemainingCustomers>0?"等待下一位顾客":"本月顾客已全部离场"):"营业前 · 配置店铺";
-                customerDetails.text=Session.Phase==TurnPhase.Open?$"{Session.LastCustomerResult}\n剩余 {Session.RemainingCustomers} 位，可呼叫下一位或闭店。":$"空展示柜也有客人 · 每回合 5 位\n偏好：{preferredCategory} · 资金 {attraction.MinimumBuyerBudget}–{attraction.MaximumBuyerBudget}\n供货：{attraction.SupplierDescription}";
+                customerDetails.text=Session.Phase==TurnPhase.Open?$"{Session.LastCustomerResult}\n剩余 {Session.RemainingCustomers} 位，可呼叫下一位或闭店。":$"空展示柜也有客人 · 本回合 {Session.CustomerCountThisTurn} 位\n偏好：{preferredCategory} · 资金 {attraction.MinimumBuyerBudget}–{attraction.MaximumBuyerBudget}\n供货：{attraction.SupplierDescription}";
                 tradeDetails.text=Session.Phase==TurnPhase.Open?"当前没有顾客。\n自有物品可以继续在三区域搬运。": "先把商品或收购牌放到左侧展示柜，再开始营业。\n\n玩家出售：基础价值 + 零售加价及有效标签。\n玩家收购：按卖家货物的当前报价付款。\n\n逐件报价求和，确认时按同一金额结算。";
             }
             else

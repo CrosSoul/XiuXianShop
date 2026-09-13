@@ -1,5 +1,14 @@
 # XiuXianShop 开发日志
 
+## 2026-09-13 — DP-28 地点物品与物流
+
+- 开工HEAD e9f4225（DP-27），工作区干净。按DP-28读取G-11 v8和G-01储存相关段落，未全量阅读GDD。
+- 增加当前地点格子、实例地点ID和随身区域搬运；普通地点遗留物先确认，取消无变化，确认仅清理当前地点物品。长期标记地点跨访问/月度/准备存档保留物品，其他地点清理不影响它。地点物品不会自动回仓库，内部搬运不额外扣体力。
+- 正常两地点均临时、格子6×4可调，经Unity API保存配置；不生成正式奖励，不实现配方、灵田/兽园或新经济。沿用容器仓库/携带与禁止嵌套规则，未开放储存容器地面丢弃。Validation新增隔离临时/长期地点与测试物品插入，测试存档独立位于Temp。
+- 最终Edit Mode121/121；DP28 Play2/2、DP27外出回归Play2/2，含真实鼠标拖放、取消/确认清理、长期地点下月取回。第一次测试对刚刷新UI同帧射线检查失败，复核下一帧实际射线正确后给测试增加一帧等待，重跑通过。未重复日历Play专项。
+- 正常场景MCP操作验证草药落地、取消保留、确认清理、木剑/腰包安全回店；9件减为8件，仅清理所确认的草药，体力仍40、ValidateState无异常。两张截图已查看；最终Console Error0/Warning0，Editor ready/stopped、无编译/Domain Reload，ShopPrototype场景dirty=false，未清日志。
+- 证据Docs/Evidence/DP28，入口和边界见DP28_LOCATION_ITEMS.md；未改Scene、Package或Project Settings。仅本地未提交/推送，交付Jira Ready for Review待用户验收，Confluence未修改。未做人工手感验收、Player构建或平台测试。
+
 ## 2026-09-13 — DP-27 外出往返
 
 - 开工HEAD 8b26a9e（DP-45），工作区干净。按DP-27读取G-11 v8、G-03与G-04相关体力验收、G-11A职责边界，未全量阅读GDD。

@@ -23,6 +23,7 @@ namespace XiuXianShop
     {
         public int id;
         public string definitionId;
+        public string locationId;
         public ContainerId container;
         public int x,y,rotation,storageItemId;
         public bool flipped,hasPurchaseValue;

@@ -10,6 +10,10 @@ namespace XiuXianShop
         public string id;
         public string title;
         public bool initiallyUnlocked;
+        [UnityEngine.Tooltip("地点物品区的原型格子尺寸，不代表职业设备容量。")]
+        public UnityEngine.Vector2Int itemGridSize = new UnityEngine.Vector2Int(6,4);
+        [UnityEngine.Tooltip("长期地点保留物品状态；普通地点离开时清理。不是种植或养殖实现。")]
+        public bool preserveItemsBetweenVisits;
     }
 
     public sealed partial class ShopSession
@@ -27,7 +31,7 @@ namespace XiuXianShop
         void InitializeTravel()
         {
             if(catalog.firstLocationStaminaCost<0 || catalog.extraLocationStaminaCost<0 ||
-                catalog.travelLocations.Any(l=>string.IsNullOrWhiteSpace(l.id)) ||
+                catalog.travelLocations.Any(l=>string.IsNullOrWhiteSpace(l.id) || l.itemGridSize.x<1 || l.itemGridSize.y<1) ||
                 catalog.travelLocations.Select(l=>l.id).Distinct().Count()!=catalog.travelLocations.Length)
                 throw new ArgumentException("外出地点配置无效。");
             foreach(var location in catalog.travelLocations.Where(l=>l.initiallyUnlocked))unlockedLocations.Add(location.id);
@@ -64,9 +68,12 @@ namespace XiuXianShop
             return Success("已抵达"+catalog.travelLocations.Single(l=>l.id==id).title+"；本次访问体力已结算。");
         }
 
-        public bool LeaveLocation()
+        public bool LeaveLocation(bool confirmed=false)
         {
             if(!IsTravelling || CurrentLocationId==null)return Fail("当前不在地点内。");
+            if(LocationLeaveNeedsConfirmation && !confirmed)return Fail("地点仍有未带走物品，确认离开后将清理这些物品。");
+            if(!CurrentLocation.preserveItemsBetweenVisits)
+                items.RemoveAll(i=>i.Container==ContainerId.Location && i.LocationId==CurrentLocationId);
             CurrentLocationId=null;
             return Success("已返回地点选择界面；携带物与剩余体力保持不变。");
         }
@@ -81,6 +88,7 @@ namespace XiuXianShop
         }
 
         bool IsTravelArea(ContainerId area,int storageId) => IsHand(area) ||
+            (area==ContainerId.Location && CurrentLocationId!=null) ||
             (area==ContainerId.Interior && storageId==CarriedPackId && CarriedPackId!=0);
     }
 }

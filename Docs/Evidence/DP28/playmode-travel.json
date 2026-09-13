@@ -1,0 +1,27 @@
+{
+  "status": "completed",
+  "duration": 2.86,
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.EarlyReturnConfirmationEndsOutingWithoutPayingOrDuplicatingPack",
+      "Status": "Passed",
+      "Duration": 1.3200216,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.TravelButtonsChargeOncePreserveHandsAndDisableVisitedAndUnaffordableLocations",
+      "Status": "Passed",
+      "Duration": 1.5131292,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

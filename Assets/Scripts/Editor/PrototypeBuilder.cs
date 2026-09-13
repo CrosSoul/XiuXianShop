@@ -11,6 +11,27 @@ namespace XiuXianShop.Editor
         public const string CatalogPath="Assets/Data/ShopCatalog.asset";
         static ShopCatalog verificationCatalog;
         static bool discountEnabled;
+        [MenuItem("XiuXianShop/Validation/Start DP28 Location Items Example (resets Play session)")]
+        public static void StartLocationItemsExample()
+        {
+            if(!CanStartVerification())return;
+            StartVerificationDay();verificationCatalog.SetStorageVerificationDefaults();
+            verificationCatalog.travelLocations=new[]
+            {
+                new TravelLocation{id="temporary-test",title="临时地点（物流测试）",initiallyUnlocked=true},
+                new TravelLocation{id="persistent-test",title="长期地点（仅物品状态测试）",initiallyUnlocked=true,preserveItemsBetweenVisits=true}
+            };
+            var shop=Object.FindFirstObjectByType<ShopPrototype>();shop.StartVerificationSession(verificationCatalog,28);
+            shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP28VerificationSave.json");
+        }
+        [MenuItem("XiuXianShop/Validation/DP28 Add Test Pill At Current Location")]
+        public static void AddLocationTestItem()
+        {
+            if(!CanStartVerification())return;
+            var shop=Object.FindFirstObjectByType<ShopPrototype>();
+            if(shop.SavePath!=System.IO.Path.Combine(Application.dataPath,"../Temp/DP28VerificationSave.json"))return;
+            shop.Run(()=>shop.Session.AddLocationItem("pill"));
+        }
         [MenuItem("XiuXianShop/Validation/DP45 Spend Configured Test Stamina (Play session)")]
         public static void SpendTestStamina()
         {

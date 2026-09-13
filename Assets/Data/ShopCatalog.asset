@@ -219,9 +219,13 @@ MonoBehaviour:
   - id: baishitang
     title: "\u767E\u4E8B\u5802"
     initiallyUnlocked: 1
+    itemGridSize: {x: 6, y: 4}
+    preserveItemsBetweenVisits: 0
   - id: tingfeng-teahouse
     title: "\u542C\u98CE\u8336\u8086"
     initiallyUnlocked: 1
+    itemGridSize: {x: 6, y: 4}
+    preserveItemsBetweenVisits: 0
   retailMarkup: 0.15
   priceTags: []
   marketEvents:

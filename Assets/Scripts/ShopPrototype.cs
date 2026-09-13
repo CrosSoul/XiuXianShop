@@ -221,6 +221,7 @@ namespace XiuXianShop
             itemViews.Clear();
             foreach(var item in Session.Items)
             {
+                if(item.Container==ContainerId.Location && item.LocationId!=Session.CurrentLocationId)continue;
                 if(!grids.ContainsKey(item.Container) || (item.Container==ContainerId.Interior && item.StorageItemId!=openStorageId))continue;
                 float itemCell=cellSizes[item.Container];
                 if(ShopSession.IsHand(item.Container))itemCell/=Mathf.Max(item.Cells.Max(p=>p.x)+1,item.Cells.Max(p=>p.y)+1);
@@ -283,6 +284,7 @@ namespace XiuXianShop
                 displayedOffer=offer;displayedPhase=Session.Phase;
             }
             notice.text=localNotice??Session.Message;
+            if(locationNotice!=null)locationNotice.text=localNotice??Session.Message;
             beginButton.interactable=Session.Phase==TurnPhase.Preparation;
             nextButton.interactable=Session.Phase==TurnPhase.Open && (offer!=null || Session.RemainingCustomers>0);
             endButton.interactable=Session.Phase==TurnPhase.Open;
@@ -321,7 +323,7 @@ namespace XiuXianShop
         // Explicit developer/test entry. The Editor menu supplies a temporary catalog clone.
         public void StartVerificationSession(ShopCatalog configuration,int seed,MarketCalendar calendar=null)
         {
-            CloseCarryPanel();CloseCarrySelection();CloseStorage();CancelDrag();catalog=configuration;Session=new ShopSession(catalog,customerSeed:seed,calendar:calendar);
+            CloseTravelConfirmation();CloseCarryPanel();CloseTravelWindow();CloseCarrySelection();CloseStorage();CancelDrag();catalog=configuration;Session=new ShopSession(catalog,customerSeed:seed,calendar:calendar);
             CalendarMessage=null;CalendarView.Close();NegotiationView.Close();
             selectedId=0;localNotice=null;Refresh();
         }
@@ -393,7 +395,7 @@ namespace XiuXianShop
         {
             var shape=Session.Find(dragId).Definition.Shape(dragRotation,dragFlipped);
             int offsetX=Mathf.Clamp(grabCell.x,0,shape.Max(p=>p.x)),offsetY=Mathf.Clamp(grabCell.y,0,shape.Max(p=>p.y));
-            foreach(var pair in grids.OrderByDescending(p=>p.Key==ContainerId.Interior))
+            foreach(var pair in grids.Where(p=>!Session.IsTravelling || ShopSession.IsHand(p.Key) || p.Key==ContainerId.Interior || p.Key==ContainerId.Location).OrderByDescending(p=>p.Key==ContainerId.Interior || p.Key==ContainerId.Location))
                 if(pair.Value.gameObject.activeInHierarchy && (pair.Key==ContainerId.Interior || storageWindow==null || !RectTransformUtility.RectangleContainsScreenPoint(storageWindow,screen,null)) && (carryWindow==null || pair.Key==ContainerId.Interior || ShopSession.IsHand(pair.Key) || !RectTransformUtility.RectangleContainsScreenPoint(carryWindow,screen,null)) && carrySelection==null && RectTransformUtility.RectangleContainsScreenPoint(pair.Value,screen,null))
                 {
                     RectTransformUtility.ScreenPointToLocalPointInRectangle(pair.Value,screen,null,out var p);

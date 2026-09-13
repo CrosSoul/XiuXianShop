@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace XiuXianShop
 {
-    public enum ContainerId { Storage, Display, Counter, CustomerCounter, Interior, LeftHand, RightHand, CarriedPack }
+    public enum ContainerId { Storage, Display, Counter, CustomerCounter, Interior, LeftHand, RightHand, CarriedPack, Location }
     public enum TurnPhase { Preparation, Open, Closed }
     public enum ItemOwner { Player, Customer }
     public enum TradeDirection { CustomerBuys, CustomerSells }
@@ -17,6 +17,7 @@ namespace XiuXianShop
         public ContainerId Container { get; internal set; }
         public ItemOwner Owner { get; internal set; }
         public int StorageItemId { get; internal set; }
+        public string LocationId { get; internal set; }
         public int X { get; internal set; }
         public int Y { get; internal set; }
         public int Rotation { get; internal set; }
@@ -149,7 +150,7 @@ namespace XiuXianShop
                 hasStaminaState=true,stamina=Stamina,staminaOverflowCustomer=HasStaminaOverflowCustomer,
                 hasTravelledThisTurn=HasTravelledThisTurn,unlockedLocationIds=unlockedLocations.ToArray(),
                 crafted=Crafted,purchases=Purchases,sales=Sales,calendar=Calendar.Capture(),tags=priceTags.Values.Select(t=>t.Copy()).ToArray(),
-                items=items.Select(i=>new SavedShopItem{id=i.Id,definitionId=i.Definition.id,container=i.Container,storageItemId=i.StorageItemId,x=i.X,y=i.Y,
+                items=items.Select(i=>new SavedShopItem{id=i.Id,definitionId=i.Definition.id,container=i.Container,storageItemId=i.StorageItemId,locationId=i.LocationId,x=i.X,y=i.Y,
                     rotation=i.Rotation,flipped=i.Flipped,hasPurchaseValue=i.PurchaseValue.HasValue,purchaseValue=i.PurchaseValue??0,
                     hasSpiritResource=i.Definition.spiritResource!=null,spiritUnits=i.SpiritUnits}).ToArray()},true);
         }
@@ -182,7 +183,7 @@ namespace XiuXianShop
                 var definition=catalog.Find(i.definitionId);
                 if(i.hasSpiritResource!=(definition.spiritResource!=null))throw new ArgumentException("存档灵气配置不匹配。");
                 session.items.Add(new GridItem {Id=i.id,Definition=definition,Owner=ItemOwner.Player,Container=i.container,StorageItemId=i.storageItemId,
-                    X=i.x,Y=i.y,Rotation=i.rotation,Flipped=i.flipped,PurchaseValue=i.hasPurchaseValue?(int?)i.purchaseValue:null,SpiritUnits=i.spiritUnits});
+                    LocationId=i.locationId,X=i.x,Y=i.y,Rotation=i.rotation,Flipped=i.flipped,PurchaseValue=i.hasPurchaseValue?(int?)i.purchaseValue:null,SpiritUnits=i.spiritUnits});
             }
             string error=session.ValidateState();if(error!=null)throw new ArgumentException("存档库存无效："+error);
             session.Calendar.Between(MarketCalendar.YearStart(session.Turn),MarketCalendar.YearStart(session.Turn)+11);
@@ -193,8 +194,9 @@ namespace XiuXianShop
         public static Vector2Int Size(ContainerId container)
             => container == ContainerId.Storage ? new Vector2Int(10,7) : container == ContainerId.Display ? new Vector2Int(6,4) : new Vector2Int(5,4);
         public GridItem Find(int id) => items.FirstOrDefault(i=>i.Id==id);
-        public IEnumerable<GridItem> In(ContainerId container, int storageItemId=0) => items.Where(i=>i.Container==container && i.StorageItemId==storageItemId);
-        public Vector2Int GridSize(ContainerId container,int storageItemId=0) => container==ContainerId.Interior ? Find(storageItemId).Definition.storageSize : Size(container);
+        public IEnumerable<GridItem> In(ContainerId container, int storageItemId=0) => items.Where(i=>i.Container==container && i.StorageItemId==storageItemId && (container!=ContainerId.Location || i.LocationId==CurrentLocationId));
+        public Vector2Int GridSize(ContainerId container,int storageItemId=0,string locationId=null) => container==ContainerId.Interior ? Find(storageItemId).Definition.storageSize :
+            container==ContainerId.Location ? catalog.travelLocations.Single(l=>l.id==(locationId??CurrentLocationId)).itemGridSize : Size(container);
         public int Occupied(ContainerId container) => In(container).Sum(i=>i.Cells.Length);
         GridItem NewItem(ItemDefinition def, ItemOwner owner) => new GridItem{Id=nextId++, Definition=def, Owner=owner,SpiritUnits=def.spiritResource?.CapacityUnits??0};
         bool Fail(string message) { Message=message; return false; }
@@ -226,13 +228,14 @@ namespace XiuXianShop
         public PriceQuote Estimate(GridItem item) => item.Container == ContainerId.Counter || item.ForSale ? Quote(item) :
             new PriceQuote(item.Definition, Array.Empty<PriceTag>(),item.BaseValue);
 
-        public bool Fits(GridItem item, ContainerId target, int x, int y, int rotation, bool flipped, ISet<int> ignored = null, int storageItemId=0)
+        public bool Fits(GridItem item, ContainerId target, int x, int y, int rotation, bool flipped, ISet<int> ignored = null, int storageItemId=0,string locationId=null)
         {
             if(IsHand(target))return !In(target).Any(i=>i.Id!=item.Id);
-            Vector2Int size=GridSize(target,storageItemId);
+            Vector2Int size=GridSize(target,storageItemId,locationId);
             var cells=item.Definition.Shape(rotation,flipped).Select(p=>p+new Vector2Int(x,y)).ToArray();
             if (cells.Any(p=>p.x<0 || p.y<0 || p.x>=size.x || p.y>=size.y)) return false;
-            var occupied=new HashSet<Vector2Int>(In(target,storageItemId).Where(i=>i.Id!=item.Id && (ignored==null || !ignored.Contains(i.Id)))
+            var contents=target==ContainerId.Location ? items.Where(i=>i.Container==ContainerId.Location && i.LocationId==(locationId??CurrentLocationId)) : In(target,storageItemId);
+            var occupied=new HashSet<Vector2Int>(contents.Where(i=>i.Id!=item.Id && (ignored==null || !ignored.Contains(i.Id)))
                 .SelectMany(i=>i.Cells.Select(p=>p+new Vector2Int(i.X,i.Y))));
             return !cells.Any(occupied.Contains);
         }
@@ -250,6 +253,9 @@ namespace XiuXianShop
             reason="";
             if(IsCarrying && id==CarriedPackId){reason="携带期间不能移动或更换已选背包，请先返回。";return false;}
             if (item==null) { reason="物品已不在这里。"; return false; }
+            if((target==ContainerId.Location || item.Container==ContainerId.Location) &&
+                (!IsTravelling || CurrentLocationId==null || (item.Container==ContainerId.Location && item.LocationId!=CurrentLocationId)))
+            {reason="只能操作当前访问地点的物品。";return false;}
             if(IsTravelling && (!IsTravelArea(item.Container,item.StorageItemId) || !IsTravelArea(target,storageItemId)))
             {reason="外出期间只能整理随身物品，回店后才能操作店内物品。";return false;}
             if (item.ForSale && target!=ContainerId.Counter && target!=ContainerId.CustomerCounter) { reason="这是顾客的货物；确认收购后才属于你。"; return false; }
@@ -278,7 +284,7 @@ namespace XiuXianShop
             if(target!=ContainerId.Interior)
             {
                 if(storageItemId!=0){reason="根层物品不能带有储存物品引用。";return false;}
-                if(item.Definition.category==ItemCategory.ProductionEquipment && target!=ContainerId.Storage)
+                if(item.Definition.category==ItemCategory.ProductionEquipment && target!=ContainerId.Storage && target!=ContainerId.Location)
                 {reason="生产设备只能放在仓库或兼容设备匣。";return false;}
                 return true;
             }
@@ -301,11 +307,12 @@ namespace XiuXianShop
         {
             if (!CanMove(id,target,x,y,rotation,flipped,out string reason,storageItemId)) return Fail(reason);
             var item=Find(id); Place(item,target,IsHand(target)?0:x,IsHand(target)?0:y,rotation,flipped);item.StorageItemId=storageItemId;
+            if(target==ContainerId.Location)item.LocationId=CurrentLocationId;
             TryPlaceSupplierItems();
             return Success($"已摆放 {item.Definition.title}。" );
         }
         static void Place(GridItem item, ContainerId target, int x, int y, int rotation, bool flipped)
-        { item.Container=target; item.StorageItemId=0; item.X=x; item.Y=y; item.Rotation=((rotation%4)+4)%4; item.Flipped=flipped; }
+        { item.Container=target; item.StorageItemId=0; item.LocationId=null; item.X=x; item.Y=y; item.Rotation=((rotation%4)+4)%4; item.Flipped=flipped; }
 
         public DisplayAttraction PreviewAttraction()
         {
@@ -534,10 +541,11 @@ namespace XiuXianShop
             if(items.Select(i=>i.Id).Distinct().Count()!=items.Count) return "Duplicate IDs";
             foreach(var item in items)
             {
+                var locationError=ValidateLocationItem(item);if(locationError!=null)return locationError;
                 var resource=item.Definition.spiritResource;
                 if(resource==null ? item.SpiritUnits!=0 : item.SpiritUnits<0 || item.SpiritUnits>resource.CapacityUnits || (item.SpiritUnits==0 && !resource.Reusable))return "Invalid spirit resource: "+item.Id;
                 if(!StoragePlacementAllowed(item,item.Container,item.StorageItemId,out var storageError))return storageError;
-                if(item.Container!=ContainerId.CarriedPack && !Fits(item,item.Container,item.X,item.Y,item.Rotation,item.Flipped,storageItemId:item.StorageItemId)) return "Invalid grid placement: "+item.Id;
+                if(item.Container!=ContainerId.CarriedPack && !Fits(item,item.Container,item.X,item.Y,item.Rotation,item.Flipped,storageItemId:item.StorageItemId,locationId:item.LocationId)) return "Invalid grid placement: "+item.Id;
                 if(item.ForSale && (Offer==null || !Offer.SupplierItems.Contains(item) ||
                     (item.Container!=ContainerId.Counter && item.Container!=ContainerId.CustomerCounter))) return "Orphaned customer item";
                 if(!item.ForSale && item.Container==ContainerId.CustomerCounter)return "Player item on customer counter";

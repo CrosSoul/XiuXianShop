@@ -7,6 +7,7 @@ namespace XiuXianShop
     public sealed partial class ShopPrototype
     {
         RectTransform travelWindow,travelConfirmation;
+        Text locationNotice;
 
         void StartTravel()
         {
@@ -44,10 +45,16 @@ namespace XiuXianShop
             else
             {
                 var location=Session.Catalog.travelLocations.Single(l=>l.id==Session.CurrentLocationId);
-                Label(travelWindow,"LocationTitle",100,160,1300,50,location.title,32,gold);
-                Label(travelWindow,"LocationDescription",100,230,980,110,"已抵达，访问体力已一次结算。\n当前可整理随身物品，或离开返回地点选择。\n此地点的具体事务尚未开放。",23,textColor);
-                CarryButton(travelWindow,"TravelLeave",1160,230,330,"离开 · 返回地点选择",()=>
-                {CancelDrag();if(Session.LeaveLocation())ShowTravelWindow();});
+                Label(travelWindow,"LocationTitle",100,110,1300,50,location.title+" · 地点物品区",29,gold);
+                var size=location.itemGridSize;float cell=Mathf.Min(48,Mathf.Min(600f/size.x,235f/size.y));
+                var grid=Rect(travelWindow,"LocationGrid",100,180,size.x*cell,size.y*cell);
+                grids[ContainerId.Location]=grid;cellSizes[ContainerId.Location]=cell;
+                for(int y=0;y<size.y;y++)for(int x=0;x<size.x;x++)Image(Rect(grid,$"Slot_{x}_{y}",x*cell,y*cell,cell-2,cell-2),line);
+                Label(travelWindow,"LocationDescription",760,170,720,100,location.preserveItemsBetweenVisits?
+                    "长期地点：区域物品跨访问保留。\n物品不会自动送回店铺，请手动收入随身区域。":
+                    "临时地点：离开时清理未带走物品。\n请拖入下方左右手或所带背包。",22,textColor);
+                locationNotice=Label(travelWindow,"LocationNotice",100,425,1370,40,"",18,gold);
+                CarryButton(travelWindow,"TravelLeave",1100,310,390,"离开 · 返回地点选择",RequestLocationLeave);
             }
             ShowCarryPanel();
         }
@@ -61,6 +68,23 @@ namespace XiuXianShop
             Label(travelConfirmation,"Question",380,320,900,100,"还有体力足够的未访问地点。\n确定回店？回店后本回合不能再次外出。",27,gold);
             CarryButton(travelConfirmation,"TravelReturnConfirm",380,470,390,"确定回店",()=>FinishTravel(true));
             CarryButton(travelConfirmation,"TravelReturnCancel",820,470,390,"继续外出",CloseTravelConfirmation);
+        }
+
+        void RequestLocationLeave()
+        {
+            CancelDrag();
+            if(!Session.LocationLeaveNeedsConfirmation){FinishLocationLeave(false);return;}
+            travelConfirmation=Rect(content,"LocationLeaveConfirmation",0,0,1600,1000);
+            Image(travelConfirmation,new Color(.02f,.03f,.04f,.96f),true);
+            Label(travelConfirmation,"Question",380,300,900,140,$"地点还有 {Session.In(ContainerId.Location).Count()} 件未带走物品。\n确认离开将清理它们，无法取回。\n左右手和所带背包内的物品不会被清理。",27,gold);
+            CarryButton(travelConfirmation,"LocationLeaveConfirm",380,490,390,"确认离开并清理",()=>FinishLocationLeave(true));
+            CarryButton(travelConfirmation,"LocationLeaveCancel",820,490,390,"留下整理",CloseTravelConfirmation);
+        }
+
+        void FinishLocationLeave(bool confirmed)
+        {
+            if(!Session.LeaveLocation(confirmed))return;
+            CloseTravelConfirmation();ShowTravelWindow();
         }
 
         void FinishTravel(bool confirmed)
@@ -78,6 +102,7 @@ namespace XiuXianShop
         {
             if(travelWindow!=null){travelWindow.gameObject.SetActive(false);Destroy(travelWindow.gameObject);}
             travelWindow=null;
+            locationNotice=null;grids.Remove(ContainerId.Location);cellSizes.Remove(ContainerId.Location);
         }
     }
 }

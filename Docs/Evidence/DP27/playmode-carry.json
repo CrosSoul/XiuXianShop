@@ -1,0 +1,27 @@
+{
+  "status": "completed",
+  "duration": 2.69,
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.MultipleActualPacksCancelWithoutChangesAndChosenContentsMoveBetweenHandsAndPack",
+      "Status": "Passed",
+      "Duration": 1.7751038,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.NoPortableChoiceStillCarriesTwoDifferentShapesAndReopensWithoutCopying",
+      "Status": "Passed",
+      "Duration": 0.8944765,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

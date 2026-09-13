@@ -12,6 +12,8 @@ namespace XiuXianShop
         public int crafted, purchases, sales;
         public bool hasStaminaState,staminaOverflowCustomer;
         public int stamina;
+        public bool hasTravelledThisTurn;
+        public string[] unlockedLocationIds;
         public SavedShopItem[] items;
         public PriceTag[] tags;
         public MarketCalendarState calendar;

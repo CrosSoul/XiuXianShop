@@ -70,6 +70,15 @@ namespace XiuXianShop
         public int staminaRecoveryPerTurn = 30;
         [Min(0), Tooltip("仅Validation模拟活动使用的体力成本，不是炼丹或外出正式成本。")]
         public int staminaTestActivityCost = 20;
+        [Min(0), Tooltip("同次外出首个地点的体力成本。")]
+        public int firstLocationStaminaCost = 60;
+        [Min(0), Tooltip("同次外出后续不同地点的体力成本。")]
+        public int extraLocationStaminaCost = 30;
+        public TravelLocation[] travelLocations =
+        {
+            new TravelLocation {id="baishitang",title="百事堂",initiallyUnlocked=true},
+            new TravelLocation {id="tingfeng-teahouse",title="听风茶肆",initiallyUnlocked=true}
+        };
         [Tooltip("玩家出售时默认零售加价；0.15 表示 +15%。")]
         public float retailMarkup = .15f;
         [Tooltip("明确配置的常驻价格标签；有日期的市场标签由 Market Events 生成。")]

@@ -25,6 +25,7 @@ namespace XiuXianShop
 
         public bool EndCarrying()
         {
+            if(IsTravelling)return Fail("请先回店，再整理卸下携带物。");
             if(!IsCarrying)return Fail("当前没有携带中的物品。" );
             var carried=items.Where(i=>IsHand(i.Container) || i.Container==ContainerId.CarriedPack).ToArray();
             var occupied=new HashSet<Vector2Int>(In(ContainerId.Storage).SelectMany(i=>i.Cells.Select(p=>p+new Vector2Int(i.X,i.Y))));

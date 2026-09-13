@@ -1,5 +1,16 @@
 # XiuXianShop 开发日志
 
+## 2026-09-13 — DP-27 外出往返
+
+- 开工HEAD 8b26a9e（DP-45），工作区干净。按DP-27读取G-11 v8、G-03与G-04相关体力验收、G-11A职责边界，未全量阅读GDD。
+- 接通携带准备→地点选择→进入/离开→回店；每回合最多一次外出，首个60/额外30体力可调，只在进入扣除。未解锁隐藏、访问过/体力不足灰态；仍有可去地点时回店确认，可取消。
+- 复用背包/双手原实例，外出不能操作店内物品或丹炉；回店保留体力和随身物，独立整理卸货以免满仓阻止回店。准备阶段存档保留外出标记与解锁，外出存档仍不开放。
+- ShopCatalog资产经Unity API增加百事堂、听风茶肆初始解锁及60/30成本，现有9物品不变。地点业务、普通地点实物清理留给DP-48/49/28；未修改场景、Package、Project Settings。
+- 最终Edit Mode117/117；Play Mode DP27 2/2与DP31携带回归2/2，真实鼠标点击/拖拽。首次Edit测试误引用未配置的灵露已修正；测试发现曾返回0项，刷新后实际执行通过，0项不计成功。没有重复日历Play专项。
+- 正常场景经Unity MCP实际执行百事堂→听风茶肆→回店卸货，100→40→10体力，9件物品保留且ValidateState无异常；locations.png、destination.png已查看。截图工具一度写入Assets/Docs，已复制到Docs并用Unity API删除仅本轮产生的资产目录。
+- 自动审批用量限制曾阻止截图，提示时间后重试成功，未绕过。最终MCP Console Error0/Warning0，Editor ready/stopped、无编译/Domain Reload，ShopPrototype场景dirty=false，未清日志。
+- 证据见Docs/Evidence/DP27，手动入口与限制见DP27_TRAVEL.md。仅本地未提交/推送，交付Jira Ready for Review待用户验收；未做玩家人工手感验收、Player构建或平台测试。Confluence未修改。
+
 ## 2026-09-13 — DP-45 营业外体力
 
 - 按任务读取G-04 v9 AC-40/42/46、G-11 v7，并因初始化规则缺失扩展到G-01/G-03 v5；未全量阅读GDD。开工前工作区干净。

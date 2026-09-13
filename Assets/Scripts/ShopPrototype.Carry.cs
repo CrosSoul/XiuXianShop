@@ -19,6 +19,7 @@ namespace XiuXianShop
         public void OpenCarrySelection()
         {
             CancelDrag();
+            if(Session.IsTravelling){ShowTravelWindow();return;}
             if(Session.IsCarrying){ShowCarryPanel();return;}
             if(Session.Phase==TurnPhase.Open){localNotice="请先结束营业再选择出门携带物。";Refresh();return;}
             CloseStorage();CloseCarrySelection();selectedPack=0;
@@ -37,7 +38,7 @@ namespace XiuXianShop
             carryChoice=Label(carrySelection,"CarryChoice",450,600,700,50,"已选择：不带背包出门",21,textColor);
             CarryButton(carrySelection,"CarryConfirm",450,670,320,"确认携带",ConfirmCarry);
             CarryButton(carrySelection,"CarryCancel",800,670,320,"取消",CloseCarrySelection);
-            Label(carrySelection,"Scope",450,735,700,60,"本界面仅配置携带状态；地点与行程尚未接入。取消不改变任何物品。",18,muted);
+            Label(carrySelection,"Scope",450,735,700,60,"确认后整理随身物品，再点击出发。每回合最多外出一次；取消选择不改变物品。",18,muted);
         }
         void SelectPack(int id){selectedPack=id;carryChoice.text=id==0?"已选择：不带背包出门":$"已选择：{Session.Find(id).Definition.title} · 实例 #{id}";}
         void ConfirmCarry()
@@ -50,8 +51,9 @@ namespace XiuXianShop
         {
             CloseCarryPanel();CloseStorage();
             carryWindow=Rect(content,"CarryPanel",590,140,930,450);Image(carryWindow,panel,true);
+            if(Session.IsTravelling)carryWindow.anchoredPosition=new Vector2(335,-480);
             Label(carryWindow,"Title",16,10,740,34,"外出携带 · 左手 / 便携储存 / 右手",23,gold);
-            CarryButton(carryWindow,"CarryHide",760,8,150,"收起",()=>{CloseCarryPanel();Refresh();});
+            CarryButton(carryWindow,"CarryHide",760,8,150,"收起",()=>{CloseCarryPanel();Refresh();}).gameObject.SetActive(!Session.IsTravelling);
             AddHandGrid(ContainerId.LeftHand,24,"左手 · 一件");AddHandGrid(ContainerId.RightHand,780,"右手 · 一件");
             if(Session.CarriedPackId!=0)
             {
@@ -62,12 +64,13 @@ namespace XiuXianShop
                 for(int y=0;y<size.y;y++)for(int x=0;x<size.x;x++)Image(Rect(grid,$"Slot_{x}_{y}",x*cell,y*cell,cell-2,cell-2),line);
             }
             else Label(carryWindow,"NoPack",270,130,410,80,"不带背包\n只有左右手，没有额外储存格子。",22,muted);
-            carryMessage=Label(carryWindow,"CarryMessage",20,355,680,70,"可从仓库放入手持位，或整理预装内容。\n仅携带基础验证，未执行地点行程。",18,muted);
+            carryMessage=Label(carryWindow,"CarryMessage",20,355,680,70,Session.IsTravelling?"可在左右手与所带背包间整理物品。\n跨地点保留原物品；回店后才可操作仓库。":Session.HasTravelledThisTurn?"本回合已外出。剩余体力保留，结束携带后可继续经营。\n若仓库放不下，可先拖动物品整理，再结束携带。":"从仓库备好随身物品，再点击出发。\n出发后本回合不能再次外出。",18,muted);
+            CarryButton(carryWindow,"TravelBegin",725,340,180,"出发 · 选择地点",StartTravel).gameObject.SetActive(!Session.IsTravelling && !Session.HasTravelledThisTurn);
             CarryButton(carryWindow,"CarryReturn",725,390,180,"结束携带 / 返回",()=>
             {
                 CancelDrag();if(!Session.EndCarrying()){carryMessage.text=Session.Message;return;}
                 CloseCarryPanel();Refresh();
-            });
+            }).gameObject.SetActive(!Session.IsTravelling);
             Refresh();
         }
         void AddHandGrid(ContainerId id,float x,string title)

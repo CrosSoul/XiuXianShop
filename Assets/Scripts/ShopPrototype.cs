@@ -62,6 +62,11 @@ namespace XiuXianShop
             if(Session!=null && displayedPricingRevision!=Session.PricingRevision && !IsDragging) Refresh();
             var keyboard=Keyboard.current;
             if(keyboard==null || Session==null) return;
+            if(travelConfirmation!=null)
+            {
+                if(keyboard.escapeKey.wasPressedThisFrame)CloseTravelConfirmation();
+                return;
+            }
             if(carrySelection!=null)
             {
                 if(keyboard.escapeKey.wasPressedThisFrame)CloseCarrySelection();

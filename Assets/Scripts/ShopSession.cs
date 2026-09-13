@@ -112,6 +112,7 @@ namespace XiuXianShop
             this.catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             if(catalog.maximumStamina<1 || catalog.staminaRecoveryPerTurn<0)throw new ArgumentException("体力配置无效。");
             Stamina=catalog.maximumStamina;
+            InitializeTravel();
             customerSeedValue=customerSeed??Guid.NewGuid().GetHashCode();
             customerRandom = new System.Random(customerSeedValue);
             Calendar=calendar??new MarketCalendar(catalog.marketEvents,customerSeed??Guid.NewGuid().GetHashCode());
@@ -146,6 +147,7 @@ namespace XiuXianShop
             return JsonUtility.ToJson(new ShopSave {catalogSignature=Hash128.Compute(JsonUtility.ToJson(catalog)).ToString(),
                 turn=Turn,money=Money,rent=Rent,debt=RentDebt,nextId=nextId,customerSeed=customerSeedValue,customerDraws=customerDraws,
                 hasStaminaState=true,stamina=Stamina,staminaOverflowCustomer=HasStaminaOverflowCustomer,
+                hasTravelledThisTurn=HasTravelledThisTurn,unlockedLocationIds=unlockedLocations.ToArray(),
                 crafted=Crafted,purchases=Purchases,sales=Sales,calendar=Calendar.Capture(),tags=priceTags.Values.Select(t=>t.Copy()).ToArray(),
                 items=items.Select(i=>new SavedShopItem{id=i.Id,definitionId=i.Definition.id,container=i.Container,storageItemId=i.StorageItemId,x=i.X,y=i.Y,
                     rotation=i.Rotation,flipped=i.Flipped,hasPurchaseValue=i.PurchaseValue.HasValue,purchaseValue=i.PurchaseValue??0,
@@ -163,6 +165,10 @@ namespace XiuXianShop
             var session=new ShopSession(catalog,false,save.customerSeed,new MarketCalendar(save.calendar));
             if(!save.hasStaminaState || save.stamina<0 || save.stamina>catalog.maximumStamina)throw new ArgumentException("存档体力状态缺失或无效，当前会话未改变。");
             session.Stamina=save.stamina;session.HasStaminaOverflowCustomer=save.staminaOverflowCustomer;
+            if(save.unlockedLocationIds==null || save.unlockedLocationIds.Any(id=>!catalog.travelLocations.Any(l=>l.id==id)))
+                throw new ArgumentException("存档地点状态缺失或无效，当前会话未改变。");
+            session.HasTravelledThisTurn=save.hasTravelledThisTurn;
+            session.unlockedLocations.Clear();session.unlockedLocations.UnionWith(save.unlockedLocationIds);
             session.Turn=save.turn;session.Money=save.money;session.OpeningMoney=save.money;session.Rent=save.rent;session.RentDebt=save.debt;
             session.nextId=save.nextId;session.Crafted=save.crafted;session.Purchases=save.purchases;session.Sales=save.sales;
             for(int i=0;i<save.customerDraws;i++)session.customerRandom.NextDouble();
@@ -244,6 +250,8 @@ namespace XiuXianShop
             reason="";
             if(IsCarrying && id==CarriedPackId){reason="携带期间不能移动或更换已选背包，请先返回。";return false;}
             if (item==null) { reason="物品已不在这里。"; return false; }
+            if(IsTravelling && (!IsTravelArea(item.Container,item.StorageItemId) || !IsTravelArea(target,storageItemId)))
+            {reason="外出期间只能整理随身物品，回店后才能操作店内物品。";return false;}
             if (item.ForSale && target!=ContainerId.Counter && target!=ContainerId.CustomerCounter) { reason="这是顾客的货物；确认收购后才属于你。"; return false; }
             if (!item.ForSale && target==ContainerId.CustomerCounter) { reason="顾客柜台仅展示顾客来货；自有物品请放在仓库、展示柜或谈判柜台。"; return false; }
             if (!StoragePlacementAllowed(item,target,storageItemId,out reason)) return false;
@@ -492,6 +500,7 @@ namespace XiuXianShop
         }
         public bool Craft()
         {
+            if(IsTravelling)return Fail("请先回店再使用店内丹炉。");
             var herb=In(ContainerId.Storage).FirstOrDefault(i=>i.Owner==ItemOwner.Player && i.Definition.id==catalog.herbId);
             var dew=In(ContainerId.Storage).FirstOrDefault(i=>i.Owner==ItemOwner.Player && i.Definition.id==catalog.dewId);
             if(herb==null || dew==null) return Fail("背包中需要 1 凝气草 + 1 灵露。可展示收购牌获得稳定供货。" );
@@ -509,6 +518,7 @@ namespace XiuXianShop
             if(Turn%catalog.rentPeriod==0) { due+=Rent; Rent=(int)Math.Ceiling(Rent*1.05); }
             int paid=Math.Min(Money,due); Money-=paid; RentDebt=due-paid;
             Turn++; Phase=TurnPhase.Preparation; ServedToday=0;TodayAttraction=null;BuyersToday=0;SuppliersToday=0; queue.Clear();
+            HasTravelledThisTurn=false;visitedLocations.Clear();
             long recovered=(long)Stamina+catalog.staminaRecoveryPerTurn;
             HasStaminaOverflowCustomer=recovered>MaximumStamina;
             Stamina=(int)Math.Min(MaximumStamina,recovered);

@@ -213,6 +213,15 @@ MonoBehaviour:
   maximumStamina: 100
   staminaRecoveryPerTurn: 30
   staminaTestActivityCost: 20
+  firstLocationStaminaCost: 60
+  extraLocationStaminaCost: 30
+  travelLocations:
+  - id: baishitang
+    title: "\u767E\u4E8B\u5802"
+    initiallyUnlocked: 1
+  - id: tingfeng-teahouse
+    title: "\u542C\u98CE\u8336\u8086"
+    initiallyUnlocked: 1
   retailMarkup: 0.15
   priceTags: []
   marketEvents:

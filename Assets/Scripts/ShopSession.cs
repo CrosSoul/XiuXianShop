@@ -79,7 +79,8 @@ namespace XiuXianShop
         public int Stamina { get; private set; }
         public int MaximumStamina => catalog.maximumStamina;
         public bool HasStaminaOverflowCustomer { get; private set; }
-        public int CustomerCountThisTurn => DailyCustomerCount + (HasStaminaOverflowCustomer ? 1 : 0);
+        public int CustomerCountThisTurn => DailyCustomerCount + (HasStaminaOverflowCustomer ? 1 : 0) +
+            (HasTeaEffect(TeaEffect.Promotion)?catalog.teaHouse.extraCustomers:0);
         public int Turn { get; private set; } = 1;
         public int Year => (Turn-1)/12+1;
         public int Month => (Turn-1)%12+1;
@@ -114,6 +115,7 @@ namespace XiuXianShop
             if(catalog.maximumStamina<1 || catalog.staminaRecoveryPerTurn<0)throw new ArgumentException("体力配置无效。");
             Stamina=catalog.maximumStamina;
             InitializeTravel();
+            ValidateTeaSettings();
             customerSeedValue=customerSeed??Guid.NewGuid().GetHashCode();
             customerRandom = new System.Random(customerSeedValue);
             Calendar=calendar??new MarketCalendar(catalog.marketEvents,customerSeed??Guid.NewGuid().GetHashCode());
@@ -149,6 +151,9 @@ namespace XiuXianShop
                 turn=Turn,money=Money,rent=Rent,debt=RentDebt,nextId=nextId,customerSeed=customerSeedValue,customerDraws=customerDraws,
                 hasStaminaState=true,stamina=Stamina,staminaOverflowCustomer=HasStaminaOverflowCustomer,
                 hasTravelledThisTurn=HasTravelledThisTurn,unlockedLocationIds=unlockedLocations.ToArray(),
+                latestTeaVisit=LatestTeaVisit,activeTeaEffect=ActiveTeaEffect,
+                hasLatestTeaVisit=LatestTeaVisit!=null,hasActiveTeaEffect=ActiveTeaEffect!=null,
+                commissionTurn=commissionTurn,commissionsCompleted=commissionsCompleted,commissionCandidates=commissionCandidates,
                 crafted=Crafted,purchases=Purchases,sales=Sales,calendar=Calendar.Capture(),tags=priceTags.Values.Select(t=>t.Copy()).ToArray(),
                 items=items.Select(i=>new SavedShopItem{id=i.Id,definitionId=i.Definition.id,container=i.Container,storageItemId=i.StorageItemId,locationId=i.LocationId,x=i.X,y=i.Y,
                     rotation=i.Rotation,flipped=i.Flipped,hasPurchaseValue=i.PurchaseValue.HasValue,purchaseValue=i.PurchaseValue??0,
@@ -170,7 +175,17 @@ namespace XiuXianShop
                 throw new ArgumentException("存档地点状态缺失或无效，当前会话未改变。");
             session.HasTravelledThisTurn=save.hasTravelledThisTurn;
             session.unlockedLocations.Clear();session.unlockedLocations.UnionWith(save.unlockedLocationIds);
+            session.LatestTeaVisit=save.hasLatestTeaVisit?save.latestTeaVisit:null;session.ActiveTeaEffect=save.hasActiveTeaEffect?save.activeTeaEffect:null;
             session.Turn=save.turn;session.Money=save.money;session.OpeningMoney=save.money;session.Rent=save.rent;session.RentDebt=save.debt;
+            session.ValidateSavedTeaState();
+            if(save.commissionTurn<0 || save.commissionTurn>save.turn || save.commissionsCompleted<0 ||
+                save.commissionsCompleted>catalog.commissions.completionLimitPerTurn)
+                throw new ArgumentException("存档委托状态无效。");
+            session.commissionTurn=save.commissionTurn;session.commissionsCompleted=save.commissionsCompleted;
+            session.commissionCandidates=save.commissionCandidates??Array.Empty<string>();
+            if(session.commissionCandidates.Any(id=>!catalog.commissions.templates.Any(t=>t.id==id)) ||
+                session.commissionCandidates.Distinct().Count()!=session.commissionCandidates.Length)
+                throw new ArgumentException("存档委托候选无效。");
             session.nextId=save.nextId;session.Crafted=save.crafted;session.Purchases=save.purchases;session.Sales=save.sales;
             for(int i=0;i<save.customerDraws;i++)session.customerRandom.NextDouble();
             session.customerDraws=save.customerDraws;
@@ -196,7 +211,7 @@ namespace XiuXianShop
         public GridItem Find(int id) => items.FirstOrDefault(i=>i.Id==id);
         public IEnumerable<GridItem> In(ContainerId container, int storageItemId=0) => items.Where(i=>i.Container==container && i.StorageItemId==storageItemId && (container!=ContainerId.Location || i.LocationId==CurrentLocationId));
         public Vector2Int GridSize(ContainerId container,int storageItemId=0,string locationId=null) => container==ContainerId.Interior ? Find(storageItemId).Definition.storageSize :
-            container==ContainerId.Location ? catalog.travelLocations.Single(l=>l.id==(locationId??CurrentLocationId)).itemGridSize : Size(container);
+            container==ContainerId.Location ? LocationGridSize(locationId??CurrentLocationId) : Size(container);
         public int Occupied(ContainerId container) => In(container).Sum(i=>i.Cells.Length);
         GridItem NewItem(ItemDefinition def, ItemOwner owner) => new GridItem{Id=nextId++, Definition=def, Owner=owner,SpiritUnits=def.spiritResource?.CapacityUnits??0};
         bool Fail(string message) { Message=message; return false; }
@@ -326,6 +341,7 @@ namespace XiuXianShop
             var supplies=allSupplies.Where(d=>advertised.Contains(d.category)).ToArray();
             bool hasAdvertisement=supplies.Length>0;
             float supplierChance=Mathf.Clamp01(catalog.baseSupplierChance+(hasAdvertisement?catalog.advertisementSupplierBonus:0)-(dominant!=null?catalog.displayedGoodsBuyerBonus:0));
+            if(HasTeaEffect(TeaEffect.Travellers))supplierChance=Mathf.Min(catalog.teaHouse.travellerChanceCap,supplierChance+catalog.teaHouse.travellerChanceBonus);
             if(allSupplies.Length==0) supplierChance=0;
             decimal value=dominant?.Value??0;
             var tier=(catalog.buyerBudgetTiers??Array.Empty<BuyerBudgetTier>()).Where(t=>t!=null && t.minimumDisplayValue<=value)
@@ -356,14 +372,16 @@ namespace XiuXianShop
             if(categories.Length==0) return Fail("商品配置缺少可售类别，无法生成顾客。请检查 ShopCatalog。" );
             queue.Clear(); ServedToday=0;BuyersToday=0;SuppliersToday=0;
             TodayAttraction=attraction;
+            int wealthyIndex=HasTeaEffect(TeaEffect.WealthyVisitor)?DrawCustomerNumber(0,CustomerCountThisTurn):-1;
             for(int n=0;n<CustomerCountThisTurn;n++)
             {
-                var category=attraction.BuyerCategory==ItemCategory.Unclassified?categories[DrawCustomerNumber(0,categories.Length)]:attraction.BuyerCategory;
-                int budget=DrawCustomerNumber(attraction.MinimumBuyerBudget,attraction.MaximumBuyerBudget+1);
+                var category=attraction.BuyerCategory==ItemCategory.Unclassified?categories[DrawCategoryWeightedIndex(categories,TeaEffect.BuyerTrend)]:attraction.BuyerCategory;
+                int budget=n==wealthyIndex?WealthyBudget(attraction):DrawCustomerNumber(attraction.MinimumBuyerBudget,attraction.MaximumBuyerBudget+1);
                 if(DrawCustomerChance()<attraction.SupplierChance)
                 {
                     // Two goods per supplying visitor is a temporary demo convention, not a balance rule.
-                    var supplies=Enumerable.Range(0,2).Select(_=>attraction.Supplies[DrawCustomerNumber(0,attraction.Supplies.Length)].id).ToArray();
+                    var supplyCategories=attraction.Supplies.Select(d=>d.category).ToArray();
+                    var supplies=Enumerable.Range(0,2).Select(_=>attraction.Supplies[DrawCategoryWeightedIndex(supplyCategories,TeaEffect.SupplierTrend)].id).ToArray();
                     queue.Enqueue((TradeDirection.CustomerSells,supplies,category,budget));
                     SuppliersToday++;
                 }
@@ -526,6 +544,7 @@ namespace XiuXianShop
             int paid=Math.Min(Money,due); Money-=paid; RentDebt=due-paid;
             Turn++; Phase=TurnPhase.Preparation; ServedToday=0;TodayAttraction=null;BuyersToday=0;SuppliersToday=0; queue.Clear();
             HasTravelledThisTurn=false;visitedLocations.Clear();
+            ActiveTeaEffect=LatestTeaVisit?.ApplyTurn==Turn?LatestTeaVisit:null;
             long recovered=(long)Stamina+catalog.staminaRecoveryPerTurn;
             HasStaminaOverflowCustomer=recovered>MaximumStamina;
             Stamina=(int)Math.Min(MaximumStamina,recovered);

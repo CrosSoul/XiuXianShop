@@ -215,6 +215,221 @@ MonoBehaviour:
   staminaTestActivityCost: 20
   firstLocationStaminaCost: 60
   extraLocationStaminaCost: 30
+  teaHouse:
+    effects:
+    - effect: 0
+      weight: 28
+    - effect: 1
+      weight: 28
+    - effect: 2
+      weight: 18
+    - effect: 3
+      weight: 10
+    - effect: 4
+      weight: 10
+    - effect: 5
+      weight: 6
+    buyerCategoryMultiplier: 2
+    supplierCategoryMultiplier: 2
+    travellerChanceBonus: 0.25
+    travellerChanceCap: 0.85
+    extraCustomers: 1
+    wealthyBudgetTierIncrease: 1
+    secretMinimumTurnsAhead: 2
+    secretMaximumTurnsAhead: 12
+  commissions:
+    candidateCount: 3
+    completionLimitPerTurn: 1
+    extraGiftChance: 0.08
+    extraGiftCount: 1
+    extraGiftPoolId: BSH-R07
+    templates:
+    - id: BSH-001
+      title: "\u836F\u94FA\u7406\u5E93"
+      enabled: 1
+      weight: 10
+      description: "\u574A\u5E02\u836F\u94FA\u521A\u6E05\u8FC7\u540E\u5E93\uFF0C\u5269\u4E0B\u4E0D\u5C11\u8FB9\u89D2\u6750\u6599\u4E0E\u65E7\u5305\u88C5\u9700\u8981\u91CD\u65B0\u5206\u7C7B\uFF0C\u638C\u67DC\u4E34\u65F6\u7F3A\u4EBA\u624B\u3002"
+      rewardPoolId: BSH-R01
+      rewardHint: "\u4F4E\u9636\u6750\u6599 \xD7 \u82E5\u5E72"
+    - id: BSH-002
+      title: "\u5546\u961F\u70B9\u8D27"
+      enabled: 1
+      weight: 10
+      description: "\u4E00\u652F\u77ED\u9014\u5546\u961F\u521A\u8FDB\u574A\u5E02\uFF0C\u9700\u8981\u5728\u5F00\u5E02\u524D\u6838\u5BF9\u8D27\u7BB1\u6570\u91CF\u548C\u6807\u7B7E\uFF0C\u907F\u514D\u5378\u8D27\u65F6\u62FF\u9519\u3002"
+      rewardPoolId: BSH-R02
+      rewardHint: "\u666E\u901A\u5546\u54C1 \xD7 \u82E5\u5E72"
+    - id: BSH-003
+      title: "\u94FA\u9762\u5E2E\u5DE5"
+      enabled: 1
+      weight: 10
+      description: "\u4E34\u8857\u6742\u8D27\u94FA\u6362\u4E86\u4E00\u6279\u8D27\u67B6\uFF0C\u9700\u8981\u6709\u4EBA\u628A\u6563\u8D27\u91CD\u65B0\u5F52\u4F4D\uFF0C\u5E76\u628A\u5269\u4F59\u5305\u88C5\u6750\u6599\u6E05\u51FA\u6765\u3002"
+      rewardPoolId: BSH-R03
+      rewardHint: "\u6750\u6599\u4E0E\u5546\u54C1\u5404\u82E5\u5E72"
+    - id: BSH-004
+      title: "\u9001\u5951\u8DD1\u817F"
+      enabled: 1
+      weight: 8
+      description: "\u4E24\u5BB6\u5546\u94FA\u9700\u8981\u5728\u95ED\u5E02\u524D\u4E92\u9001\u4E00\u4EFD\u76D6\u5370\u5951\u4E66\uFF0C\u8DEF\u4E0D\u8FDC\uFF0C\u4F46\u53CC\u65B9\u90FD\u62BD\u4E0D\u5F00\u8EAB\u3002"
+      rewardPoolId: BSH-R04
+      rewardHint: "\u5C11\u91CF\u7ECF\u8425\u8D27\u5E01"
+    - id: BSH-005
+      title: "\u5E93\u623F\u6E05\u8D26"
+      enabled: 1
+      weight: 8
+      description: "\u4E00\u95F4\u516C\u7528\u8D27\u6808\u7684\u8D26\u9762\u4E0E\u5B9E\u7269\u5BF9\u4E0D\u4E0A\uFF0C\u9700\u8981\u6309\u8D27\u7B7E\u91CD\u65B0\u6E05\u70B9\u4E00\u904D\u6563\u843D\u6742\u9879\u3002"
+      rewardPoolId: BSH-R06
+      rewardHint: "\u4F4E\u9636\u6742\u9879 \xD7 \u82E5\u5E72"
+    - id: BSH-006
+      title: "\u4E34\u65F6\u770B\u644A"
+      enabled: 1
+      weight: 10
+      description: "\u644A\u4E3B\u4E34\u65F6\u8981\u53BB\u529E\u4E8B\uFF0C\u8BF7\u4EBA\u66FF\u4ED6\u7167\u770B\u7247\u523B\u644A\u4F4D\u5E76\u6309\u5DF2\u7ECF\u5199\u597D\u7684\u4EF7\u7B7E\u4EA4\u63A5\u8D27\u7269\u3002"
+      rewardPoolId: BSH-R02
+      rewardHint: "\u666E\u901A\u5546\u54C1 \xD7 \u82E5\u5E72"
+    - id: BSH-007
+      title: "\u8D27\u6808\u642C\u8FD0"
+      enabled: 1
+      weight: 10
+      description: "\u8D27\u6808\u91CC\u6709\u4E00\u6279\u4E0D\u503C\u5F53\u96C7\u4E13\u95E8\u529B\u58EB\u7684\u5C0F\u7BB1\u5B50\uFF0C\u9700\u8981\u4ECE\u540E\u95E8\u632A\u5230\u5206\u62E3\u533A\u3002"
+      rewardPoolId: BSH-R01
+      rewardHint: "\u4F4E\u9636\u6750\u6599 \xD7 \u82E5\u5E72"
+    - id: BSH-008
+      title: "\u9A7F\u7AD9\u9001\u4EF6"
+      enabled: 1
+      weight: 8
+      description: "\u574A\u5E02\u9A7F\u7AD9\u79EF\u7740\u51E0\u4EFD\u77ED\u9014\u5305\u4EF6\uFF0C\u6B63\u597D\u9700\u8981\u6709\u4EBA\u987A\u8DEF\u9001\u5230\u9644\u8FD1\u51E0\u5BB6\u5546\u94FA\u3002"
+      rewardPoolId: BSH-R05
+      rewardHint: "\u5C11\u91CF\u7ECF\u8425\u8D27\u5E01\uFF0B\u4E00\u4EF6\u5B9E\u7269"
+    - id: BSH-009
+      title: "\u4FEE\u7F2E\u6742\u5F79"
+      enabled: 1
+      weight: 9
+      description: "\u4E00\u95F4\u65E7\u94FA\u5B50\u6362\u4E86\u95E8\u677F\u548C\u8D27\u67B6\uFF0C\u5B8C\u5DE5\u540E\u8FD8\u6709\u9489\u4EF6\u3001\u6728\u6599\u548C\u6742\u6750\u8981\u6574\u7406\u6536\u62E2\u3002"
+      rewardPoolId: BSH-R01
+      rewardHint: "\u4F4E\u9636\u6750\u6599 \xD7 \u82E5\u5E72"
+    - id: BSH-010
+      title: "\u96C6\u5E02\u76D8\u8D27"
+      enabled: 1
+      weight: 9
+      description: "\u96C6\u5E02\u51C6\u5907\u6536\u644A\uFF0C\u51E0\u5BB6\u644A\u4F4D\u9700\u8981\u5408\u5E76\u6E05\u70B9\u5269\u4F59\u8D27\u7269\uFF0C\u6309\u5404\u81EA\u540D\u518C\u91CD\u65B0\u88C5\u7BB1\u3002"
+      rewardPoolId: BSH-R02
+      rewardHint: "\u666E\u901A\u5546\u54C1 \xD7 \u82E5\u5E72"
+    - id: BSH-011
+      title: "\u884C\u5546\u5378\u8D27"
+      enabled: 1
+      weight: 9
+      description: "\u4E00\u540D\u884C\u5546\u5E26\u56DE\u96F6\u6563\u8D27\u7269\uFF0C\u6570\u91CF\u4E0D\u591A\u4F46\u79CD\u7C7B\u6742\uFF0C\u9700\u8981\u5E2E\u5FD9\u5378\u4E0B\u5E76\u6309\u7528\u9014\u5206\u5F00\u3002"
+      rewardPoolId: BSH-R03
+      rewardHint: "\u6750\u6599\u4E0E\u5546\u54C1\u5404\u82E5\u5E72"
+    - id: BSH-012
+      title: "\u836F\u6750\u5206\u62E3"
+      enabled: 1
+      weight: 10
+      description: "\u836F\u519C\u9001\u6765\u4E00\u6279\u54C1\u8D28\u666E\u901A\u7684\u6742\u6750\uFF0C\u9700\u8981\u628A\u53EF\u7528\u90E8\u5206\u3001\u5305\u88C5\u548C\u5E9F\u8FB9\u5206\u5F00\uFF0C\u65B9\u4FBF\u836F\u94FA\u5165\u5E93\u3002"
+      rewardPoolId: BSH-R01
+      rewardHint: "\u4F4E\u9636\u6750\u6599 \xD7 \u82E5\u5E72"
+    - id: BSH-013
+      title: "\u8D26\u623F\u6284\u5F55"
+      enabled: 1
+      weight: 7
+      description: "\u767E\u4E8B\u5802\u4EE3\u5546\u6237\u5F52\u6863\u4E00\u6279\u65E7\u8D26\uFF0C\u9700\u8981\u628A\u51E0\u9875\u5DF2\u6838\u5BF9\u7684\u6D41\u6C34\u8A8A\u5199\u5230\u7EDF\u4E00\u683C\u5F0F\u4E2D\u3002"
+      rewardPoolId: BSH-R04
+      rewardHint: "\u5C11\u91CF\u7ECF\u8425\u8D27\u5E01"
+    - id: BSH-014
+      title: "\u5668\u94FA\u642C\u7BB1"
+      enabled: 1
+      weight: 9
+      description: "\u5668\u7269\u94FA\u521A\u6536\u5230\u4E00\u6279\u666E\u901A\u96F6\u4EF6\u548C\u6742\u8D27\uFF0C\u9700\u8981\u628A\u6CA1\u6709\u6280\u672F\u8981\u6C42\u7684\u7BB1\u4EF6\u642C\u5230\u5BF9\u5E94\u8D27\u4F4D\u3002"
+      rewardPoolId: BSH-R06
+      rewardHint: "\u4F4E\u9636\u6742\u9879 \xD7 \u82E5\u5E72"
+    - id: BSH-015
+      title: "\u5BA2\u6808\u642C\u67F4"
+      enabled: 1
+      weight: 8
+      description: "\u5BA2\u6808\u540E\u9662\u65B0\u5230\u4E00\u6279\u65E5\u5E38\u8017\u6750\uFF0C\u9700\u8981\u5728\u665A\u5E02\u524D\u642C\u5165\u5E93\u623F\u5E76\u6309\u7528\u9014\u5806\u653E\u3002"
+      rewardPoolId: BSH-R05
+      rewardHint: "\u5C11\u91CF\u7ECF\u8425\u8D27\u5E01\uFF0B\u4E00\u4EF6\u5B9E\u7269"
+    - id: BSH-016
+      title: "\u7075\u821F\u6CCA\u4F4D\u5378\u8D27"
+      enabled: 1
+      weight: 8
+      description: "\u5C0F\u578B\u7075\u821F\u4E34\u65F6\u9760\u6CCA\uFF0C\u51E0\u7BB1\u666E\u901A\u8D27\u7269\u6025\u7740\u8FDB\u574A\u5E02\uFF0C\u642C\u8FD0\u4E0E\u5206\u62E3\u90FD\u4E0D\u9700\u8981\u4E13\u4E1A\u8D44\u683C\u3002"
+      rewardPoolId: BSH-R03
+      rewardHint: "\u6750\u6599\u4E0E\u5546\u54C1\u5404\u82E5\u5E72"
+    rewardPools:
+    - id: BSH-R01
+      enabled: 1
+      minimumMoney: 0
+      maximumMoney: 0
+      items:
+      - itemIds:
+        - herb
+        - dew
+        - cinnabar
+        minimumCount: 2
+        maximumCount: 4
+    - id: BSH-R02
+      enabled: 1
+      minimumMoney: 0
+      maximumMoney: 0
+      items:
+      - itemIds:
+        - sword
+        minimumCount: 1
+        maximumCount: 3
+    - id: BSH-R03
+      enabled: 1
+      minimumMoney: 0
+      maximumMoney: 0
+      items:
+      - itemIds:
+        - herb
+        - dew
+        - cinnabar
+        minimumCount: 1
+        maximumCount: 1
+      - itemIds:
+        - sword
+        minimumCount: 1
+        maximumCount: 1
+    - id: BSH-R04
+      enabled: 1
+      minimumMoney: 6
+      maximumMoney: 10
+      items: []
+    - id: BSH-R05
+      enabled: 1
+      minimumMoney: 4
+      maximumMoney: 6
+      items:
+      - itemIds:
+        - herb
+        - dew
+        - cinnabar
+        - sword
+        minimumCount: 1
+        maximumCount: 1
+    - id: BSH-R06
+      enabled: 1
+      minimumMoney: 0
+      maximumMoney: 0
+      items:
+      - itemIds:
+        - herb
+        - dew
+        - cinnabar
+        - sword
+        minimumCount: 1
+        maximumCount: 3
+    - id: BSH-R07
+      enabled: 1
+      minimumMoney: 0
+      maximumMoney: 0
+      items:
+      - itemIds:
+        - pill
+        minimumCount: 1
+        maximumCount: 1
   travelLocations:
   - id: baishitang
     title: "\u767E\u4E8B\u5802"

@@ -74,6 +74,8 @@ namespace XiuXianShop
         public int firstLocationStaminaCost = 60;
         [Min(0), Tooltip("同次外出后续不同地点的体力成本。")]
         public int extraLocationStaminaCost = 30;
+        public TeaHouseSettings teaHouse = new TeaHouseSettings();
+        public CommissionSettings commissions = new CommissionSettings();
         public TravelLocation[] travelLocations =
         {
             new TravelLocation {id="baishitang",title="百事堂",initiallyUnlocked=true},

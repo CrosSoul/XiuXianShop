@@ -1,5 +1,23 @@
 # XiuXianShop 开发日志
 
+## 2026-09-13 — DP-49 百事堂委托
+
+- 基线191f001，开工已有DP48未提交修改，完整保留；本轮未提交/推送。按DP49、G11v8、G11Av1与G04v10 AC52–55实施，缺少池成员才补查规范v6/物品表v21，未全量阅读GDD。
+- 16模板、7池通过Unity API存入ShopCatalog；每月三选一、权重无放回、固定候选、即时正常奖励与8%单件谢礼。只使用已批准现有herb/dew/cinnabar/sword/pill，无新物品同步或长期成长。
+- 实物进入领取区，沿用双手/便携储存、离开确认及清理；满格时领取区为奖励向下增行并可滚动，随身容量不变。货币直接加余额，准备存档保留候选与完成状态。
+- Edit151/151，百事堂Play3/3、地点回归Play2/2；实际滚轮/鼠标拖拽覆盖满领取区、手与腰包带回、重复领取、跨月。修复弹性滚动使奖励暂时不可点击的问题；0项测试不计通过，刷新发现后实际执行。正常MCP验证两件朱砂、体力40、余额120，截图已查看。
+- 文件、配置、证据及手动步骤见DP49_COMMISSIONS.md与Evidence/DP49。未改Scene、Package、Project Settings、Confluence；待Jira Ready for Review用户验收。人工手感、Player构建、平台测试未执行。
+- 最终MCP Console Error0/Warning0，未清日志；Editor ready/stopped、无编译/Domain Reload，ShopPrototype dirty=false，git diff --check通过。
+
+## 2026-09-13 — DP-48 听风茶肆
+
+- 基线191f001（DP-28），开工工作区干净。按DP-48及G-11 v8、G-05 v4、G-04 v10相关验收实施，未全量阅读GDD或扩展范围。
+- 接入六效果可调权重28/28/18/10/10/6、进入一次抽取、固定消息、下一回合经营加成与独立当前/待生效记录。风向复用展示筛选候选池；阔客提高随机一名预算档位，宣传可叠体力奖励。
+- 秘闻复用或合法安排未来行情，尊重同类型冷却，无合法候选改抽其他效果；提前显示不提前改变价格。准备存档保留消息及已知行情，未新增完整存档系统。
+- 最终Edit140/140，DP48 Play2/2、DP27回归Play2/2；正常场景与隔离秘闻MCP操作、两张截图已查看。存档空对象问题修复及首次Play不稳定查找的证据限制详见DP48_TEAHOUSE.md。未重复旧日历Play全套。
+- Console Error0/Warning0，未清日志；Editor ready/stopped、无编译/Domain Reload，场景dirty=false。ShopCatalog经Unity API保存；未改Scene、Package或Project Settings。
+- 证据Docs/Evidence/DP48。仅本地未提交/推送，交付Jira Ready for Review待用户验收；未改Confluence、未做人工手感验收/Player构建/平台测试。
+
 ## 2026-09-13 — DP-28 地点物品与物流
 
 - 开工HEAD e9f4225（DP-27），工作区干净。按DP-28读取G-11 v8和G-01储存相关段落，未全量阅读GDD。

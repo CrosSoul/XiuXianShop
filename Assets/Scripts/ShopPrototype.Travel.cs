@@ -45,16 +45,28 @@ namespace XiuXianShop
             else
             {
                 var location=Session.Catalog.travelLocations.Single(l=>l.id==Session.CurrentLocationId);
-                Label(travelWindow,"LocationTitle",100,110,1300,50,location.title+" · 地点物品区",29,gold);
-                var size=location.itemGridSize;float cell=Mathf.Min(48,Mathf.Min(600f/size.x,235f/size.y));
-                var grid=Rect(travelWindow,"LocationGrid",100,180,size.x*cell,size.y*cell);
+                Label(travelWindow,"LocationTitle",100,110,1300,50,location.title+(location.id=="baishitang"?" · 领取区（可滚动）":" · 地点物品区"),29,gold);
+                var size=Session.GridSize(ContainerId.Location);float cell=Mathf.Min(48,600f/size.x);
+                var viewport=Rect(travelWindow,"LocationViewport",100,180,size.x*cell,235);
+                Image(viewport,panel,true);
+                viewport.gameObject.AddComponent<RectMask2D>();
+                var grid=Rect(viewport,"LocationGrid",0,0,size.x*cell,size.y*cell);
+                var scroll=viewport.gameObject.AddComponent<ScrollRect>();
+                scroll.viewport=viewport;scroll.content=grid;scroll.horizontal=false;scroll.scrollSensitivity=30;
+                scroll.movementType=ScrollRect.MovementType.Clamped;
                 grids[ContainerId.Location]=grid;cellSizes[ContainerId.Location]=cell;
                 for(int y=0;y<size.y;y++)for(int x=0;x<size.x;x++)Image(Rect(grid,$"Slot_{x}_{y}",x*cell,y*cell,cell-2,cell-2),line);
-                Label(travelWindow,"LocationDescription",760,170,720,100,location.preserveItemsBetweenVisits?
+                Label(travelWindow,"LocationDescription",760,170,720,120,location.id=="tingfeng-teahouse"?Session.DescribeTeaNews(Session.LatestTeaVisit):location.preserveItemsBetweenVisits?
                     "长期地点：区域物品跨访问保留。\n物品不会自动送回店铺，请手动收入随身区域。":
                     "临时地点：离开时清理未带走物品。\n请拖入下方左右手或所带背包。",22,textColor);
                 locationNotice=Label(travelWindow,"LocationNotice",100,425,1370,40,"",18,gold);
                 CarryButton(travelWindow,"TravelLeave",1100,310,390,"离开 · 返回地点选择",RequestLocationLeave);
+                if(location.id=="tingfeng-teahouse")CarryButton(travelWindow,"TeaLocationNews",760,310,310,"查看坊市消息",OpenTeaNews);
+                if(location.id=="baishitang")
+                {
+                    CarryButton(travelWindow,"CommissionOpen",760,310,310,Session.CommissionLimitReached?"查看已完成委托":"查看本月委托",OpenCommissions);
+                    locationNotice.text=Session.CommissionResult;
+                }
             }
             ShowCarryPanel();
         }

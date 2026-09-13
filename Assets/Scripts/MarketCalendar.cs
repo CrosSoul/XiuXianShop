@@ -25,9 +25,10 @@ namespace XiuXianShop
         public int endTurn;
         public PriceTag effect;
         public int Duration => endTurn-startTurn+1;
+        public bool knownInAdvance;
         public bool ActiveOn(int turn) => startTurn<=turn && turn<=endTurn;
         public string StatusOn(int turn) => turn<startTurn ? "未开始" : turn>endTurn ? "已结束" : "生效中";
-        public MarketEvent Copy() => new MarketEvent {id=id,title=title,description=description,startTurn=startTurn,endTurn=endTurn,effect=effect.Copy()};
+        public MarketEvent Copy() => new MarketEvent {id=id,title=title,description=description,startTurn=startTurn,endTurn=endTurn,effect=effect.Copy(),knownInAdvance=knownInAdvance};
     }
 
     [Serializable]
@@ -50,7 +51,7 @@ namespace XiuXianShop
     }
 
     // A session snapshot, not a global clock. Reading a year never consumes customer randomness.
-    public sealed class MarketCalendar
+    public sealed partial class MarketCalendar
     {
         readonly int seed;
         readonly bool fixedSchedule;
@@ -106,7 +107,7 @@ namespace XiuXianShop
                     int start=(year-1)*12+1+offset,end=start+duration-1;
                     // Stable effect IDs identify the market type, including saved events.
                     // Ending on turn 4 blocks turns 5 and 6; the earliest repeat is turn 7.
-                    if(events.Any(e=>e.effect.id==d.id && start<=e.endTurn+TestCooldownTurns && end+TestCooldownTurns>=e.startTurn))continue;
+                    if(!CanSchedule(d.id,start,end))continue;
                     var effect=d.effect.Copy();effect.id=d.id;
                     candidates.Add(new MarketEvent {id=$"market:{year}:{i}",title=d.title,description=d.description,
                         startTurn=start,endTurn=end,effect=effect});
@@ -127,7 +128,7 @@ namespace XiuXianShop
             var tag=e.effect.Copy();tag.id=e.id;tag.title=e.title;return tag;
         });
         public MarketEvent[] VisibleBetween(int first,int last,int today)
-            => Between(first,last).Where(e=>e.startTurn<=today).ToArray();
+            => Between(first,last).Where(e=>e.startTurn<=today || e.knownInAdvance).ToArray();
         public CalendarEventSegment[] Segments(int firstTurn,int today=int.MaxValue)
         {
             var visible=VisibleBetween(firstTurn,firstTurn+11,today);

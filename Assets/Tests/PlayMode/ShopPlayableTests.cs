@@ -90,7 +90,8 @@ namespace XiuXianShop.Tests
                 if(!shop.NegotiationView.IsOpen)yield return Click("NegotiationOpen");
                 yield return Click("NegotiationConfirm");yield break;
             }
-            var button=shop.FindButton(name);Assert.That(button.interactable,Is.True,$"{name} must be enabled at this step.");
+            var button=shop.GetComponentsInChildren<UnityEngine.UI.Button>(true).FirstOrDefault(b=>b.name==name);
+            Assert.That(button,Is.Not.Null,$"Missing button: {name}");Assert.That(button.interactable,Is.True,$"{name} must be enabled at this step.");
             var rect=(RectTransform)button.transform;var center=RectTransformUtility.WorldToScreenPoint(null,rect.TransformPoint(rect.rect.center));
             yield return MouseAt(center,false);yield return MouseAt(center,true);yield return MouseAt(center,false);
         }

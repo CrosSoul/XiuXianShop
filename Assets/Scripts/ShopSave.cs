@@ -14,6 +14,10 @@ namespace XiuXianShop
         public int stamina;
         public bool hasTravelledThisTurn;
         public string[] unlockedLocationIds;
+        public TeaVisitResult latestTeaVisit,activeTeaEffect;
+        public bool hasLatestTeaVisit,hasActiveTeaEffect;
+        public int commissionTurn, commissionsCompleted;
+        public string[] commissionCandidates;
         public SavedShopItem[] items;
         public PriceTag[] tags;
         public MarketCalendarState calendar;

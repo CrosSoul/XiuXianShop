@@ -9,8 +9,14 @@ namespace XiuXianShop
         public bool LocationLeaveNeedsConfirmation => CurrentLocationId!=null &&
             !CurrentLocation.preserveItemsBetweenVisits && In(ContainerId.Location).Any();
 
-        // Current callers are isolated validation fixtures. Destination rewards can use this
-        // same item insertion later; opening the view never creates items by itself.
+        Vector2Int LocationGridSize(string id)
+        {
+            var size=catalog.travelLocations.Single(l=>l.id==id).itemGridSize;
+            if(id=="baishitang")size.y=System.Math.Max(size.y,commissionGridHeight);
+            return size;
+        }
+
+        // Shared by destination rewards and isolated validation fixtures.
         public bool AddLocationItem(string definitionId)
         {
             if(!IsTravelling || CurrentLocationId==null)return Fail("请先进入地点。");
@@ -18,7 +24,7 @@ namespace XiuXianShop
             var item=new GridItem {Id=nextId,Definition=definition,Owner=ItemOwner.Player,
                 SpiritUnits=definition.spiritResource?.CapacityUnits??0};
             if(!StoragePlacementAllowed(item,ContainerId.Location,0,out var reason))return Fail(reason);
-            var size=CurrentLocation.itemGridSize;
+            var size=GridSize(ContainerId.Location);
             for(int y=0;y<size.y;y++)for(int x=0;x<size.x;x++)
             {
                 if(!Fits(item,ContainerId.Location,x,y,0,false))continue;

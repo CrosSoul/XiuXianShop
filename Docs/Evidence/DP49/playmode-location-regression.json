@@ -1,0 +1,27 @@
+{
+  "status": "completed",
+  "duration": 4.11,
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.LocationDragPickupAndLeaveConfirmationKeepOnlyCarriedItems",
+      "Status": "Passed",
+      "Duration": 2.073061,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.PersistentLocationShowsSameItemOnNextVisitAndNoOrdinaryCleanupPrompt",
+      "Status": "Passed",
+      "Duration": 2.0025424,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

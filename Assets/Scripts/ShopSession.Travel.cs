@@ -65,6 +65,8 @@ namespace XiuXianShop
             if(!CanEnterLocation(id,out var reason))return Fail(reason);
             Stamina-=NextLocationStaminaCost;
             visitedLocations.Add(id);CurrentLocationId=id;
+            if(id=="tingfeng-teahouse")ReceiveTeaNews();
+            if(id=="baishitang")PrepareCommissions();
             return Success("已抵达"+catalog.travelLocations.Single(l=>l.id==id).title+"；本次访问体力已结算。");
         }
 
@@ -74,6 +76,7 @@ namespace XiuXianShop
             if(LocationLeaveNeedsConfirmation && !confirmed)return Fail("地点仍有未带走物品，确认离开后将清理这些物品。");
             if(!CurrentLocation.preserveItemsBetweenVisits)
                 items.RemoveAll(i=>i.Container==ContainerId.Location && i.LocationId==CurrentLocationId);
+            if(CurrentLocationId=="baishitang"){commissionGridHeight=0;CommissionResult="";}
             CurrentLocationId=null;
             return Success("已返回地点选择界面；携带物与剩余体力保持不变。");
         }

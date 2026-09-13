@@ -57,7 +57,7 @@ namespace XiuXianShop
             heading.text=$"年度日历 · 第 {(firstTurn-1)/12+1} 年   |   当前：{session.DateLabel}";
             rentInfo.text=$"下次收租：第 {session.NextRentTurn} 回合结束，{session.Rent} 灵石；待付房租 {session.RentDebt}。\n每6回合收租，结束本月时结算；翻阅不扣款。行情采用隔离测试配置，非正式平衡。";
             previous.interactable=firstTurn>1;save.interactable=load.interactable=session.Phase==TurnPhase.Preparation;
-            message.text=shop.CalendarMessage??"行情在开始本回合公开完整持续时间。点击持续条查看详情；可滚动查看。绿色生效中，灰色已结束。";
+            message.text=shop.CalendarMessage??"行情开始时公开，茶肆秘闻可提前获知。金色未开始、绿色生效中、灰色已结束；获知不提前改变价格。";
             foreach(Transform child in rows) {child.gameObject.SetActive(false);Destroy(child.gameObject);}
             var segments=session.Calendar.Segments(firstTurn,session.Turn);
             float top=0;
@@ -85,7 +85,7 @@ namespace XiuXianShop
                     string name=e.title.Length>9*s.Turns?e.title.Substring(0,Math.Max(3,9*s.Turns-1))+"…":e.title;
                     var b=Button(rows,$"MarketBar_{e.id}_{week}",s.Column*231+4,top+68+s.Lane*36,s.Turns*231-12,30,
                         (e.startTurn<firstTurn+week*6?"‹ ":"")+name+(e.endTurn>firstTurn+week*6+5?" ›":""),()=>SelectEvent(e.id));
-                    b.targetGraphic.color=e.ActiveOn(session.Turn)?new Color(.23f,.40f,.29f):new Color(.26f,.27f,.28f);
+                    b.targetGraphic.color=session.Turn<e.startTurn?new Color(.42f,.33f,.16f):e.ActiveOn(session.Turn)?new Color(.23f,.40f,.29f):new Color(.26f,.27f,.28f);
                 }
                 top+=height+18;
             }

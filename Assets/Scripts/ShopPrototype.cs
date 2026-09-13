@@ -27,6 +27,7 @@ namespace XiuXianShop
         Text header, rent, phaseText, selection, customerTitle, customerDetails, notice, furnaceText, previewText, displaySummary, tradeDetails, tradeStatus, tradeHeading;
         int displayedPricingRevision;
         Text staminaText;
+        Button teaNewsButton;
         TradeOffer displayedOffer;
         TurnPhase displayedPhase;
         public int CustomerSeed { get; set; } = -1;
@@ -62,6 +63,16 @@ namespace XiuXianShop
             if(Session!=null && displayedPricingRevision!=Session.PricingRevision && !IsDragging) Refresh();
             var keyboard=Keyboard.current;
             if(keyboard==null || Session==null) return;
+            if(commissionWindow!=null)
+            {
+                if(keyboard.escapeKey.wasPressedThisFrame)CloseCommissions();
+                return;
+            }
+            if(teaWindow!=null)
+            {
+                if(keyboard.escapeKey.wasPressedThisFrame)CloseTeaNews();
+                return;
+            }
             if(travelConfirmation!=null)
             {
                 if(keyboard.escapeKey.wasPressedThisFrame)CloseTravelConfirmation();
@@ -112,6 +123,7 @@ namespace XiuXianShop
             Label(content,"ShopName",44,30,190,44,"栖云当铺",30,gold);
             MakeButton("CalendarOpen",240,33,100,38,"日历",()=>{CancelDrag();CalendarView.Open();});
             MakeButton("CarryOpen",720,74,240,34,"出门携带",OpenCarrySelection);
+            teaNewsButton=MakeButton("TeaNewsOpen",980,74,240,34,"坊市消息",OpenTeaNews);
             staminaText=Label(content,"Stamina",44,81,660,26,"",17,gold);
             header=Label(content,"Resources",350,34,380,34,"",24,textColor);
             phaseText=Label(content,"Phase",754,35,310,32,"",22,gold);
@@ -229,6 +241,8 @@ namespace XiuXianShop
                 view.anchoredPosition=new Vector2(item.X*cellSizes[item.Container],-item.Y*cellSizes[item.Container]); itemViews[item.Id]=view;
             }
             header.text=$"{Session.DateLabel}    |    灵石 {Session.Money}";
+            teaNewsButton.GetComponentInChildren<Text>().text=Session.ActiveTeaEffect?.ApplyTurn==Session.Turn && Session.ActiveTeaEffect.effect!=TeaEffect.MarketSecret?
+                "坊市消息 · 本月加成":Session.LatestTeaVisit?.visitTurn==Session.Turn?"坊市消息 · 新消息":"坊市消息";
             staminaText.text=$"体力 {Session.Stamina}/{Session.MaximumStamina} · 每月恢复 {catalog.staminaRecoveryPerTurn}"+
                 (Session.HasStaminaOverflowCustomer?" · 本月溢出客流 +1":" · 营业不消耗体力");
             phaseText.text=Session.Phase==TurnPhase.Preparation?"营业前 · 配置展示":Session.Phase==TurnPhase.Open?"营业中 · 客源已确定":"已闭店 · 整理 / 炼丹";
@@ -323,7 +337,7 @@ namespace XiuXianShop
         // Explicit developer/test entry. The Editor menu supplies a temporary catalog clone.
         public void StartVerificationSession(ShopCatalog configuration,int seed,MarketCalendar calendar=null)
         {
-            CloseTravelConfirmation();CloseCarryPanel();CloseTravelWindow();CloseCarrySelection();CloseStorage();CancelDrag();catalog=configuration;Session=new ShopSession(catalog,customerSeed:seed,calendar:calendar);
+            CloseCommissions();CloseTeaNews();CloseTravelConfirmation();CloseCarryPanel();CloseTravelWindow();CloseCarrySelection();CloseStorage();CancelDrag();catalog=configuration;Session=new ShopSession(catalog,customerSeed:seed,calendar:calendar);
             CalendarMessage=null;CalendarView.Close();NegotiationView.Close();
             selectedId=0;localNotice=null;Refresh();
         }

@@ -21,7 +21,7 @@ namespace XiuXianShop.Tests
             Assert.That(s.AdvanceTurn(),Is.False);Assert.That(s.Stamina,Is.EqualTo(expected));
             for(int i=0;i<3;i++)s.PreviewAttraction();
             Assert.That(s.BeginBusiness());Assert.That(s.BeginBusiness(),Is.False);
-            Assert.That(s.BuyersToday+s.SuppliersToday,Is.EqualTo(bonus?6:5));
+            Assert.That(s.BuyersToday+s.SuppliersToday+s.TradingCustomersToday,Is.EqualTo(bonus?6:5));
             int served=0;while(s.Offer!=null){served++;Assert.That(s.NextCustomer());}
             Assert.That(served,Is.EqualTo(bonus?6:5));Assert.That(s.Stamina,Is.EqualTo(expected));
         }

@@ -14,8 +14,8 @@ namespace XiuXianShop.Tests
             yield return RestartWithTestCatalog(c=>
             {
                 c.startingItems=new[]{"pill","pill"};c.retailMarkup=0;c.Find("pill").baseValue=25;
-                c.baseSupplierChance=0;c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
-                c.buyerBudgetVariation=0;c.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=18}};
+                c.customers.tradingWeight=0;c.customers.buyingWeight=1-(0);c.customers.sellingWeight=0;c.customers.oneSupplyWeight=0;c.customers.twoSuppliesWeight=1;c.customers.displayedItemWeight=1000000;
+                foreach(var budgetRow in c.customers.budgets)budgetRow.ordinary=budgetRow.wealthy=budgetRow.lavish=18;
             },17);
             var s=shop.Session;yield return Drag(s.Items[0],ContainerId.Display,0,0);yield return Click("BeginBusiness");
             var item=s.Items[1];yield return Drag(item,ContainerId.Counter,0,0);yield return Click("NegotiationOpen");
@@ -37,8 +37,8 @@ namespace XiuXianShop.Tests
             yield return RestartWithTestCatalog(c=>
             {
                 c.startingItems=new[]{"pill","pill"};c.retailMarkup=0;c.Find("pill").baseValue=10;
-                c.baseSupplierChance=1;c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
-                c.buyerBudgetVariation=0;c.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=100}};
+                c.customers.tradingWeight=1;c.customers.buyingWeight=1-(1);c.customers.sellingWeight=0;c.customers.oneSupplyWeight=0;c.customers.twoSuppliesWeight=1;c.customers.displayedItemWeight=1000000;
+                foreach(var budgetRow in c.customers.budgets)budgetRow.ordinary=budgetRow.wealthy=budgetRow.lavish=100;
                 foreach(var d in c.items)d.supplierAvailable=d.id=="dew";
                 c.Find("dew").baseValue=15;
             },17);
@@ -67,8 +67,8 @@ namespace XiuXianShop.Tests
             yield return RestartWithTestCatalog(c=>
             {
                 c.startingItems=new[]{"pill","pill","pill","pill","pill","jade"};c.retailMarkup=0;c.Find("pill").baseValue=10;
-                c.baseSupplierChance=1;c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
-                c.buyerBudgetVariation=0;c.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=100}};
+                c.customers.tradingWeight=1;c.customers.buyingWeight=1-(1);c.customers.sellingWeight=0;c.customers.oneSupplyWeight=0;c.customers.twoSuppliesWeight=1;c.customers.displayedItemWeight=1000000;
+                foreach(var budgetRow in c.customers.budgets)budgetRow.ordinary=budgetRow.wealthy=budgetRow.lavish=100;
                 foreach(var d in c.items)d.supplierAvailable=d.id=="dew";c.Find("dew").baseValue=15;
             },17);
             var s=shop.Session;var own=s.Items.Where(i=>i.Definition.id=="pill").ToArray();var jade=s.Items.Single(i=>i.Definition.id=="jade");
@@ -110,7 +110,7 @@ namespace XiuXianShop.Tests
         {
             yield return RestartWithTestCatalog(c=>
             {
-                c.startingItems=new[]{"pill"};c.baseSupplierChance=1;c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
+                c.startingItems=new[]{"pill"};c.customers.tradingWeight=1;c.customers.buyingWeight=1-(1);c.customers.sellingWeight=0;c.customers.oneSupplyWeight=0;c.customers.twoSuppliesWeight=1;c.customers.displayedItemWeight=1000000;
                 foreach(var d in c.items)d.supplierAvailable=d.id=="pill";
             },17);
             var s=shop.Session;var own=s.Items[0];yield return Drag(own,ContainerId.Display,0,0);

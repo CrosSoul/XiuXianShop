@@ -84,7 +84,9 @@ namespace XiuXianShop
             if(!IsOpen)return;
             var session=shop.Session;var offer=session.Offer;
             if(offer!=openedOffer){Close();return;}
-            customer.text=offer==null?"当前没有顾客。":$"{offer.CustomerName}  |  求购：{ShopCatalog.CategoryName(offer.RequestedCategory)}  |  剩余预算：{offer.RemainingBudget}\n你的可用资金：{session.Money} 灵石";
+            customer.text=offer==null?"当前没有顾客。":offer.Behavior==CustomerBehavior.Selling?
+                $"{offer.CustomerName}  |  只出售，无求购计划\n你的可用资金：{session.Money} 灵石":
+                $"{offer.CustomerName}  |  求购：{ShopCatalog.CategoryName(offer.RequestedCategory)}  |  剩余预算：{offer.RemainingBudget}\n你的可用资金：{session.Money} 灵石";
             var quote=session.PreviewTrade(requestAll);
             bool expired=pendingConcession!=null && (!quote.Matches(pendingConcession) || !quote.CanConfirm);
             if(expired)CancelConcession();

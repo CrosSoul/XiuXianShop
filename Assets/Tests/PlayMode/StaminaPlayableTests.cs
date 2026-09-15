@@ -21,7 +21,7 @@ namespace XiuXianShop.Tests
             Assert.That(s.Stamina,Is.EqualTo(100));Assert.That(s.CustomerCountThisTurn,Is.EqualTo(6));
             for(int n=0;n<3;n++){shop.Refresh();shop.CalendarView.Open();shop.CalendarView.Close();}
             Assert.That(shop.GetComponentsInChildren<Text>().Any(t=>t.text.Contains("本月溢出客流 +1")),Is.True);
-            yield return Click("BeginBusiness");Assert.That(s.BuyersToday+s.SuppliersToday,Is.EqualTo(6));
+            yield return Click("BeginBusiness");Assert.That(s.BuyersToday+s.SuppliersToday+s.TradingCustomersToday,Is.EqualTo(6));
             for(int n=0;n<6;n++)yield return Click("NextCustomer");
             Assert.That(s.Offer,Is.Null);Assert.That(s.ServedToday,Is.EqualTo(6));Assert.That(s.Stamina,Is.EqualTo(100));
             Assert.That(s.ValidateState(),Is.Null);LogAssert.NoUnexpectedReceived();

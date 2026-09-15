@@ -32,6 +32,9 @@ namespace XiuXianShop
 
     public sealed class TradeOffer
     {
+        public CustomerBehavior Behavior { get; internal set; }
+        public CustomerBudgetTier BudgetTier { get; internal set; }
+        public bool WealthyPromotion { get; internal set; }
         public TradeDirection Direction { get; internal set; }
         public string CustomerName { get; internal set; }
         // Compatibility accessors for the first remaining supply; direction is an arrival hint,
@@ -48,30 +51,25 @@ namespace XiuXianShop
     // The same snapshot feeds the opening preview and the turn's queue. No random draws in previews.
     public sealed class DisplayAttraction
     {
-        public ItemCategory BuyerCategory { get; internal set; }
-        public decimal DisplayValue { get; internal set; }
-        public int BudgetTierMinimum { get; internal set; }
-        public int MinimumBuyerBudget { get; internal set; }
-        public int MaximumBuyerBudget { get; internal set; }
-        public float SupplierChance { get; internal set; }
-        public bool HasAdvertisement { get; internal set; }
-        internal ItemDefinition[] Supplies;
-        public string SupplierDescription => HasAdvertisement?string.Join("、",Supplies.Select(d=>d.category).Distinct().Select(ShopCatalog.CategoryName)):"随机商品";
+        public CustomerCategoryWeight[] BuyingCategories { get; internal set; }
+        public CustomerCategoryWeight[] SellingCategories { get; internal set; }
+        public double BuyingChance { get; internal set; }
+        public double SellingChance { get; internal set; }
+        public double TradingChance { get; internal set; }
     }
 
     // One small session owns the grid and economic mutations. UI never edits inventory directly.
     // Failed operations validate before committing: no money or items are consumed on failure.
     public sealed partial class ShopSession
     {
-        public const int DailyCustomerCount = 5;
         readonly ShopCatalog catalog;
         readonly System.Random customerRandom;
         readonly int customerSeedValue;
         int customerDraws;
         readonly List<GridItem> items = new List<GridItem>();
         readonly Dictionary<string, PriceTag> priceTags = new Dictionary<string, PriceTag>();
-        readonly Queue<(TradeDirection direction, string[] definitionIds, ItemCategory category, int budget)> queue
-            = new Queue<(TradeDirection,string[],ItemCategory,int)>();
+        readonly Queue<(TradeDirection direction, string[] definitionIds, ItemCategory category, int budget, CustomerBehavior behavior, CustomerBudgetTier tier, bool promoted)> queue
+            = new Queue<(TradeDirection,string[],ItemCategory,int,CustomerBehavior,CustomerBudgetTier,bool)>();
         int nextId = 1;
         public IReadOnlyList<GridItem> Items => items;
         public ShopCatalog Catalog => catalog;
@@ -79,7 +77,7 @@ namespace XiuXianShop
         public int Stamina { get; private set; }
         public int MaximumStamina => catalog.maximumStamina;
         public bool HasStaminaOverflowCustomer { get; private set; }
-        public int CustomerCountThisTurn => DailyCustomerCount + (HasStaminaOverflowCustomer ? 1 : 0) +
+        public int CustomerCountThisTurn => catalog.customers.baseCustomerCount + (HasStaminaOverflowCustomer ? catalog.customers.staminaOverflowCustomers : 0) +
             (HasTeaEffect(TeaEffect.Promotion)?catalog.teaHouse.extraCustomers:0);
         public int Turn { get; private set; } = 1;
         public int Year => (Turn-1)/12+1;
@@ -105,7 +103,7 @@ namespace XiuXianShop
         public DisplayAttraction TodayAttraction { get; private set; }
         public int BuyersToday { get; private set; }
         public int SuppliersToday { get; private set; }
-        public bool SupplyAdvertisedToday => TodayAttraction?.HasAdvertisement??false;
+        public int TradingCustomersToday { get; private set; }
         public bool HasFurnace => true;
         public string Message { get; private set; } = "先整理物品，再把收购牌和商品放入展示柜。丹炉已备好。";
 
@@ -329,37 +327,7 @@ namespace XiuXianShop
         static void Place(GridItem item, ContainerId target, int x, int y, int rotation, bool flipped)
         { item.Container=target; item.StorageItemId=0; item.LocationId=null; item.X=x; item.Y=y; item.Rotation=((rotation%4)+4)%4; item.Flipped=flipped; }
 
-        public DisplayAttraction PreviewAttraction()
-        {
-            var display=In(ContainerId.Display).Where(i=>i.Owner==ItemOwner.Player).ToArray();
-            var dominant=display.Where(i=>IsSaleItem(i.Definition) && i.BaseValue>0).GroupBy(i=>i.Definition.category)
-                .Select(g=>new {Category=g.Key,Value=g.Sum(i=>i.BaseValue)})
-                .OrderByDescending(g=>g.Value).ThenBy(g=>(int)g.Category).FirstOrDefault();
-            var advertised=display.Where(i=>i.Definition.procurementSign).Select(i=>i.Definition.advertisedCategory).Distinct().ToArray();
-            // Select definitions by the sign's category, not a hard-coded herb/dew schedule.
-            var allSupplies=catalog.items.Where(d=>IsSaleItem(d) && d.supplierAvailable).ToArray();
-            var supplies=allSupplies.Where(d=>advertised.Contains(d.category)).ToArray();
-            bool hasAdvertisement=supplies.Length>0;
-            float supplierChance=Mathf.Clamp01(catalog.baseSupplierChance+(hasAdvertisement?catalog.advertisementSupplierBonus:0)-(dominant!=null?catalog.displayedGoodsBuyerBonus:0));
-            if(HasTeaEffect(TeaEffect.Travellers))supplierChance=Mathf.Min(catalog.teaHouse.travellerChanceCap,supplierChance+catalog.teaHouse.travellerChanceBonus);
-            if(allSupplies.Length==0) supplierChance=0;
-            decimal value=dominant?.Value??0;
-            var tier=(catalog.buyerBudgetTiers??Array.Empty<BuyerBudgetTier>()).Where(t=>t!=null && t.minimumDisplayValue<=value)
-                .OrderByDescending(t=>t.minimumDisplayValue).FirstOrDefault();
-            int baseBudget=Math.Max(1,tier?.baseBudget??20);
-            float variation=Mathf.Clamp(catalog.buyerBudgetVariation,0,.5f);
-            return new DisplayAttraction
-            {
-                BuyerCategory=dominant?.Category??ItemCategory.Unclassified,
-                DisplayValue=value,
-                BudgetTierMinimum=tier?.minimumDisplayValue??0,
-                MinimumBuyerBudget=Math.Max(1,Mathf.CeilToInt(baseBudget*(1-variation))),
-                MaximumBuyerBudget=Math.Max(1,Mathf.FloorToInt(baseBudget*(1+variation))),
-                SupplierChance=supplierChance,
-                HasAdvertisement=hasAdvertisement,
-                Supplies=hasAdvertisement?supplies:allSupplies
-            };
-        }
+        public DisplayAttraction PreviewAttraction() => BuildCustomerAttraction();
         static bool IsSaleItem(ItemDefinition definition) => !definition.IsStorage && definition.category!=ItemCategory.ProductionEquipment && !definition.procurementSign && definition.FullBaseValue>0
             && definition.category!=ItemCategory.Unclassified && definition.category!=ItemCategory.BusinessSign;
 
@@ -368,29 +336,9 @@ namespace XiuXianShop
             if(IsCarrying)return Fail("请先结束携带状态再营业。" );
             if (Phase!=TurnPhase.Preparation) return Fail("本月已经营业过；闭店后推进下个月。" );
             var attraction=PreviewAttraction();
-            var categories=catalog.items.Where(IsSaleItem).Select(d=>d.category).Distinct().OrderBy(c=>(int)c).ToArray();
-            if(categories.Length==0) return Fail("商品配置缺少可售类别，无法生成顾客。请检查 ShopCatalog。" );
-            queue.Clear(); ServedToday=0;BuyersToday=0;SuppliersToday=0;
+            queue.Clear();ServedToday=0;BuyersToday=0;SuppliersToday=0;TradingCustomersToday=0;
+            if(!GenerateOrdinaryCustomers(attraction))return false;
             TodayAttraction=attraction;
-            int wealthyIndex=HasTeaEffect(TeaEffect.WealthyVisitor)?DrawCustomerNumber(0,CustomerCountThisTurn):-1;
-            for(int n=0;n<CustomerCountThisTurn;n++)
-            {
-                var category=attraction.BuyerCategory==ItemCategory.Unclassified?categories[DrawCategoryWeightedIndex(categories,TeaEffect.BuyerTrend)]:attraction.BuyerCategory;
-                int budget=n==wealthyIndex?WealthyBudget(attraction):DrawCustomerNumber(attraction.MinimumBuyerBudget,attraction.MaximumBuyerBudget+1);
-                if(DrawCustomerChance()<attraction.SupplierChance)
-                {
-                    // Two goods per supplying visitor is a temporary demo convention, not a balance rule.
-                    var supplyCategories=attraction.Supplies.Select(d=>d.category).ToArray();
-                    var supplies=Enumerable.Range(0,2).Select(_=>attraction.Supplies[DrawCategoryWeightedIndex(supplyCategories,TeaEffect.SupplierTrend)].id).ToArray();
-                    queue.Enqueue((TradeDirection.CustomerSells,supplies,category,budget));
-                    SuppliersToday++;
-                }
-                else
-                {
-                    queue.Enqueue((TradeDirection.CustomerBuys,Array.Empty<string>(),category,budget));
-                    BuyersToday++;
-                }
-            }
             Phase=TurnPhase.Open;
             return NextCustomer();
         }
@@ -404,10 +352,12 @@ namespace XiuXianShop
             var request=queue.Dequeue();
             Offer=new TradeOffer{Direction=request.direction, SupplierItems=request.definitionIds.Select(id=>NewItem(catalog.Find(id),ItemOwner.Customer)).ToArray(),
                 CustomerName=request.direction==TradeDirection.CustomerSells?"采药客 · 阿青":"散修 · 云生",
-                RequestedCategory=request.category,RemainingBudget=request.budget};
+                RequestedCategory=request.category,RemainingBudget=request.budget,
+                Behavior=request.behavior,BudgetTier=request.tier,WealthyPromotion=request.promoted};
             var current=Offer;current.CurrentPrice=()=>current.SupplierItem==null?0:Quote(current.SupplierItem).Amount;
             TryPlaceSupplierItems();
-            return Success($"顾客求购{ShopCatalog.CategoryName(request.category)}，预算 {request.budget}。来货在顾客柜台，确认前仍属顾客；可继续交易或随时下一位。" );
+            var intention=request.behavior==CustomerBehavior.Selling?"顾客只出售，没有求购计划。":$"顾客求购{ShopCatalog.CategoryName(request.category)}，预算 {request.budget}。";
+            return Success(intention+"可交易来货在顾客柜台，确认前仍属顾客；可继续交易或随时下一位。" );
         }
 
         void TryPlaceSupplierItems()
@@ -542,7 +492,7 @@ namespace XiuXianShop
             int due=RentDebt;
             if(Turn%catalog.rentPeriod==0) { due+=Rent; Rent=(int)Math.Ceiling(Rent*1.05); }
             int paid=Math.Min(Money,due); Money-=paid; RentDebt=due-paid;
-            Turn++; Phase=TurnPhase.Preparation; ServedToday=0;TodayAttraction=null;BuyersToday=0;SuppliersToday=0; queue.Clear();
+            Turn++; Phase=TurnPhase.Preparation; ServedToday=0;TodayAttraction=null;BuyersToday=0;SuppliersToday=0;TradingCustomersToday=0; queue.Clear();
             HasTravelledThisTurn=false;visitedLocations.Clear();
             ActiveTeaEffect=LatestTeaVisit?.ApplyTurn==Turn?LatestTeaVisit:null;
             long recovered=(long)Stamina+catalog.staminaRecoveryPerTurn;

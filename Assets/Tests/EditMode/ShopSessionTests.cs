@@ -14,10 +14,10 @@ namespace XiuXianShop.Tests
         static string Snapshot(ShopSession s)=>s.Money+"|"+s.Turn+"|"+string.Join(";",s.Items.OrderBy(i=>i.Id).Select(i=>$"{i.Id},{i.Definition.id},{i.Container},{i.Owner},{i.X},{i.Y},{i.Rotation},{i.Flipped}"));
         static void Valid(ShopSession s)=>Assert.That(s.ValidateState(),Is.Null);
         static void Display(ShopSession s,GridItem i,int x=0,int y=0) {Assert.That(s.Move(i.Id,ContainerId.Display,x,y,i.Rotation,i.Flipped),Is.True,s.Message);}
-        void BuyersOnly(int budget=20) {catalog.baseSupplierChance=0;catalog.advertisementSupplierBonus=0;catalog.displayedGoodsBuyerBonus=0;catalog.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=budget}};catalog.buyerBudgetVariation=0;}
+        void BuyersOnly(int budget=20) {catalog.customers.tradingWeight=0;catalog.customers.buyingWeight=1-(0);catalog.customers.sellingWeight=0;catalog.customers.oneSupplyWeight=0;catalog.customers.twoSuppliesWeight=1;catalog.customers.displayedItemWeight=1000000;foreach(var budgetRow in catalog.customers.budgets)budgetRow.ordinary=budgetRow.wealthy=budgetRow.lavish=budget;}
         void SuppliersOnly(string id="herb")
         {
-            catalog.baseSupplierChance=1;catalog.advertisementSupplierBonus=0;catalog.displayedGoodsBuyerBonus=0;
+            catalog.customers.tradingWeight=1;catalog.customers.buyingWeight=1-(1);catalog.customers.sellingWeight=0;catalog.customers.oneSupplyWeight=0;catalog.customers.twoSuppliesWeight=1;catalog.customers.displayedItemWeight=1000000;
             foreach(var d in catalog.items) if(d.id!=id)d.supplierAvailable=false;
         }
 
@@ -206,7 +206,7 @@ namespace XiuXianShop.Tests
             Assert.That(s.Purchases,Is.Zero,"Arrival never purchases goods, regardless of the random requested category.");
             Assert.That(s.Move(sign.Id,ContainerId.Storage,0,0,0,false));
             foreach(var item in dew) {Assert.That(s.FindSpace(item,ContainerId.Storage,out int x,out int y));Assert.That(s.Move(item.Id,ContainerId.Storage,x,y,0,false));}
-            Assert.That(s.NextCustomer());Assert.That(s.SupplyAdvertisedToday);Assert.That(s.Offer.Direction,Is.EqualTo(TradeDirection.CustomerSells));
+            Assert.That(s.NextCustomer());Assert.That(s.Offer.Direction,Is.EqualTo(TradeDirection.CustomerSells));
             Assert.That(s.NextCustomer());Assert.That(s.Purchases,Is.Zero);Assert.That(s.Items.Count(i=>i.Owner==ItemOwner.Player),Is.EqualTo(21));Valid(s);
         }
 
@@ -241,7 +241,8 @@ namespace XiuXianShop.Tests
 
         [Test] public void TwoProcureCraftSellLoopsAndTwoDaysAreProfitable()
         {
-            catalog.baseSupplierChance=1;catalog.startingItems=new[]{"sign"};catalog.Find("cinnabar").supplierAvailable=false;
+            catalog.customers.supplyPools=new[]{new CustomerSupplyPool{category=ItemCategory.Material,itemIds=new[]{"herb","dew"}}};
+            catalog.customers.tradingWeight=1;catalog.customers.buyingWeight=1-(1);catalog.customers.sellingWeight=0;catalog.customers.oneSupplyWeight=0;catalog.customers.twoSuppliesWeight=1;catalog.customers.displayedItemWeight=1000000;catalog.startingItems=new[]{"sign"};catalog.Find("cinnabar").supplierAvailable=false;
             var s=new ShopSession(catalog,customerSeed:0);Display(s,s.Items[0]);
             // Turn 1 obtains two complete ingredient sets through normal suppliers.
             Assert.That(s.BeginBusiness());
@@ -262,78 +263,12 @@ namespace XiuXianShop.Tests
             Assert.That(s.EndBusiness());Assert.That(s.AdvanceTurn());Assert.That(s.Turn,Is.EqualTo(3));Assert.That(s.HasFurnace);Valid(s);
         }
 
-        [TestCase(false,false,.4f)]
-        [TestCase(false,true,.2f)]
-        [TestCase(true,false,.8f)]
-        [TestCase(true,true,.6f)]
-        public void FiveVisitorsAreSampledIndividuallyWithDisplayWeightedProbabilities(bool sign,bool goods,float chance)
-        {
-            catalog.baseSupplierChance=.4f;catalog.advertisementSupplierBonus=.4f;catalog.displayedGoodsBuyerBonus=.2f;
-            catalog.startingItems=new[]{"sign","pill"};
-            int totalSuppliers=0;var dailyCounts=new System.Collections.Generic.HashSet<int>();
-            for(int seed=0;seed<100;seed++)
-            {
-                var s=new ShopSession(catalog,customerSeed:seed);
-                if(sign)Display(s,s.Items[0]);if(goods)Display(s,s.Items[1],2,0);
-                Assert.That(s.PreviewAttraction().SupplierChance,Is.EqualTo(chance).Within(.0001));
-                Assert.That(s.BeginBusiness());Assert.That(s.BuyersToday+s.SuppliersToday,Is.EqualTo(5));
-                dailyCounts.Add(s.SuppliersToday);totalSuppliers+=s.SuppliersToday;
-                for(int n=0;n<5;n++)
-                {
-                    Assert.That(s.Offer,Is.Not.Null);
-                    if(sign && s.Offer.Direction==TradeDirection.CustomerSells) Assert.That(s.Find(s.Offer.ItemId).Definition.category,Is.EqualTo(ItemCategory.Material));
-                    if(goods && s.Offer.Direction==TradeDirection.CustomerBuys) Assert.That(s.Offer.RequestedCategory,Is.EqualTo(ItemCategory.Medicine));
-                    Assert.That(s.NextCustomer());Valid(s);
-                }
-                Assert.That(s.Offer,Is.Null);Assert.That(s.RemainingCustomers,Is.Zero);Assert.That(s.ServedToday,Is.EqualTo(5));
-                Assert.That(s.BeginBusiness(),Is.False);Assert.That(s.NextCustomer());Assert.That(s.Offer,Is.Null);
-            }
-            Assert.That(dailyCounts.Count,Is.GreaterThan(2),"Do not replace random visitors with a fixed daily ratio.");
-            Assert.That(totalSuppliers/500f,Is.EqualTo(chance).Within(.08f));
-        }
 
-        [Test] public void OnlyHighestCategoryCountsAndTiesUseStableCategoryOrder()
-        {
-            catalog.Find("herb").baseValue=10;catalog.Find("pill").baseValue=50;
-            var s=Session("herb","herb","herb","pill");
-            Display(s,s.Items[0]);Display(s,s.Items[1],2,0);Display(s,s.Items[2],4,0);Display(s,s.Items[3],0,2);
-            var preview=s.PreviewAttraction();Assert.That(preview.BuyerCategory,Is.EqualTo(ItemCategory.Medicine));Assert.That(preview.DisplayValue,Is.EqualTo(50));
-            catalog.Find("pill").baseValue=30;
-            Assert.That(s.PreviewAttraction().BuyerCategory,Is.EqualTo(ItemCategory.Medicine),"Equal category totals use enum order, not placement order.");
-            catalog.Find("herb").baseValue=11;
-            Assert.That(s.PreviewAttraction().BuyerCategory,Is.EqualTo(ItemCategory.Material));Assert.That(s.PreviewAttraction().DisplayValue,Is.EqualTo(33));
-        }
 
-        [TestCase(0,0,18,22)]
-        [TestCase(20,0,18,22)]
-        [TestCase(22,0,18,22)]
-        [TestCase(29,0,18,22)]
-        [TestCase(30,30,54,66)]
-        [TestCase(99,30,54,66)]
-        [TestCase(100,100,135,165)]
-        [TestCase(299,100,135,165)]
-        [TestCase(300,300,360,440)]
-        [TestCase(600,300,360,440)]
-        public void BudgetUsesDiscreteTierAndEachBuyerVariesWithinTenPercent(int value,int threshold,int minimum,int maximum)
-        {
-            var defaults=ScriptableObject.CreateInstance<ShopCatalog>();
-            catalog.buyerBudgetTiers=defaults.buyerBudgetTiers;UnityEngine.Object.DestroyImmediate(defaults);catalog.buyerBudgetVariation=.1f;
-            catalog.Find("pill").baseValue=value;catalog.startingItems=new[]{"pill"};
-            var observed=new System.Collections.Generic.HashSet<int>();
-            for(int seed=0;seed<30;seed++)
-            {
-                var s=new ShopSession(catalog,customerSeed:seed);if(value>0)Display(s,s.Items[0]);
-                var preview=s.PreviewAttraction();Assert.That(preview.BudgetTierMinimum,Is.EqualTo(threshold));
-                Assert.That(preview.MinimumBuyerBudget,Is.EqualTo(minimum));Assert.That(preview.MaximumBuyerBudget,Is.EqualTo(maximum));
-                Assert.That(s.BeginBusiness());
-                for(int n=0;n<5;n++) {observed.Add(s.Offer.RemainingBudget);Assert.That(s.Offer.RemainingBudget,Is.InRange(minimum,maximum));s.NextCustomer();}
-            }
-            Assert.That(observed.Count,Is.GreaterThan(1),"Budgets must fluctuate per visitor, not stay at the tier base.");
-        }
 
         [Test] public void PreviewDoesNotConsumeRandomnessAndOpeningFreezesTheWholeQueue()
         {
-            catalog.baseSupplierChance=.4f;catalog.advertisementSupplierBonus=.4f;catalog.displayedGoodsBuyerBonus=.2f;catalog.buyerBudgetVariation=.1f;
+            catalog.customers.tradingWeight=.4f;catalog.customers.buyingWeight=1-(.4f);catalog.customers.sellingWeight=0;catalog.customers.oneSupplyWeight=0;catalog.customers.twoSuppliesWeight=1;catalog.customers.displayedItemWeight=1000000;
             catalog.startingItems=new[]{"sign","pill","jade"};
             var a=new ShopSession(catalog,customerSeed:17);var b=new ShopSession(catalog,customerSeed:17);
             Display(a,a.Items[0]);Display(b,b.Items[0]);Display(a,a.Items[1],2,0);Display(b,b.Items[1],2,0);
@@ -348,18 +283,9 @@ namespace XiuXianShop.Tests
                 a.NextCustomer();b.NextCustomer();
             }
             Assert.That(a.TodayAttraction,Is.SameAs(captured));a.EndBusiness();a.AdvanceTurn();Assert.That(a.TodayAttraction,Is.Null);
-            a.BeginBusiness();Assert.That(a.TodayAttraction.BuyerCategory,Is.EqualTo(ItemCategory.Container));Assert.That(a.BuyersToday+a.SuppliersToday,Is.EqualTo(6));
+            a.BeginBusiness();Assert.That(a.TodayAttraction.BuyingCategories.Single(c=>c.Category==ItemCategory.Container).DisplayedCount,Is.EqualTo(1));Assert.That(a.BuyersToday+a.SuppliersToday+a.TradingCustomersToday,Is.EqualTo(6));
         }
 
-        [Test] public void AdvertisementSelectsItsConfiguredCategoryAndDuplicatesDoNotStackProbability()
-        {
-            catalog.baseSupplierChance=.2f;catalog.advertisementSupplierBonus=.4f;catalog.startingItems=new[]{"sign","sign"};
-            catalog.Find("sign").advertisedCategory=ItemCategory.Equipment;var s=new ShopSession(catalog,customerSeed:1);
-            Display(s,s.Items[0]);float probability=s.PreviewAttraction().SupplierChance;Display(s,s.Items[1],2,0);
-            Assert.That(s.PreviewAttraction().SupplierChance,Is.EqualTo(probability));Assert.That(s.PreviewAttraction().SupplierDescription,Is.EqualTo("装备"));
-            catalog.baseSupplierChance=1;s.BeginBusiness();
-            for(int n=0;n<5;n++) {Assert.That(s.Find(s.Offer.ItemId).Definition.id,Is.EqualTo("sword"));s.NextCustomer();}
-        }
 
         [Test] public void SleepChargesPeriodicRentAndNeverMakesNegativeMoney()
         {

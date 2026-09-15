@@ -26,10 +26,10 @@ namespace XiuXianShop.Tests
             }
             yield return Click("TravelLeave");yield return Click("TravelReturn");yield return Click("TravelReturnConfirm");yield return Click("CarryReturn");
             yield return Click("TeaNewsOpen");yield return Click("TeaNewsClose");Assert.That(s.LatestTeaVisit,Is.SameAs(result));
-            yield return Click("BeginBusiness");Assert.That(s.BuyersToday+s.SuppliersToday,Is.EqualTo(5));
+            yield return Click("BeginBusiness");Assert.That(s.BuyersToday+s.SuppliersToday+s.TradingCustomersToday,Is.EqualTo(5));
             yield return Click("EndBusiness");yield return Click("AdvanceTurn");
             Assert.That(shop.FindButton("TeaNewsOpen").GetComponentInChildren<Text>().text,Does.Contain("本月加成"));
-            yield return Click("BeginBusiness");Assert.That(s.BuyersToday+s.SuppliersToday,Is.EqualTo(6));
+            yield return Click("BeginBusiness");Assert.That(s.BuyersToday+s.SuppliersToday+s.TradingCustomersToday,Is.EqualTo(6));
             for(int i=0;i<6;i++)yield return Click("NextCustomer");Assert.That(s.Offer,Is.Null);Assert.That(s.ServedToday,Is.EqualTo(6));
             yield return Click("EndBusiness");yield return Click("AdvanceTurn");Assert.That(s.CustomerCountThisTurn,Is.EqualTo(5));
             Assert.That(s.ValidateState(),Is.Null);LogAssert.NoUnexpectedReceived();

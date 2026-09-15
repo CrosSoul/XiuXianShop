@@ -237,6 +237,70 @@ MonoBehaviour:
     wealthyBudgetTierIncrease: 1
     secretMinimumTurnsAhead: 2
     secretMaximumTurnsAhead: 12
+  customers:
+    baseCustomerCount: 5
+    staminaOverflowCustomers: 1
+    buyingWeight: 40
+    sellingWeight: 25
+    tradingWeight: 35
+    baseCategoryWeight: 10
+    displayedItemWeight: 5
+    ordinaryWeight: 75
+    wealthyWeight: 23
+    lavishWeight: 2
+    oneSupplyWeight: 75
+    twoSuppliesWeight: 25
+    budgets:
+    - category: 2
+      ordinary: 20
+      wealthy: 60
+      lavish: 150
+      balanceNote: "\u666E\u901A20\u5DF2\u786E\u8BA4\uFF1B\u5BCC\u88D5/\u9614\u7EF0\u4E3A\u539F\u578B"
+    - category: 1
+      ordinary: 45
+      wealthy: 100
+      lavish: 220
+      balanceNote: "\u666E\u901A45\u5DF2\u786E\u8BA4\uFF1B\u5BCC\u88D5/\u9614\u7EF0\u4E3A\u539F\u578B"
+    - category: 3
+      ordinary: 30
+      wealthy: 80
+      lavish: 180
+      balanceNote: "\u539F\u578B\u91D1\u989D\uFF0C\u975E\u6700\u7EC8\u5E73\u8861"
+    - category: 4
+      ordinary: 25
+      wealthy: 70
+      lavish: 160
+      balanceNote: "\u539F\u578B\u91D1\u989D\uFF0C\u975E\u6700\u7EC8\u5E73\u8861"
+    - category: 10
+      ordinary: 20
+      wealthy: 60
+      lavish: 150
+      balanceNote: "\u539F\u578B\u91D1\u989D\uFF0C\u975E\u6700\u7EC8\u5E73\u8861"
+    - category: 11
+      ordinary: 120
+      wealthy: 250
+      lavish: 500
+      balanceNote: "\u539F\u578B\u91D1\u989D\uFF0C\u975E\u6700\u7EC8\u5E73\u8861"
+    - category: 12
+      ordinary: 11000
+      wealthy: 15000
+      lavish: 20000
+      balanceNote: "\u539F\u578B\u91D1\u989D\uFF0C\u975E\u6700\u7EC8\u5E73\u8861"
+    supplyPools:
+    - category: 2
+      weight: 10
+      itemIds:
+      - herb
+      - dew
+      - cinnabar
+    - category: 1
+      weight: 10
+      itemIds:
+      - pill
+    - category: 3
+      weight: 10
+      itemIds:
+      - sword
   commissions:
     candidateCount: 3
     completionLimitPerTurn: 1
@@ -486,19 +550,6 @@ MonoBehaviour:
       playerBuys: 1
   rentPeriod: 6
   firstRent: 20
-  buyerBudgetTiers:
-  - minimumDisplayValue: 0
-    baseBudget: 20
-  - minimumDisplayValue: 30
-    baseBudget: 60
-  - minimumDisplayValue: 100
-    baseBudget: 150
-  - minimumDisplayValue: 300
-    baseBudget: 400
-  buyerBudgetVariation: 0.1
-  baseSupplierChance: 0.4
-  advertisementSupplierBonus: 0.4
-  displayedGoodsBuyerBonus: 0.2
   references:
     version: 2
     RefIds:

@@ -46,24 +46,7 @@ namespace XiuXianShop.Tests
             Assert.That(s.CustomerCountThisTurn,Is.EqualTo(6));Assert.That(s.Stamina,Is.EqualTo(10));
         }
 
-        [Test] public void TravellersAddConfiguredPercentagePointsThenCapWithoutGuaranteeingArrival()
-        {
-            catalog.baseSupplierChance=.75f;catalog.teaHouse.travellerChanceBonus=.25f;catalog.teaHouse.travellerChanceCap=.85f;
-            var s=Visit(TeaEffect.Travellers);Assert.That(s.PreviewAttraction().SupplierChance,Is.EqualTo(.75f).Within(.0001));NextTurn(s);
-            Assert.That(s.PreviewAttraction().SupplierChance,Is.EqualTo(.85f).Within(.0001));
-            catalog.teaHouse.travellerChanceBonus=.05f;catalog.teaHouse.travellerChanceCap=.95f;
-            Assert.That(s.PreviewAttraction().SupplierChance,Is.EqualTo(.8f).Within(.0001));
-        }
 
-        [TestCase(1,60)] [TestCase(2,150)] [TestCase(20,400)]
-        public void ExactlyOneRandomVisitorGetsConfiguredBudgetTierIncrease(int increase,int budget)
-        {
-            catalog.buyerBudgetVariation=0;catalog.teaHouse.wealthyBudgetTierIncrease=increase;
-            var s=Visit(TeaEffect.WealthyVisitor);NextTurn(s);Assert.That(s.BeginBusiness());
-            var budgets=new System.Collections.Generic.List<int>();
-            while(s.Offer!=null){budgets.Add(s.Offer.RemainingBudget);s.NextCustomer();}
-            Assert.That(budgets.Count(b=>b==budget),Is.EqualTo(1));Assert.That(budgets.Count(b=>b==20),Is.EqualTo(4));
-        }
 
         [Test] public void PromotionStacksWithStaminaOverflowAndDoesNotAppendOnPreview()
         {
@@ -74,27 +57,6 @@ namespace XiuXianShop.Tests
             Assert.That(s.BeginBusiness(),Is.False);Assert.That(s.RemainingCustomers,Is.EqualTo(7));
         }
 
-        [TestCase(TeaEffect.BuyerTrend)] [TestCase(TeaEffect.SupplierTrend)]
-        public void CategoryMultipliersChangeNormalizedSamplingWithinExistingCandidates(TeaEffect effect)
-        {
-            catalog.baseSupplierChance=1;int matches=0,total=0;double expected=0;
-            for(int seed=0;seed<160;seed++)
-            {
-                var s=Visit(effect,seed);NextTurn(s);
-                var categories=effect==TeaEffect.BuyerTrend?
-                    catalog.items.Where(d=>!d.procurementSign && d.FullBaseValue>0).Select(d=>d.category).Distinct().ToArray():
-                    catalog.items.Where(d=>d.supplierAvailable && !d.procurementSign && d.FullBaseValue>0).Select(d=>d.category).ToArray();
-                var target=s.ActiveTeaEffect.category;int baseCount=categories.Count(c=>c==target);
-                double probability=2d*baseCount/(categories.Length+baseCount);
-                s.BeginBusiness();while(s.Offer!=null)
-                {
-                    var draws=effect==TeaEffect.BuyerTrend?new[]{s.Offer.RequestedCategory}:s.Offer.SupplierItems.Select(i=>i.Definition.category).ToArray();
-                    matches+=draws.Count(c=>c==target);total+=draws.Length;expected+=draws.Length*probability;s.NextCustomer();
-                }
-            }
-            Assert.That((double)matches/total,Is.EqualTo(expected/total).Within(.05));
-            Assert.That(matches,Is.GreaterThan(0));Assert.That(matches,Is.LessThan(total));
-        }
 
         [Test] public void SecretFailureRedrawsOtherEffectWithoutCreatingIllegalMarket()
         {

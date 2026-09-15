@@ -52,10 +52,10 @@ namespace XiuXianShop.Editor
             foreach(var item in verificationCatalog.items)item.supplierAvailable=item.id=="pill";
             verificationCatalog.retailMarkup=.15f;
             verificationCatalog.marketEvents=System.Array.Empty<MarketEventDefinition>();
-            verificationCatalog.baseSupplierChance=.5f;
-            verificationCatalog.advertisementSupplierBonus=0;verificationCatalog.displayedGoodsBuyerBonus=0;
-            verificationCatalog.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=60}};
-            verificationCatalog.buyerBudgetVariation=0;
+            verificationCatalog.customers.tradingWeight=.5f;verificationCatalog.customers.buyingWeight=1-(.5f);verificationCatalog.customers.sellingWeight=0;verificationCatalog.customers.oneSupplyWeight=0;verificationCatalog.customers.twoSuppliesWeight=1;verificationCatalog.customers.displayedItemWeight=1000000;
+
+            foreach(var budgetRow in verificationCatalog.customers.budgets)budgetRow.ordinary=budgetRow.wealthy=budgetRow.lavish=60;
+
             verificationCatalog.priceTags=new[]{new PriceTag{id="buy-test",title="测试收购修正",percent=-.2f,playerSells=false}};
             shop.StartVerificationSession(verificationCatalog,0);discountEnabled=false;
             EditorApplication.playModeStateChanged-=CleanupVerification;
@@ -74,8 +74,8 @@ namespace XiuXianShop.Editor
             verificationCatalog.Find("herb").baseValue=15;verificationCatalog.Find("dew").baseValue=20;
             foreach(var item in verificationCatalog.items)item.supplierAvailable=item.id=="herb" || item.id=="dew";
             verificationCatalog.retailMarkup=0;verificationCatalog.priceTags=System.Array.Empty<PriceTag>();
-            verificationCatalog.baseSupplierChance=1;
-            verificationCatalog.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=60}};
+            verificationCatalog.customers.tradingWeight=1;verificationCatalog.customers.buyingWeight=1-(1);verificationCatalog.customers.sellingWeight=0;verificationCatalog.customers.oneSupplyWeight=0;verificationCatalog.customers.twoSuppliesWeight=1;verificationCatalog.customers.displayedItemWeight=1000000;
+            foreach(var budgetRow in verificationCatalog.customers.budgets)budgetRow.ordinary=budgetRow.wealthy=budgetRow.lavish=60;
             var shop=Object.FindFirstObjectByType<ShopPrototype>();
             // Use an isolated save path so this repeatable fixture cannot overwrite a player's save.
             shop.StartVerificationSession(verificationCatalog,17);

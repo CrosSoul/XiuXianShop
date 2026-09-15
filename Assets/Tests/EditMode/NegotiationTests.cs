@@ -13,15 +13,15 @@ namespace XiuXianShop.Tests
         {
             catalog=ScriptableObject.CreateInstance<ShopCatalog>();catalog.SetPrototypeDefaults();
             catalog.startingItems=new[]{"pill"};catalog.retailMarkup=0;
-            catalog.baseSupplierChance=1;catalog.advertisementSupplierBonus=0;catalog.displayedGoodsBuyerBonus=0;
-            catalog.buyerBudgetVariation=0;catalog.marketEvents=Array.Empty<MarketEventDefinition>();
+            catalog.customers.tradingWeight=1;catalog.customers.buyingWeight=1-(1);catalog.customers.sellingWeight=0;catalog.customers.oneSupplyWeight=0;catalog.customers.twoSuppliesWeight=1;catalog.customers.displayedItemWeight=1000000;
+            catalog.marketEvents=Array.Empty<MarketEventDefinition>();
             foreach(var d in catalog.items){d.cells=new[]{Vector2Int.zero};d.supplierAvailable=d.id=="herb" || d.id=="dew";}
             catalog.Find("pill").baseValue=10;catalog.Find("herb").baseValue=15;catalog.Find("dew").baseValue=20;
         }
         [TearDown] public void Cleanup()=>UnityEngine.Object.DestroyImmediate(catalog);
         ShopSession Session(int cash=120,int budget=60)
         {
-            catalog.startingMoney=cash;catalog.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=budget}};
+            catalog.startingMoney=cash;foreach(var budgetRow in catalog.customers.budgets)budgetRow.ordinary=budgetRow.wealthy=budgetRow.lavish=budget;
             for(int seed=0;seed<100;seed++)
             {
                 var s=new ShopSession(catalog,customerSeed:seed);

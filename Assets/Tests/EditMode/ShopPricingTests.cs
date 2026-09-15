@@ -12,8 +12,8 @@ namespace XiuXianShop.Tests
             catalog=ScriptableObject.CreateInstance<ShopCatalog>();catalog.SetPrototypeDefaults();
             catalog.Find("pill").baseValue=20;
             catalog.startingItems=new[]{"pill","pill","pill"};
-            catalog.baseSupplierChance=0;catalog.advertisementSupplierBonus=0;catalog.displayedGoodsBuyerBonus=0;
-            catalog.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=60}};catalog.buyerBudgetVariation=0;
+            catalog.customers.tradingWeight=0;catalog.customers.buyingWeight=1-(0);catalog.customers.sellingWeight=0;catalog.customers.oneSupplyWeight=0;catalog.customers.twoSuppliesWeight=1;catalog.customers.displayedItemWeight=1000000;
+            foreach(var budgetRow in catalog.customers.budgets)budgetRow.ordinary=budgetRow.wealthy=budgetRow.lavish=60;
         }
         [TearDown] public void Cleanup()=>Object.DestroyImmediate(catalog);
         static PriceTag Discount(float value=-.3f)=>new PriceTag{id="test-market",title="测试降价",percent=value};
@@ -50,7 +50,7 @@ namespace XiuXianShop.Tests
         }
         [Test] public void ActualPurchaseValueIsSixteenAndDoesNotChangeWithTagsOrLocation()
         {
-            catalog.startingItems=new string[0];catalog.baseSupplierChance=1;
+            catalog.startingItems=new string[0];catalog.customers.tradingWeight=1;catalog.customers.buyingWeight=1-(1);catalog.customers.sellingWeight=0;catalog.customers.oneSupplyWeight=0;catalog.customers.twoSuppliesWeight=1;catalog.customers.displayedItemWeight=1000000;
             foreach(var d in catalog.items)d.supplierAvailable=d.id=="pill";
             var s=new ShopSession(catalog);s.SetPriceTag(Discount(-.2f));Assert.That(s.BeginBusiness());
             var item=s.Offer.SupplierItem;
@@ -66,8 +66,8 @@ namespace XiuXianShop.Tests
         [Test] public void DisplaySnapshotUsesBaseValuesAndDoesNotRecalculateFromQuotes()
         {
             var s=new ShopSession(catalog);OpenBuyer(s);var snapshot=s.TodayAttraction;
-            s.SetPriceTag(Discount(-.8f));Assert.That(s.PreviewAttraction().DisplayValue,Is.EqualTo(20));
-            Stage(s,s.Items[0]);Assert.That(s.TodayAttraction,Is.SameAs(snapshot));Assert.That(snapshot.DisplayValue,Is.EqualTo(20));
+            s.SetPriceTag(Discount(-.8f));Assert.That(s.PreviewAttraction().BuyingCategories.Single(c=>c.Category==ItemCategory.Medicine).DisplayedCount,Is.EqualTo(1));
+            Stage(s,s.Items[0]);Assert.That(s.TodayAttraction,Is.SameAs(snapshot));Assert.That(snapshot.BuyingCategories.Single(c=>c.Category==ItemCategory.Medicine).DisplayedCount,Is.EqualTo(1));
         }
         [Test] public void LowerBoundRoundingAndDirectionalTagsAreExplicit()
         {
@@ -89,7 +89,7 @@ namespace XiuXianShop.Tests
         }
         [Test] public void FullCounterSupplierCanBeSkippedWithoutFreeItemsOrStuckQueue()
         {
-            catalog.startingItems=Enumerable.Repeat("dew",20).ToArray();catalog.baseSupplierChance=1;
+            catalog.startingItems=Enumerable.Repeat("dew",20).ToArray();catalog.customers.tradingWeight=1;catalog.customers.buyingWeight=1-(1);catalog.customers.sellingWeight=0;catalog.customers.oneSupplyWeight=0;catalog.customers.twoSuppliesWeight=1;catalog.customers.displayedItemWeight=1000000;
             foreach(var d in catalog.items)d.supplierAvailable=d.id=="pill";
             var s=new ShopSession(catalog);
             for(int i=0;i<20;i++)Assert.That(s.Move(s.Items[i].Id,ContainerId.Counter,i%5,i/5,0,false));

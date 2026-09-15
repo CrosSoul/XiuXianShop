@@ -12,8 +12,8 @@ namespace XiuXianShop.Tests
         {
             catalog=ScriptableObject.CreateInstance<ShopCatalog>();catalog.SetPrototypeDefaults();
             catalog.Find("pill").baseValue=20;catalog.startingItems=new[]{"pill","pill","pill"};
-            catalog.baseSupplierChance=0;catalog.advertisementSupplierBonus=0;catalog.displayedGoodsBuyerBonus=0;
-            catalog.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=50}};catalog.buyerBudgetVariation=0;
+            catalog.customers.tradingWeight=0;catalog.customers.buyingWeight=1-(0);catalog.customers.sellingWeight=0;catalog.customers.oneSupplyWeight=0;catalog.customers.twoSuppliesWeight=1;catalog.customers.displayedItemWeight=1000000;
+            foreach(var budgetRow in catalog.customers.budgets)budgetRow.ordinary=budgetRow.wealthy=budgetRow.lavish=50;
         }
         [TearDown] public void Cleanup()=>UnityEngine.Object.DestroyImmediate(catalog);
         ShopSession Session()=>new ShopSession(catalog,customerSeed:17,calendar:MarketCalendar.OverlapExample());
@@ -58,7 +58,7 @@ namespace XiuXianShop.Tests
         public void MixedTradeUsesOnlyActiveMarketEffectsAndPreservesHistory(int turn,int sale,int buy,int net)
         {
             catalog.retailMarkup=0;catalog.Find("pill").baseValue=10;
-            catalog.baseSupplierChance=1;
+            catalog.customers.tradingWeight=1;catalog.customers.buyingWeight=1-(1);catalog.customers.sellingWeight=0;catalog.customers.oneSupplyWeight=0;catalog.customers.twoSuppliesWeight=1;catalog.customers.displayedItemWeight=1000000;
             foreach(var d in catalog.items)d.supplierAvailable=d.id=="pill";
             var s=Session();Advance(s,turn);
             var own=s.Items[0];Assert.That(s.Move(own.Id,ContainerId.Display,0,0,0,false));
@@ -176,11 +176,11 @@ namespace XiuXianShop.Tests
             var quote=s.Quote(s.Items[0]);Assert.That(quote.Modifiers,Does.Contain("+20%"));Assert.That(quote.Modifiers,Does.Contain("-10%"));
             int money=s.Money;Assert.That(s.AcceptTrade());Assert.That(s.Money,Is.EqualTo(money+50));Assert.That(s.IncomeToday,Is.EqualTo(50));
             Assert.That(s.Offer.RemainingBudget,Is.Zero);Assert.That(s.Items.Count,Is.EqualTo(1));Assert.That(s.AcceptTrade(),Is.False);
-            Assert.That(s.TodayAttraction,Is.SameAs(snapshot));Assert.That(snapshot.DisplayValue,Is.EqualTo(20));
+            Assert.That(s.TodayAttraction,Is.SameAs(snapshot));Assert.That(snapshot.BuyingCategories.Single(c=>c.Category==ItemCategory.Medicine).DisplayedCount,Is.EqualTo(1));
         }
         [Test] public void PurchaseHistoryCalendarAndRentSurviveJsonRestoreWithoutDuplicateEffects()
         {
-            catalog.baseSupplierChance=1;foreach(var d in catalog.items)d.supplierAvailable=d.id=="pill";
+            catalog.customers.tradingWeight=1;catalog.customers.buyingWeight=1-(1);catalog.customers.sellingWeight=0;catalog.customers.oneSupplyWeight=0;catalog.customers.twoSuppliesWeight=1;catalog.customers.displayedItemWeight=1000000;foreach(var d in catalog.items)d.supplierAvailable=d.id=="pill";
             var s=Session();Advance(s,6);Assert.That(s.BeginBusiness());Assert.That(s.Offer.Price,Is.EqualTo(24));
             var bought=s.Offer.SupplierItem;Assert.That(s.Move(bought.Id,ContainerId.Counter,0,0,0,false));
             Assert.That(s.AcceptTrade());Assert.That(bought.PurchaseValue,Is.EqualTo(24));
@@ -218,7 +218,7 @@ namespace XiuXianShop.Tests
         }
         [Test] public void RestoredCustomerRandomSequenceIsUnaffectedByCalendarBrowsing()
         {
-            catalog.baseSupplierChance=.5f;catalog.marketEvents=MarketCalendar.PrototypeDefinitions();
+            catalog.customers.tradingWeight=.5f;catalog.customers.buyingWeight=1-(.5f);catalog.customers.sellingWeight=0;catalog.customers.oneSupplyWeight=0;catalog.customers.twoSuppliesWeight=1;catalog.customers.displayedItemWeight=1000000;catalog.marketEvents=MarketCalendar.PrototypeDefinitions();
             var a=new ShopSession(catalog,customerSeed:452);Advance(a,9);
             a.Calendar.Between(71,84);var b=ShopSession.RestoreSave(catalog,a.CaptureSave());
             b.Calendar.Between(140,160);

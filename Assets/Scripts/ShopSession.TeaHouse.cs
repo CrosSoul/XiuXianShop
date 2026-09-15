@@ -57,33 +57,15 @@ namespace XiuXianShop
             }
             if(result.effect==TeaEffect.BuyerTrend || result.effect==TeaEffect.SupplierTrend)
             {
-                var categories=catalog.items.Where(d=>IsSaleItem(d) && (result.effect!=TeaEffect.SupplierTrend || d.supplierAvailable))
-                    .Select(d=>d.category).Distinct().OrderBy(c=>(int)c).ToArray();
+                var categories=result.effect==TeaEffect.SupplierTrend?
+                    BuildCustomerAttraction().SellingCategories.Select(c=>c.Category).ToArray():
+                    catalog.items.Where(IsSaleItem).Select(d=>d.category).Distinct().OrderBy(c=>(int)c).ToArray();
                 if(categories.Length==0)throw new InvalidOperationException("茶肆风向没有有效商品类别。");
                 result.category=categories[DrawCustomerNumber(0,categories.Length)];
             }
             LatestTeaVisit=result;
         }
 
-        int DrawCategoryWeightedIndex(ItemCategory[] categories,TeaEffect effect)
-        {
-            if(!HasTeaEffect(effect))return DrawCustomerNumber(0,categories.Length);
-            double multiplier=effect==TeaEffect.BuyerTrend?catalog.teaHouse.buyerCategoryMultiplier:catalog.teaHouse.supplierCategoryMultiplier;
-            double roll=DrawCustomerChance()*categories.Sum(c=>c==ActiveTeaEffect.category?multiplier:1);
-            for(int i=0;i<categories.Length;i++){roll-=categories[i]==ActiveTeaEffect.category?multiplier:1;if(roll<0)return i;}
-            return categories.Length-1;
-        }
-
-        int WealthyBudget(DisplayAttraction attraction)
-        {
-            var tiers=catalog.buyerBudgetTiers.OrderBy(t=>t.minimumDisplayValue).ToArray();
-            int index=Array.FindIndex(tiers,t=>t.minimumDisplayValue==attraction.BudgetTierMinimum);
-            var tier=tiers[Math.Min(tiers.Length-1,index+catalog.teaHouse.wealthyBudgetTierIncrease)];
-            float variation=UnityEngine.Mathf.Clamp(catalog.buyerBudgetVariation,0,.5f);
-            int minimum=Math.Max(1,UnityEngine.Mathf.CeilToInt(tier.baseBudget*(1-variation)));
-            int maximum=Math.Max(1,UnityEngine.Mathf.FloorToInt(tier.baseBudget*(1+variation)));
-            return DrawCustomerNumber(minimum,maximum+1);
-        }
 
         public string DescribeTeaNews(TeaVisitResult result)
         {
@@ -91,8 +73,8 @@ namespace XiuXianShop
             var t=catalog.teaHouse;string timing=$"第 {result.ApplyTurn} 回合营业：";
             switch(result.effect)
             {
-                case TeaEffect.BuyerTrend:return timing+$"求购风向 · {ShopCatalog.CategoryName(result.category)}求购倾向 ×{t.buyerCategoryMultiplier:0.##}，仍受展示柜筛选影响。";
-                case TeaEffect.SupplierTrend:return timing+$"供货风向 · {ShopCatalog.CategoryName(result.category)}供货倾向 ×{t.supplierCategoryMultiplier:0.##}，仍受展示柜筛选影响。";
+                case TeaEffect.BuyerTrend:return timing+$"求购风向 · {ShopCatalog.CategoryName(result.category)}求购权重 ×{t.buyerCategoryMultiplier:0.##}，在展示加权后生效。";
+                case TeaEffect.SupplierTrend:return timing+$"供货风向 · {ShopCatalog.CategoryName(result.category)}供货权重 ×{t.supplierCategoryMultiplier:0.##}，仅影响普通来货池。";
                 case TeaEffect.Travellers:return timing+$"商旅到访 · 携货求购概率 +{t.travellerChanceBonus*100:0.##} 个百分点，上限 {t.travellerChanceCap:P0}。";
                 case TeaEffect.Promotion:return timing+$"宣传店铺 · 顾客 +{t.extraCustomers}。";
                 case TeaEffect.WealthyVisitor:return timing+$"阔客风声 · 随机一名顾客预算提高 {t.wealthyBudgetTierIncrease} 档，最高不超过顶档。";

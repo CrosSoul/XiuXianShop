@@ -138,7 +138,7 @@ namespace XiuXianShop.Tests
             for(int turn=1;turn<=2;turn++)
             {
                 int expectedCustomers=s.CustomerCountThisTurn;
-                yield return Click("BeginBusiness");Assert.That(s.BuyersToday+s.SuppliersToday,Is.EqualTo(expectedCustomers));
+                yield return Click("BeginBusiness");Assert.That(s.BuyersToday+s.SuppliersToday+s.TradingCustomersToday,Is.EqualTo(expectedCustomers));
                 for(int n=0;n<expectedCustomers;n++)
                 {
                     Assert.That(s.Offer,Is.Not.Null);
@@ -199,8 +199,8 @@ namespace XiuXianShop.Tests
             yield return RestartWithTestCatalog(c=>
             {
                 c.Find("pill").baseValue=20;c.startingItems=new[]{"pill","pill","pill"};
-                c.baseSupplierChance=0;c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
-                c.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=50}};c.buyerBudgetVariation=0;
+                c.customers.tradingWeight=0;c.customers.buyingWeight=1-(0);c.customers.sellingWeight=0;c.customers.oneSupplyWeight=0;c.customers.twoSuppliesWeight=1;c.customers.displayedItemWeight=1000000;
+                foreach(var budgetRow in c.customers.budgets)budgetRow.ordinary=budgetRow.wealthy=budgetRow.lavish=50;
             },17);
             shop.StartVerificationSession(testCatalog,17,MarketCalendar.OverlapExample());
             shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP17_UI_Test_"+System.Guid.NewGuid()+".json");
@@ -308,9 +308,9 @@ namespace XiuXianShop.Tests
         {
             yield return RestartWithTestCatalog(c=>
             {
-                c.startingItems=Enumerable.Repeat("dew",20).ToArray();c.baseSupplierChance=0;
-                c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
-                c.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=60}};c.buyerBudgetVariation=0;
+                c.startingItems=Enumerable.Repeat("dew",20).ToArray();c.customers.tradingWeight=0;c.customers.buyingWeight=1-(0);c.customers.sellingWeight=0;c.customers.oneSupplyWeight=0;c.customers.twoSuppliesWeight=1;c.customers.displayedItemWeight=1000000;
+
+                foreach(var budgetRow in c.customers.budgets)budgetRow.ordinary=budgetRow.wealthy=budgetRow.lavish=60;
             });
             var s=shop.Session;var items=s.Items.ToArray();
             yield return Drag(items[0],ContainerId.Display,0,0);yield return Click("BeginBusiness");
@@ -336,8 +336,8 @@ namespace XiuXianShop.Tests
             yield return RestartWithTestCatalog(c=>
             {
                 c.Find("pill").baseValue=20;c.startingItems=new[]{"pill","pill","pill"};
-                c.baseSupplierChance=0;c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
-                c.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=60}};c.buyerBudgetVariation=0;
+                c.customers.tradingWeight=0;c.customers.buyingWeight=1-(0);c.customers.sellingWeight=0;c.customers.oneSupplyWeight=0;c.customers.twoSuppliesWeight=1;c.customers.displayedItemWeight=1000000;
+                foreach(var budgetRow in c.customers.budgets)budgetRow.ordinary=budgetRow.wealthy=budgetRow.lavish=60;
             });
             var s=shop.Session;var pills=s.Items.ToArray();shop.SelectItem(pills[0].Id);
             Assert.That(DetailText,Does.Contain("基础价值 20 · 预估价值 20"));Assert.That(DetailText,Does.Not.Contain("购买价值"));
@@ -362,8 +362,8 @@ namespace XiuXianShop.Tests
             {
                 c.Find("pill").baseValue=20;c.startingItems=new[]{"pill","pill","pill"};
                 foreach(var d in c.items)d.supplierAvailable=d.id=="pill";
-                c.baseSupplierChance=.5f;c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
-                c.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=60}};c.buyerBudgetVariation=0;
+                c.customers.tradingWeight=.5f;c.customers.buyingWeight=1-(.5f);c.customers.sellingWeight=0;c.customers.oneSupplyWeight=0;c.customers.twoSuppliesWeight=1;c.customers.displayedItemWeight=1000000;
+                foreach(var budgetRow in c.customers.budgets)budgetRow.ordinary=budgetRow.wealthy=budgetRow.lavish=60;
                 c.priceTags=new[]{new PriceTag{id="buy-test",title="测试收购修正",percent=-.2f,playerSells=false}};
             },0);
             var s=shop.Session;yield return Drag(s.Items[0],ContainerId.Display,0,0);yield return Click("BeginBusiness");
@@ -413,8 +413,8 @@ namespace XiuXianShop.Tests
             yield return RestartWithTestCatalog(c=>
             {
                 c.startingItems=c.startingItems.Concat(new[]{"pill","pill"}).ToArray();
-                c.retailMarkup=0;c.baseSupplierChance=0;c.advertisementSupplierBonus=0;c.displayedGoodsBuyerBonus=0;
-                c.buyerBudgetTiers=new[]{new BuyerBudgetTier{baseBudget=budget}};c.buyerBudgetVariation=0;
+                c.retailMarkup=0;c.customers.tradingWeight=0;c.customers.buyingWeight=1-(0);c.customers.sellingWeight=0;c.customers.oneSupplyWeight=0;c.customers.twoSuppliesWeight=1;c.customers.displayedItemWeight=1000000;
+                foreach(var budgetRow in c.customers.budgets)budgetRow.ordinary=budgetRow.wealthy=budgetRow.lavish=budget;
             });
             yield return Drag(shop.Session.Items.First(i=>i.Definition.id=="pill"),ContainerId.Display,2,0);
             yield return Click("BeginBusiness");Assert.That(shop.Session.Offer.RemainingBudget,Is.EqualTo(budget));
@@ -476,7 +476,7 @@ namespace XiuXianShop.Tests
             Assert.That(CustomerText,Does.Contain("空展示柜也有客人"));Assert.That(CustomerText,Does.Contain("18–22"));
             yield return Click("BeginBusiness");var snapshot=s.TodayAttraction;
             yield return Drag(s.Items.First(i=>i.Definition.id=="jade"),ContainerId.Display,0,0);
-            Assert.That(s.TodayAttraction,Is.SameAs(snapshot));Assert.That(snapshot.BuyerCategory,Is.EqualTo(ItemCategory.Unclassified));
+            Assert.That(s.TodayAttraction,Is.SameAs(snapshot));Assert.That(snapshot.BuyingCategories.All(c=>c.DisplayedCount==0),Is.True);
             for(int n=0;n<5;n++)
             {
                 Assert.That(s.Offer,Is.Not.Null);if(s.Offer.Direction==TradeDirection.CustomerBuys) Assert.That(s.Offer.RemainingBudget,Is.InRange(18,22));

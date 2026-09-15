@@ -50,8 +50,9 @@ namespace XiuXianShop.Tests
             Assert.That(session.ConsumeSpirit(mid.Id,0),Is.False);Assert.That(session.ConsumeSpirit(mid.Id,-1),Is.False);
             Assert.That(session.ConsumeSpirit(mid.Id,int.MaxValue),Is.False);Assert.That(session.RefillSpirit(mid.Id,1),Is.False);
             Assert.That(session.RefillSpirit(Stone("stone_low").Id,1),Is.False);Assert.That(session.CaptureSave(),Is.EqualTo(before));
-            catalog.baseSupplierChance=1;catalog.displayedGoodsBuyerBonus=0;
+            catalog.customers.tradingWeight=1;catalog.customers.buyingWeight=1-(1);catalog.customers.sellingWeight=0;catalog.customers.oneSupplyWeight=0;catalog.customers.twoSuppliesWeight=1;catalog.customers.displayedItemWeight=1000000;
             foreach(var d in catalog.items)d.supplierAvailable=d.id=="stone_mid";
+            catalog.customers.supplyPools=new[]{new CustomerSupplyPool{category=ItemCategory.StoneMid,itemIds=new[]{"stone_mid"}}};
             session=new ShopSession(catalog,customerSeed:33);Assert.That(session.BeginBusiness());
             var customer=session.Offer.SupplierItems[0];int units=customer.SpiritUnits;
             Assert.That(session.ConsumeSpirit(customer.Id,1),Is.False);Assert.That(session.RefillSpirit(customer.Id,1),Is.False);
@@ -60,15 +61,16 @@ namespace XiuXianShop.Tests
         [Test] public void DynamicQuoteAndDisplayUseRemainingValueAndOpeningSnapshotStaysFixed()
         {
             var mid=Stone("stone_mid");Assert.That(session.Move(mid.Id,ContainerId.Display,0,0,0,false));
-            Assert.That(session.ConsumeSpirit(mid.Id,8000));Assert.That(session.PreviewAttraction().DisplayValue,Is.EqualTo(27m));
+            Assert.That(session.ConsumeSpirit(mid.Id,8000));Assert.That(session.PreviewAttraction().BuyingCategories.Single(c=>c.Category==ItemCategory.StoneMid).DisplayedCount,Is.EqualTo(1));
             Assert.That(session.Estimate(mid).BaseValue,Is.EqualTo(27m));Assert.That(session.BeginBusiness());
-            Assert.That(session.RefillSpirit(mid.Id,100));Assert.That(session.TodayAttraction.DisplayValue,Is.EqualTo(27m));
+            Assert.That(session.RefillSpirit(mid.Id,100));Assert.That(session.TodayAttraction.BuyingCategories.Single(c=>c.Category==ItemCategory.StoneMid).DisplayedCount,Is.EqualTo(1));
             Assert.That(session.Move(mid.Id,ContainerId.Counter,0,0,0,false));
             Assert.That(session.Quote(mid).BaseValue,Is.EqualTo(28m));Assert.That(session.Quote(mid).Amount,Is.EqualTo(32));
         }
         [Test] public void PurchasedResourceRetainsHistoryThroughStorageCarryAndSave()
         {
-            catalog.baseSupplierChance=1;foreach(var d in catalog.items)d.supplierAvailable=d.id=="stone_mid";
+            catalog.customers.supplyPools=new[]{new CustomerSupplyPool{category=ItemCategory.StoneMid,itemIds=new[]{"stone_mid"}}};
+            catalog.customers.tradingWeight=1;catalog.customers.buyingWeight=1-(1);catalog.customers.sellingWeight=0;catalog.customers.oneSupplyWeight=0;catalog.customers.twoSuppliesWeight=1;catalog.customers.displayedItemWeight=1000000;foreach(var d in catalog.items)d.supplierAvailable=d.id=="stone_mid";
             session=new ShopSession(catalog,customerSeed:33);Assert.That(session.BeginBusiness());
             var bought=session.Offer.SupplierItems[0];Assert.That(session.Move(bought.Id,ContainerId.Counter,0,0,0,false));
             Assert.That(session.AcceptTrade());Assert.That(bought.PurchaseValue,Is.EqualTo(107));

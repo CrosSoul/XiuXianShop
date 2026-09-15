@@ -7,13 +7,6 @@ namespace XiuXianShop
 {
     public enum ItemCategory { Unclassified, Medicine, Material, Equipment, Container, BusinessSign, StorageContainer, EquipmentContainer, PortableContainer, ProductionEquipment, StoneLow, StoneMid, StoneHigh }
 
-    [Serializable]
-    public sealed class BuyerBudgetTier
-    {
-        [Min(0), Tooltip("此档展示基础价值总和下限，包含该数值；下一档下限不包含在此档。")]
-        public int minimumDisplayValue;
-        [Min(1)] public int baseBudget;
-    }
 
     [Serializable]
     public sealed class ItemDefinition
@@ -75,6 +68,7 @@ namespace XiuXianShop
         [Min(0), Tooltip("同次外出后续不同地点的体力成本。")]
         public int extraLocationStaminaCost = 30;
         public TeaHouseSettings teaHouse = new TeaHouseSettings();
+        public CustomerGenerationSettings customers = new CustomerGenerationSettings();
         public CommissionSettings commissions = new CommissionSettings();
         public TravelLocation[] travelLocations =
         {
@@ -89,22 +83,6 @@ namespace XiuXianShop
         public MarketEventDefinition[] marketEvents = Array.Empty<MarketEventDefinition>();
         [Min(1)] public int rentPeriod = 6;
         [Min(1)] public int firstRent = 20;
-        [Tooltip("按生效类别展示基础价值总和选档，同档价值变化不改变资金范围。空展示柜按价值 0。")]
-        public BuyerBudgetTier[] buyerBudgetTiers =
-        {
-            new BuyerBudgetTier {minimumDisplayValue=0,baseBudget=20},
-            new BuyerBudgetTier {minimumDisplayValue=30,baseBudget=60},
-            new BuyerBudgetTier {minimumDisplayValue=100,baseBudget=150},
-            new BuyerBudgetTier {minimumDisplayValue=300,baseBudget=400}
-        };
-        [Range(0,.5f), Tooltip("每位买家的资金在当前档基准值上下浮动的比例；0.1 表示 ±10%。")]
-        public float buyerBudgetVariation = .1f;
-        [Range(0,1), Tooltip("无展示影响时，每位顾客成为卖家的概率。")]
-        public float baseSupplierChance = .4f;
-        [Range(0,1), Tooltip("有有效广告牌时增加的卖家概率；重复广告牌不叠加。")]
-        public float advertisementSupplierBonus = .4f;
-        [Range(0,1), Tooltip("有可售商品展示时增加的买家概率（从卖家概率中扣除）。")]
-        public float displayedGoodsBuyerBonus = .2f;
         public ItemDefinition Find(string id) => items.First(d => d.id == id);
         // Explicit isolated fixture; never writes the catalog asset or imports draft goods.
         public void SetStorageVerificationDefaults()

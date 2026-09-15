@@ -46,7 +46,7 @@ namespace XiuXianShop.Tests
         [Test] public void PurchasedContentsKeepHistoryWhenWarehouseIsFullAndAfterRestore()
         {
             catalog.startingItems=new[]{"test-storage-case"}.Concat(Enumerable.Repeat("dew",60)).ToArray();
-            catalog.baseSupplierChance=1;catalog.displayedGoodsBuyerBonus=0;
+            catalog.customers.tradingWeight=1;catalog.customers.buyingWeight=1-(1);catalog.customers.sellingWeight=0;catalog.customers.oneSupplyWeight=0;catalog.customers.twoSuppliesWeight=1;catalog.customers.displayedItemWeight=1000000;
             foreach(var d in catalog.items)d.supplierAvailable=d.id=="dew";
             session=new ShopSession(catalog,customerSeed:17);
             var box=Item("test-storage-case");Assert.That(session.BeginBusiness());

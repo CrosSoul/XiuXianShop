@@ -1,5 +1,13 @@
 # XiuXianShop 开发日志
 
+## 2026-09-20 — DP-50 最终收尾
+
+- 当前主体已提交为 2b0960a，续接开始工作区干净。本轮仅修正 ShopPrototype 来货总价值误用谈判柜台总价，并更新交付记录/截图；未提交或推送本轮改动。
+- 前阶段 Edit139/139、DP50 Play3/3；收尾定向 Edit10/10、DP23 Play1/1 结果已核对。正常 Play 确认空展示柜5人、丹药普通45、只出售无求购、跨月人数归零。
+- 本轮显示修正编译通过，正常 Play 的实际 UI 显示来货1件/10灵石，截图已查看。未重复全套测试，未执行人工手感或Player构建。
+- Unity Pipeline CLI最终检查：Console Error0/Warning0，未清日志；Editor ready/stopped、无编译/Domain Reload；ShopPrototype dirty=false。此前连接/额度中断已解除。
+- 详细文件、配置入口、规则边界与试玩步骤见 DP50_CUSTOMERS.md。交付停在待用户验收，不自行标 Done。
+
 ## 2026-09-15 — DP-50 普通随机顾客（待最终验证）
 
 - 统一营业生成入口，接入三种行为、类别展示权重、三档类别预算、普通供货池和既有体力/茶肆效果；未扩展新广告牌或长期成长系统。详见 DP50_CUSTOMERS.md。

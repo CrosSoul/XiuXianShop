@@ -1,6 +1,6 @@
 # DP-50 普通随机顾客 v1
 
-当前状态：实现已接入，等待恢复 Unity Editor 连接完成最终验证。仅本地未提交。
+当前状态：实现与最终验证已完成，待用户验收。主体已在现有提交 2b0960a；2026-09-20 的来货价值显示修正和交付记录仅本地未提交。
 
 ## 正式依据与范围
 
@@ -35,15 +35,16 @@ Inspector 中打开 `Assets/Data/ShopCatalog.asset` 的 Customers：
 - 新增 EditMode `CustomerGenerationTests.cs`、PlayMode `CustomerGenerationPlayableTests.cs`；更新旧测试配置与已被新正式规则替代的断言。相关旧测试涉及交易、行情、灵石、体力、储存、茶肆；没有改动这些系统的玩法。
 - 新文件 `.meta` 由 Unity 生成。未改 Scene、Package、Project Settings。
 
-## 已执行验证与待完成项
+## 已执行验证
 
 - 保存记录 `Evidence/DP50/editmode.json`：Edit Mode 139/139，通过，0 跳过。
 - 保存记录 `Evidence/DP50/playmode-customers.json`：DP-50 Play Mode 3/3，通过，0 跳过。覆盖同时买卖进入现有谈判并按净额扣预算、只出售来货成交后不获得求购预算、叠加 7 人与重复刷新不重生成。
 - Edit Mode 包含概率分布、展示快照、风向非必然命中、商旅归一化与上限、可编辑类别预算、空池排除和随机一名升档。
-- 上述结果来自本次任务前一阶段。续接时发现 Editor 未连接，先前 DP-23 Play 回归临时结果已不存在，不能报告该回归通过。
-- 续接补充了月度切换清空同时买卖人数、只出售到店消息和营业前展示说明；这些收尾修改尚未在 Unity 编译/运行验证。
-- `git diff --check` 通过。尚待最终 Console Error/Warning、Editor ready、场景无未保存修改检查；未清空 Console。未执行人工手感验收、Player 构建或平台测试。
-
+- 收尾版定向 Edit Mode 10/10、DP23 净额预算 Play 回归 1/1 通过，见 `editmode-final-customers.json`、`playmode-budget-regression.json`。此前中断的测试未计入通过；后来实际重新执行并保存了结果。
+- 实际正常 Play：空展示柜生成 5 人；丹药普通档预算 45；只出售显示无求购计划；跨月三类人数均清零。这些通过运行时调用检查，区别于鼠标操作的自动 Play 测试。
+- 2026-09-20 修正顾客来货总价值误用谈判柜台总价的问题，编译完成无错误；正常 Play 读取实际 UI 并查看截图，来货 1 件正确显示 10 灵石。此显示修正不改交易结算，没有无差别重跑全套测试。
+- 最终 Unity Pipeline CLI 检查：Console Error 0 / Warning 0，未清日志；Editor ready/stopped，compiling=false、domainReloadInProgress=false；ShopPrototype isDirty=false。当前连接通过 CLI 完成，未将其冒称为 MCP 工具调用。
+- 未执行玩家人工手感验收、Player 构建或平台测试。无未解决正式规则冲突。
 ## 开发者试玩步骤
 
 1. 正常场景 Play，空展示柜开始营业，确认仍有 5 位普通顾客，可跳过顾客。
@@ -52,4 +53,4 @@ Inspector 中打开 `Assets/Data/ShopCatalog.asset` 的 Customers：
 4. 遇到只出售顾客，界面显示无求购计划，可购买其来货。
 5. 叠加溢出客流与茶肆宣传，确认本次 7 人，反复打开界面不会加人。
 
-概率效果不保证单次出现；自动测试采用多个种子验证分布。无需新增手动资产配置，但必须恢复 Unity Editor 连接才能完成收尾。
+概率效果不保证单次出现；自动测试采用多个种子验证分布。无需新增手动资产配置，可直接 Play 按以上步骤验收。

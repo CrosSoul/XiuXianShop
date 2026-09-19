@@ -1,6 +1,6 @@
 ## DP-50 普通随机顾客（2026-09-15）
 
-实现与首轮自动测试已完成；等待 Unity 连接恢复后验证收尾修改、DP23 回归及最终 Console/Editor 状态。未进入验收完成，详见 [DP50_CUSTOMERS.md](DP50_CUSTOMERS.md)。
+实现、收尾验证与 DP23 回归已完成；2026-09-20 Console 无 Error/Warning，Editor ready/stopped，场景已保存。待用户验收，详见 [DP50_CUSTOMERS.md](DP50_CUSTOMERS.md)。
 
 ## DP-49 百事堂（2026-09-13）
 

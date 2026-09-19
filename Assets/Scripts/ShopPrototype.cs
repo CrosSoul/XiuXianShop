@@ -278,7 +278,8 @@ namespace XiuXianShop
             {
                 customerTitle.text=$"{offer.CustomerName} · {(offer.Behavior==CustomerBehavior.Buying?"只求购":offer.Behavior==CustomerBehavior.Selling?"只出售":"同时买卖")}";
                 string demand=offer.Behavior==CustomerBehavior.Selling?"无求购计划":$"想要：{ShopCatalog.CategoryName(offer.RequestedCategory)} · 剩余资金：{offer.RemainingBudget}";
-                customerDetails.text=$"{demand}\n来货 {offer.SupplierItems.Count(i=>i.ForSale)} 件 · 总价值：{total} 灵石\n普通随机顾客 · 开业快照已固定";
+                var supplyValue=offer.SupplierItems.Where(i=>i.ForSale).Sum(i=>Session.Quote(i).Amount);
+                customerDetails.text=$"{demand}\n来货 {offer.SupplierItems.Count(i=>i.ForSale)} 件 · 总价值：{supplyValue} 灵石\n普通随机顾客 · 开业快照已固定";
                 var quote=Session.PreviewTrade();
                 tradeDetails.text=string.Join("\n\n",quote.Lines.Select(l=>l.Description));
                 if(quote.Lines.Count==0)tradeDetails.text="谈判柜台为空。打开谈判可请求全部来货，或手动选入商品。";

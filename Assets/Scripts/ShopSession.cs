@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace XiuXianShop
 {
-    public enum ContainerId { Storage, Display, Counter, CustomerCounter, Interior, LeftHand, RightHand, CarriedPack, Location }
+    public enum ContainerId { Storage, Display, Counter, CustomerCounter, Interior, LeftHand, RightHand, CarriedPack, Location, AlchemyFuel, AlchemyOutput }
     public enum TurnPhase { Preparation, Open, Closed }
     public enum ItemOwner { Player, Customer }
     public enum TradeDirection { CustomerBuys, CustomerSells }
@@ -24,7 +24,9 @@ namespace XiuXianShop
         public bool Flipped { get; internal set; }
         public int? PurchaseValue { get; internal set; }
         public int SpiritUnits { get; internal set; }
-        public decimal BaseValue => Definition.spiritResource == null ? Definition.baseValue :
+        public PillQuality Quality { get; internal set; } = PillQuality.Ordinary;
+        public decimal QualityValueMultiplier { get; internal set; } = 1;
+        public decimal BaseValue => Definition.spiritResource == null ? Definition.baseValue * QualityValueMultiplier :
             Definition.spiritResource.ContainerPrice + (decimal)SpiritUnits / Definition.spiritResource.UnitsPerEquivalent;
         public bool ForSale => Owner==ItemOwner.Customer;
         public Vector2Int[] Cells => Definition.Shape(Rotation, Flipped);
@@ -143,6 +145,7 @@ namespace XiuXianShop
         }
         public string CaptureSave()
         {
+            if(items.Any(i=>i.QualityValueMultiplier!=1))throw new InvalidOperationException("当前灰盒不保存炼丹品相，请勿用旧存档入口保存炼丹验证结果。");
             if(IsCarrying)throw new InvalidOperationException("请先结束携带状态再保存；当前版本不保存外出携带过程。" );
             if(Phase!=TurnPhase.Preparation)throw new InvalidOperationException("仅营业准备阶段可存档；请先闭店并结束回合。");
             return JsonUtility.ToJson(new ShopSave {catalogSignature=Hash128.Compute(JsonUtility.ToJson(catalog)).ToString(),
@@ -209,6 +212,7 @@ namespace XiuXianShop
         public GridItem Find(int id) => items.FirstOrDefault(i=>i.Id==id);
         public IEnumerable<GridItem> In(ContainerId container, int storageItemId=0) => items.Where(i=>i.Container==container && i.StorageItemId==storageItemId && (container!=ContainerId.Location || i.LocationId==CurrentLocationId));
         public Vector2Int GridSize(ContainerId container,int storageItemId=0,string locationId=null) => container==ContainerId.Interior ? Find(storageItemId).Definition.storageSize :
+            container==ContainerId.AlchemyFuel ? catalog.alchemy.fuelSize : container==ContainerId.AlchemyOutput ? catalog.alchemy.outputSize :
             container==ContainerId.Location ? LocationGridSize(locationId??CurrentLocationId) : Size(container);
         public int Occupied(ContainerId container) => In(container).Sum(i=>i.Cells.Length);
         GridItem NewItem(ItemDefinition def, ItemOwner owner) => new GridItem{Id=nextId++, Definition=def, Owner=owner,SpiritUnits=def.spiritResource?.CapacityUnits??0};
@@ -266,6 +270,7 @@ namespace XiuXianShop
             reason="";
             if(IsCarrying && id==CarriedPackId){reason="携带期间不能移动或更换已选背包，请先返回。";return false;}
             if (item==null) { reason="物品已不在这里。"; return false; }
+            if(!CanMoveAlchemy(item,target,out reason))return false;
             if((target==ContainerId.Location || item.Container==ContainerId.Location) &&
                 (!IsTravelling || CurrentLocationId==null || (item.Container==ContainerId.Location && item.LocationId!=CurrentLocationId)))
             {reason="只能操作当前访问地点的物品。";return false;}

@@ -11,6 +11,14 @@ namespace XiuXianShop.Editor
         public const string CatalogPath="Assets/Data/ShopCatalog.asset";
         static ShopCatalog verificationCatalog;
         static bool discountEnabled;
+        [MenuItem("XiuXianShop/Validation/Start DP58 Alchemy Graybox (resets Play session)")]
+        public static void StartAlchemyExample()
+        {
+            if(!CanStartVerification())return;
+            StartVerificationDay();AlchemyVerification.Configure(verificationCatalog);
+            var shop=Object.FindFirstObjectByType<ShopPrototype>();shop.StartVerificationSession(verificationCatalog,58);
+            shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP58VerificationSave.json");
+        }
         [MenuItem("XiuXianShop/Validation/Start DP28 Location Items Example (resets Play session)")]
         public static void StartLocationItemsExample()
         {

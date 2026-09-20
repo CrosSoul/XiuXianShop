@@ -6,12 +6,14 @@ namespace XiuXianShop
     public sealed partial class ShopSession
     {
         public TravelLocation CurrentLocation => catalog.travelLocations.Single(l=>l.id==CurrentLocationId);
+        public int CurrentLocationItemCount => In(ContainerId.Location).Count() + (IsAtAlchemy?items.Count(i=>IsAlchemyArea(i.Container)):0);
         public bool LocationLeaveNeedsConfirmation => CurrentLocationId!=null &&
-            !CurrentLocation.preserveItemsBetweenVisits && In(ContainerId.Location).Any();
+            !CurrentLocation.preserveItemsBetweenVisits && CurrentLocationItemCount>0;
 
         Vector2Int LocationGridSize(string id)
         {
             var size=catalog.travelLocations.Single(l=>l.id==id).itemGridSize;
+            if(id==AlchemyLocationId)size=catalog.alchemy.preparationSize;
             if(id=="baishitang")size.y=System.Math.Max(size.y,commissionGridHeight);
             return size;
         }

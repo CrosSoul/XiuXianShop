@@ -60,6 +60,7 @@ namespace XiuXianShop
 
         void Update()
         {
+            TickAlchemyPanel();
             if(Session!=null && displayedPricingRevision!=Session.PricingRevision && !IsDragging) Refresh();
             var keyboard=Keyboard.current;
             if(keyboard==null || Session==null) return;
@@ -316,6 +317,7 @@ namespace XiuXianShop
         {
             var q=Session.Estimate(item);
             string history=item.PurchaseValue.HasValue?$" · 购买价值 {item.PurchaseValue.Value}":"";
+            if(item.Definition.category==ItemCategory.Medicine)history+=$" · 品相 {AlchemySettings.QualityName(item.Quality)}";
             if(item.Definition.spiritResource!=null)
             {
                 var r=item.Definition.spiritResource;
@@ -393,6 +395,7 @@ namespace XiuXianShop
 
         public void BeginItemDrag(int id,Vector2 screen)
         {
+            if(Session.IsAtAlchemy && Session.Alchemy!=null && (Session.Alchemy.Locked || Session.Alchemy.Phase==AlchemyPhase.Running))return;
             var item=Session.Find(id); if(item==null || IsDragging)return;
             selectedId=dragId=id; dragRotation=item.Rotation; dragFlipped=item.Flipped;pointer=screen;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(grids[item.Container],screen,null,out var point);
@@ -410,7 +413,7 @@ namespace XiuXianShop
         {
             var shape=Session.Find(dragId).Definition.Shape(dragRotation,dragFlipped);
             int offsetX=Mathf.Clamp(grabCell.x,0,shape.Max(p=>p.x)),offsetY=Mathf.Clamp(grabCell.y,0,shape.Max(p=>p.y));
-            foreach(var pair in grids.Where(p=>!Session.IsTravelling || ShopSession.IsHand(p.Key) || p.Key==ContainerId.Interior || p.Key==ContainerId.Location).OrderByDescending(p=>p.Key==ContainerId.Interior || p.Key==ContainerId.Location))
+            foreach(var pair in grids.Where(p=>!Session.IsTravelling || ShopSession.IsHand(p.Key) || p.Key==ContainerId.Interior || p.Key==ContainerId.Location || Session.IsAlchemyArea(p.Key)).OrderByDescending(p=>p.Key==ContainerId.Interior || p.Key==ContainerId.Location || Session.IsAlchemyArea(p.Key)))
                 if(pair.Value.gameObject.activeInHierarchy && (pair.Key==ContainerId.Interior || storageWindow==null || !RectTransformUtility.RectangleContainsScreenPoint(storageWindow,screen,null)) && (carryWindow==null || pair.Key==ContainerId.Interior || ShopSession.IsHand(pair.Key) || !RectTransformUtility.RectangleContainsScreenPoint(carryWindow,screen,null)) && carrySelection==null && RectTransformUtility.RectangleContainsScreenPoint(pair.Value,screen,null))
                 {
                     RectTransformUtility.ScreenPointToLocalPointInRectangle(pair.Value,screen,null,out var p);

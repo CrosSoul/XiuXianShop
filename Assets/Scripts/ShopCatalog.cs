@@ -70,6 +70,7 @@ namespace XiuXianShop
         public TeaHouseSettings teaHouse = new TeaHouseSettings();
         public CustomerGenerationSettings customers = new CustomerGenerationSettings();
         public CommissionSettings commissions = new CommissionSettings();
+        public AlchemySettings alchemy = new AlchemySettings();
         public TravelLocation[] travelLocations =
         {
             new TravelLocation {id="baishitang",title="百事堂",initiallyUnlocked=true},

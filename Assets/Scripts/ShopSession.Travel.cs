@@ -67,16 +67,19 @@ namespace XiuXianShop
             visitedLocations.Add(id);CurrentLocationId=id;
             if(id=="tingfeng-teahouse")ReceiveTeaNews();
             if(id=="baishitang")PrepareCommissions();
+            if(id==AlchemyLocationId)Alchemy=null;
             return Success("已抵达"+catalog.travelLocations.Single(l=>l.id==id).title+"；本次访问体力已结算。");
         }
 
         public bool LeaveLocation(bool confirmed=false)
         {
             if(!IsTravelling || CurrentLocationId==null)return Fail("当前不在地点内。");
+            if(IsAtAlchemy && Alchemy!=null && (Alchemy.Locked || Alchemy.Phase==AlchemyPhase.Running))return Fail("请先完成当前动作并收丹或中止，再离开炼丹房。");
             if(LocationLeaveNeedsConfirmation && !confirmed)return Fail("地点仍有未带走物品，确认离开后将清理这些物品。");
             if(!CurrentLocation.preserveItemsBetweenVisits)
                 items.RemoveAll(i=>i.Container==ContainerId.Location && i.LocationId==CurrentLocationId);
             if(CurrentLocationId=="baishitang"){commissionGridHeight=0;CommissionResult="";}
+            if(IsAtAlchemy){items.RemoveAll(i=>IsAlchemyArea(i.Container));Alchemy=null;}
             CurrentLocationId=null;
             return Success("已返回地点选择界面；携带物与剩余体力保持不变。");
         }
@@ -91,6 +94,7 @@ namespace XiuXianShop
         }
 
         bool IsTravelArea(ContainerId area,int storageId) => IsHand(area) ||
+            (IsAtAlchemy && IsAlchemyArea(area)) ||
             (area==ContainerId.Location && CurrentLocationId!=null) ||
             (area==ContainerId.Interior && storageId==CarriedPackId && CarriedPackId!=0);
     }

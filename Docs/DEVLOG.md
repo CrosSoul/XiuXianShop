@@ -1,5 +1,25 @@
 # XiuXianShop 开发日志
 
+## 2026-09-20 — DP-58 异地炼丹房灰盒 v1
+
+- 基线5fe584a，开工工作区干净；本轮仅本地修改，未提交/推送。按DP58、DP10、G06v11、G04v13 AC63–69、G05v5品相接口、G11v9地点基础和G07/G09资源规则实施；仅因候选缺失定向读取物品表v22，未全量阅读GDD。
+- 新增AlchemySettings、ShopSession.Alchemy、ShopPrototype.Alchemy、AlchemyVerification和Edit/Play两组炼丹测试。修改ShopCatalog、ShopSession（实例品相/格子/移动约束）、ShopSession.Travel/LocationItems、ShopPrototype/Travel和Editor/PrototypeBuilder；新.meta由Unity生成。未改Scene、Prefab、Package、Project Settings或正式物品资产。
+- 配置入口：ShopCatalog的Alchemy。炉息/研磨8s，完美±0.5s、合格±2s，三火1/1.5/2，原型耗能0.02下品灵石等价/秒；按原灵石整数精度累计取整扣除，不建立额外资源余额。评分1/0.6/0，阈值0.90/0.70/0.45，品相倍率1/1.2/1.5；备料6×4、供能2×2、输出2×2；showDebug和debugTimeScale可调。全部为灰盒值，非最终平衡。
+- 三张配置：recipe_pill_basic→pill（0/8/16秒）；recipe_pill_fire_yang→pill_fire_yang（现磨火灵果，0/8/16秒）；recipe_pill_metal_water→pill_metal_water（研磨水灵果和金灵果，8秒高火、24秒低火、32秒收丹）。只使用一套炉程和既有物品实例、Grid、外出/体力、灵石消耗及报价逻辑。
+- 材料实际投炉才移除，开炉需供能/输出空间，研磨锁住手动动作，炉钟持续运行；供能不足中止，已消耗不返还。普通/良品/上品共用定义，品相作为实例基础价值倍率。废丹只作为失败，无药渣经济。离开确认包含备料、灵石和产物，随身实例保留；一次访问不能第二炉。
+- 验证：Edit Mode159/159（本任务20项）通过；实际鼠标拖拽/按钮Play3/3通过，三张丹方均完成、带走产物并覆盖离开取消/确认。原始结果见Evidence/DP58/editmode.json、playmode.json。备料界面截图已查看，含可滚动调试时序；后续中文文案及离开件数修正仅作编译/最终状态检查。未执行玩家人工手感验收、Player构建或平台测试。
+- 正式数据边界：候选材料及两种新丹药只进入运行时灰盒副本，参考既有ID/形状/价值，没有把草稿同步成正式资产。灵石沿用DP33隔离配置（精度0.01，容器价仍为临时值）。没有新增剧情或正式地点解锁。旧店内一键炼丹原型未扩展；当前旧存档入口明确拒绝保存带品相倍率的灰盒结果，未实现炼丹存档，避免静默丢品相。未发现阻塞性的正式GDD冲突。
+
+试玩入口与步骤：
+1. 打开ShopPrototype并Play，执行菜单 XiuXianShop > Validation > Start DP58 Alchemy Graybox (resets Play session)。它重置当前Play验证会话，退出Play后恢复原资产。
+2. 出门携带中选择灰盒材料包；把所选丹方材料装包、灵石放手中，出发并选择炼丹房。只在进入地点扣60体力。
+3. 将材料拖到备料格、灵石拖到供能位，选择丹方，点击首味材料后投入，再开炉。按界面炉息流程投料/研磨/换火/收丹；右侧调试区域可滚动查看目标与实际偏差。
+4. 把产物、剩余材料及灵石手动收入随身包/左右手。离开有遗留会确认，取消可继续整理。每次访问只能一炉；重复体验可重新运行验证菜单。
+5. 在运行时Catalog副本的Alchemy调整秒数、窗口、倍率、格子和开发时间倍率；需要保留参数时在退出Play后调整正式Catalog中的Alchemy配置，不保存候选物品副本。
+
+仍待人工灰盒决定：8秒研磨是否形成自然节奏、0.5/2秒窗口是否适合操作、三档火候绝对耗能、判定聚合与价值倍率、空间尺寸、一访一炉是否过紧、高阶多动作是否超过合理复杂度。自动测试不替代这些体验判断。
+
+
 ## 2026-09-20 — DP-50 最终收尾
 
 - 当前主体已提交为 2b0960a，续接开始工作区干净。本轮仅修正 ShopPrototype 来货总价值误用谈判柜台总价，并更新交付记录/截图；未提交或推送本轮改动。
@@ -357,3 +377,6 @@ M ProjectSettings/QualitySettings.asset
 - 根据用户反馈，通过Unity API在ShopCatalog资产追加现有test-storage-case测试定义和一件初始库存。直接Play即可获得外部3×3、内部10×10的储物匣；原7件物品和jade不变。仅测试用途、不参与交易，没有新建重复正式商品。
 - 更新开局物品数量断言为8；本次只验证正常开局与储物匣打开，不重复完整回归。
 - 本次正常场景开局Play自动测试1/1通过；再次正常Play确认仓库共8件物品，点击测试匣打开10×10窗口。Console Error0/Warning0，验证后退出Play。
+
+DP-58 最终状态补充：Unity Pipeline CLI 检查 Console Error0/Warning0（未清日志），Editor ready/stopped、无编译/Domain Reload；ShopPrototype dirty=false。文本 git diff --check 通过。
+

@@ -56,11 +56,12 @@ namespace XiuXianShop
                 scroll.movementType=ScrollRect.MovementType.Clamped;
                 grids[ContainerId.Location]=grid;cellSizes[ContainerId.Location]=cell;
                 for(int y=0;y<size.y;y++)for(int x=0;x<size.x;x++)Image(Rect(grid,$"Slot_{x}_{y}",x*cell,y*cell,cell-2,cell-2),line);
-                Label(travelWindow,"LocationDescription",760,170,720,120,location.id=="tingfeng-teahouse"?Session.DescribeTeaNews(Session.LatestTeaVisit):location.preserveItemsBetweenVisits?
+                if(!Session.IsAtAlchemy)Label(travelWindow,"LocationDescription",760,170,720,120,location.id=="tingfeng-teahouse"?Session.DescribeTeaNews(Session.LatestTeaVisit):location.preserveItemsBetweenVisits?
                     "长期地点：区域物品跨访问保留。\n物品不会自动送回店铺，请手动收入随身区域。":
                     "临时地点：离开时清理未带走物品。\n请拖入下方左右手或所带背包。",22,textColor);
                 locationNotice=Label(travelWindow,"LocationNotice",100,425,1370,40,"",18,gold);
-                CarryButton(travelWindow,"TravelLeave",1100,310,390,"离开 · 返回地点选择",RequestLocationLeave);
+                if(!Session.IsAtAlchemy)CarryButton(travelWindow,"TravelLeave",1100,310,390,"离开 · 返回地点选择",RequestLocationLeave);
+                if(Session.IsAtAlchemy)BuildAlchemyPanel();
                 if(location.id=="tingfeng-teahouse")CarryButton(travelWindow,"TeaLocationNews",760,310,310,"查看坊市消息",OpenTeaNews);
                 if(location.id=="baishitang")
                 {
@@ -88,7 +89,7 @@ namespace XiuXianShop
             if(!Session.LocationLeaveNeedsConfirmation){FinishLocationLeave(false);return;}
             travelConfirmation=Rect(content,"LocationLeaveConfirmation",0,0,1600,1000);
             Image(travelConfirmation,new Color(.02f,.03f,.04f,.96f),true);
-            Label(travelConfirmation,"Question",380,300,900,140,$"地点还有 {Session.In(ContainerId.Location).Count()} 件未带走物品。\n确认离开将清理它们，无法取回。\n左右手和所带背包内的物品不会被清理。",27,gold);
+            Label(travelConfirmation,"Question",380,300,900,140,$"地点还有 {Session.CurrentLocationItemCount} 件未带走物品。\n确认离开将清理它们，无法取回。\n左右手和所带背包内的物品不会被清理。",27,gold);
             CarryButton(travelConfirmation,"LocationLeaveConfirm",380,490,390,"确认离开并清理",()=>FinishLocationLeave(true));
             CarryButton(travelConfirmation,"LocationLeaveCancel",820,490,390,"留下整理",CloseTravelConfirmation);
         }
@@ -114,6 +115,9 @@ namespace XiuXianShop
         {
             if(travelWindow!=null){travelWindow.gameObject.SetActive(false);Destroy(travelWindow.gameObject);}
             travelWindow=null;
+            alchemyStatus=null;alchemyDebug=null;alchemyRecipeText=null;
+            grids.Remove(ContainerId.AlchemyFuel);grids.Remove(ContainerId.AlchemyOutput);
+            cellSizes.Remove(ContainerId.AlchemyFuel);cellSizes.Remove(ContainerId.AlchemyOutput);
             locationNotice=null;grids.Remove(ContainerId.Location);cellSizes.Remove(ContainerId.Location);
         }
     }

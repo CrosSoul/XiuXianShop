@@ -8,9 +8,11 @@ namespace XiuXianShop
     {
         public string Action;
         public double TargetTime, ActualTime;
+        public double? EntryTime;
         public float Score;
         public string Result;
-        public override string ToString() => $"{Action}：目标{TargetTime:0.00}s / 实际{ActualTime:0.00}s / 偏差{ActualTime-TargetTime:+0.00;-0.00;0.00}s · {Result}";
+        public override string ToString() => (EntryTime.HasValue?$"{Action}：入炉{EntryTime:0.00}s / 目标在炉":$"{Action}：目标")+
+            $"{TargetTime:0.00}s / 实际{ActualTime:0.00}s / 偏差{ActualTime-TargetTime:+0.00;-0.00;0.00}s · {Result}";
     }
 
     // One visit's furnace state; item ownership, grids and spirit remain in ShopSession.
@@ -101,9 +103,13 @@ namespace XiuXianShop
             {
                 var expected=a.Recipe.targets[index];
                 if((expected.breaths==0)!=(a.Phase==AlchemyPhase.Preparing))a.StructuralErrors.Add("投料阶段错误："+item.Definition.title);
-                if(expected.itemId!=item.Definition.id)a.StructuralErrors.Add("投料错误：需要"+expected.itemId+"，投入"+item.Definition.id);
+                if(expected.itemId!=item.Definition.id)a.StructuralErrors.Add("投料错误：需要"+catalog.Find(expected.itemId).title+"，投入"+item.Definition.title);
                 if(expected.ground && !a.groundItems.Contains(itemId))a.StructuralErrors.Add("应研磨后投入："+item.Definition.title);
-                JudgeAlchemy(index,"投入"+item.Definition.title);
+                // The recipe's recommended rhythm defines residence duration, not an insertion-time score.
+                double collectBreaths=a.Recipe.targets.Single(t=>t.kind==AlchemyEventKind.Collect).breaths;
+                a.Judgements.Add(new AlchemyJudgement {Action=item.Definition.title,EntryTime=a.Time,
+                    TargetTime=(collectBreaths-expected.breaths)*catalog.alchemy.breathSeconds,Result="待收丹"});
+                a.completedTargets.Add(index);
             }
             items.Remove(item);a.groundItems.Remove(itemId);
             return Success("材料已入炉；中止不会返还已投入材料。");
@@ -188,12 +194,20 @@ namespace XiuXianShop
         {
             if(!CanAlchemyAct(true))return false;
             var a=Alchemy;var cfg=catalog.alchemy;
+            foreach(var j in a.Judgements.Where(j=>j.EntryTime.HasValue))
+            {
+                j.ActualTime=a.Time-j.EntryTime.Value;
+                double error=Math.Abs(j.ActualTime-j.TargetTime);
+                bool perfect=error<=cfg.perfectWindow+1e-6, acceptable=error<=cfg.acceptableWindow+1e-6;
+                j.Score=perfect?cfg.perfectScore:acceptable?cfg.acceptableScore:cfg.severeScore;
+                j.Result=perfect?"完美":acceptable?"合格（轻微偏差）":"严重偏差";
+            }
             for(int i=0;i<a.Recipe.targets.Length;i++)
             {
                 var t=a.Recipe.targets[i];
-                if(t.kind==AlchemyEventKind.Collect){JudgeAlchemy(i,"收丹");continue;}
+                if(t.kind==AlchemyEventKind.Collect)continue;
                 if(a.completedTargets.Contains(i))continue;
-                if(t.kind==AlchemyEventKind.Ingredient)a.StructuralErrors.Add("漏投："+t.itemId);
+                if(t.kind==AlchemyEventKind.Ingredient)a.StructuralErrors.Add("漏投："+catalog.Find(t.itemId).title);
                 a.Judgements.Add(new AlchemyJudgement {Action="遗漏"+(t.kind==AlchemyEventKind.Heat?"换火":t.itemId),TargetTime=t.breaths*cfg.breathSeconds,ActualTime=a.Time,Score=cfg.severeScore,Result="严重偏差"});
             }
             a.Score=a.Judgements.Average(j=>j.Score);

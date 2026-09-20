@@ -7,7 +7,7 @@ namespace XiuXianShop
 {
     public sealed partial class ShopPrototype
     {
-        Text alchemyStatus,alchemyDebug,alchemyRecipeText;
+        Text alchemyStatus,alchemyDebug,alchemyRecipeText,alchemyGrinding;
         Button[] alchemyActions;
         void BuildAlchemyPanel()
         {
@@ -21,7 +21,7 @@ namespace XiuXianShop
                 CarryButton(travelWindow,"AlchemyRecipe_"+recipe.id,740+i*245,105,235,recipe.title,()=>AlchemyCommand(()=>Session.SelectAlchemyRecipe(recipe.id)));
             }
             alchemyRecipeText=Label(travelWindow,"AlchemyRecipe",740,145,735,78,"",16,textColor);
-            alchemyStatus=Label(travelWindow,"AlchemyStatus",740,225,750,65,"",18,gold);
+            alchemyStatus=Label(travelWindow,"AlchemyStatus",740,225,750,75,"",17,gold);
             alchemyActions=new[]{
                 CarryButton(travelWindow,"AlchemyAdd",740,305,175,"投入选中材料",()=>AlchemyCommand(()=>Session.AddAlchemyIngredient(selectedId))),
                 CarryButton(travelWindow,"AlchemyGrind",925,305,175,"研磨选中材料",()=>AlchemyCommand(()=>Session.GrindAlchemyIngredient(selectedId))),
@@ -30,6 +30,7 @@ namespace XiuXianShop
             for(int i=0;i<3;i++){var heat=(AlchemyHeat)i;CarryButton(travelWindow,"AlchemyHeat_"+heat,740+i*135,350,125,new[]{"低火","中火","高火"}[i],()=>AlchemyCommand(()=>Session.SetAlchemyHeat(heat)));}
             CarryButton(travelWindow,"AlchemyAbort",1160,350,150,"中止本炉",()=>AlchemyCommand(Session.AbortAlchemy));
             CarryButton(travelWindow,"TravelLeave",1320,350,170,"离开炼丹房",RequestLocationLeave);
+            alchemyGrinding=Label(travelWindow,"AlchemyGrinding",925,390,350,32,"",18,gold);
             var viewport=Rect(travelWindow,"AlchemyDebugViewport",1275,445,300,520);Image(viewport,panel,true);viewport.gameObject.AddComponent<RectMask2D>();
             alchemyDebug=Label(viewport,"AlchemyDebug",8,8,278,510,"",16,muted);
             alchemyDebug.alignment=TextAnchor.UpperLeft;
@@ -53,26 +54,32 @@ namespace XiuXianShop
         {
             if(Session==null || !Session.IsAtAlchemy)return;
             int before=Session.Items.Count;
+            bool wasGrinding=Session.Alchemy!=null && Session.Alchemy.Locked;
             Session.TickAlchemy(Time.unscaledDeltaTime*Session.Catalog.alchemy.debugTimeScale);
-            if(Session.Items.Count!=before)Refresh();
+            if(Session.Items.Count!=before || (wasGrinding && !Session.Alchemy.Locked))Refresh();
             RefreshAlchemyPanel();
         }
         void RefreshAlchemyPanel()
         {
             if(alchemyStatus==null || !Session.IsAtAlchemy)return;
             var a=Session.Alchemy;
-            if(a==null){alchemyStatus.text="选择丹方；将随身材料拖到备料格，灵石拖到供能位。";return;}
+            if(a==null){alchemyStatus.text="未开炉 · 中火";return;}
             var cfg=Session.Catalog.alchemy;
             string Title(AlchemyTarget t)=>t.kind==AlchemyEventKind.Ingredient?Session.Catalog.Find(t.itemId).title+(t.ground?"（研磨）":""):t.kind==AlchemyEventKind.Heat?"换"+AlchemySettings.HeatName(t.heat):"收丹";
             alchemyRecipeText.text=string.Join(" → ",a.Recipe.targets.Select(t=>$"{t.breaths:0.#}炉息 {Title(t)}"));
             var fuel=Session.In(ContainerId.AlchemyFuel).FirstOrDefault();
             var selected=Session.Find(selectedId);
-            alchemyStatus.text=$"{AlchemySettings.PhaseName(a.Phase)} · {AlchemySettings.HeatName(a.Heat)} · {(a.Locked?$"研磨中 {a.GrindingRemaining:0.0}s":"可操作")} · 选中：{selected?.Definition.title??"无"}{(Session.IsAlchemyGround(selectedId)?"（已研磨）":"")}\n"+
-                (a.Phase==AlchemyPhase.Finished?$"品相：{AlchemySettings.QualityName(a.Quality)} · 请手动带走产物":Session.Message);
+            alchemyGrinding.text=a.Locked?$"研磨中 · 剩余 {a.GrindingRemaining:0.0}s":Session.IsAlchemyGround(selectedId)?"已研磨":"";
+            var worst=a.Judgements.OrderBy(j=>j.Score).ThenByDescending(j=>Math.Abs(j.ActualTime-j.TargetTime)).FirstOrDefault();
+            string summary=a.StructuralErrors.FirstOrDefault() ?? (worst==null || worst.Result=="完美"?"无明显偏差":
+                worst.Action+(worst.EntryTime.HasValue?(worst.ActualTime>worst.TargetTime?"在炉过久":"在炉不足"):"时机偏差"));
+            alchemyStatus.text=$"{(a.Phase==AlchemyPhase.Preparing?"未开炉":AlchemySettings.PhaseName(a.Phase))} · {AlchemySettings.HeatName(a.Heat)} · 炉钟 {a.Time:0.0}s · 选中：{selected?.Definition.title??"无"}\n"+
+                (a.Phase==AlchemyPhase.Finished?$"已结束 · 品相：{AlchemySettings.QualityName(a.Quality)} · {summary}":Session.Message);
             foreach(var button in alchemyActions)button.interactable=!a.Locked && a.Phase!=AlchemyPhase.Finished && a.Phase!=AlchemyPhase.Aborted;
             alchemyDebug.text=cfg.showDebug?$"开发调试（可滚动）\n炉钟 {a.Time:0.00}s\n灵气 {fuel?.SpiritUnits??0} 单位\n完美±{cfg.perfectWindow}s / 合格±{cfg.acceptableWindow}s\n分数{a.Score:0.00}\n目标：\n"+
-                string.Join("\n",a.Recipe.targets.Select(t=>$"{t.breaths*cfg.breathSeconds:0.00}s {Title(t)}"))+"\n实际：\n"+
-                string.Join("\n",a.Actions.Concat(a.Judgements.Select(j=>j.ToString())).Concat(a.StructuralErrors)):"";
+                string.Join("\n",a.Recipe.targets.Where(t=>t.kind==AlchemyEventKind.Heat).Select(t=>$"{t.breaths*cfg.breathSeconds:0.00}s {Title(t)}"))+"\n逐材料在炉时长 / 火候判定：\n"+
+                string.Join("\n",a.Judgements.Select(j=>j.EntryTime.HasValue && a.Phase!=AlchemyPhase.Finished?
+                    $"{j.Action}：入炉{j.EntryTime:0.00}s / 目标在炉{j.TargetTime:0.00}s / 实际{a.Time-j.EntryTime.Value:0.00}s / 偏差{a.Time-j.EntryTime.Value-j.TargetTime:+0.00;-0.00;0.00}s · 待收丹":j.ToString()).Concat(a.Actions).Concat(a.StructuralErrors)):"";
             alchemyDebug.rectTransform.sizeDelta=new Vector2(278,Mathf.Max(510,alchemyDebug.preferredHeight+20));
         }
     }

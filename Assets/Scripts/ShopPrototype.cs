@@ -385,7 +385,7 @@ namespace XiuXianShop
             }
             var first=shape.OrderBy(p=>p.y).ThenBy(p=>p.x).First();
             var name=Label(rect,"ItemName",first.x*cell+3,first.y*cell+18,cell-7,26,item.Definition.title,12,new Color(.08f,.12f,.14f)); name.alignment=TextAnchor.MiddleCenter;
-            Label(rect,"Owner",first.x*cell+5,first.y*cell+3,cell-8,17,item.Owner==ItemOwner.Customer?"客":"己",11,new Color(.12f,.18f,.20f));
+            Label(rect,"Owner",first.x*cell+5,first.y*cell+3,cell-8,17,Session.IsAlchemyGround(item.Id)?"已研磨":item.Owner==ItemOwner.Customer?"客":"己",11,new Color(.12f,.18f,.20f));
             return rect;
         }
         public Vector2 CellScreenPosition(ContainerId container,int x,int y)

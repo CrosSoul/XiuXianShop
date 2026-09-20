@@ -63,10 +63,25 @@ namespace XiuXianShop.Tests
         }
 
         [TestCase(7.5,1f)] [TestCase(8.5,1f)] [TestCase(6,.6f)] [TestCase(10,.6f)] [TestCase(5.9,0f)] [TestCase(10.1,0f)]
-        public void TimingWindowBoundariesAreInclusive(double when,float score)
+        public void ResidenceWindowBoundariesAreInclusive(double duration,float score)
         {
-            Select("recipe_pill_basic");Add("herb");Assert.That(s.StartAlchemy());s.TickAlchemy(when);Add("dew");
+            Select("recipe_pill_basic");Add("herb");Assert.That(s.StartAlchemy());s.TickAlchemy(8.42);Add("dew");
+            Assert.That(s.Alchemy.Judgements.All(j=>j.Result=="待收丹"));
+            s.TickAlchemy(duration);Assert.That(s.CollectAlchemy());
             Assert.That(s.Alchemy.Judgements.Last().Score,Is.EqualTo(score));Assert.That(s.Alchemy.StructuralErrors,Is.Empty);
+        }
+
+        [Test] public void CollectionScoresEachResidenceOnceAndPreloadingDoesNotEarnPerfectScore()
+        {
+            Select("recipe_pill_basic");Add("herb");s.TickAlchemy(100);Assert.That(s.StartAlchemy());
+            s.TickAlchemy(8.42);Add("dew");s.TickAlchemy(9.86);Assert.That(s.CollectAlchemy());
+            var timings=s.Alchemy.Judgements;
+            Assert.That(timings.Count,Is.EqualTo(2),"No independent collection score");
+            Assert.That(timings[0].EntryTime,Is.Zero);Assert.That(timings[0].TargetTime,Is.EqualTo(16));
+            Assert.That(timings[0].ActualTime,Is.EqualTo(18.28).Within(.00001));Assert.That(timings[0].Score,Is.Zero);
+            Assert.That(timings[1].EntryTime,Is.EqualTo(8.42));Assert.That(timings[1].TargetTime,Is.EqualTo(8));
+            Assert.That(timings[1].ActualTime,Is.EqualTo(9.86).Within(.00001));Assert.That(timings[1].Score,Is.EqualTo(.6f));
+            Assert.That(s.Alchemy.Quality,Is.EqualTo(PillQuality.Ruined));
         }
 
         [Test] public void StructureErrorsCannotBeCancelledByPerfectTiming()

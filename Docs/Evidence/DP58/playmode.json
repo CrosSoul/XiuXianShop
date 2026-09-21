@@ -1,32 +1,46 @@
 {
   "status": "completed",
-  "duration": 37.32,
+  "duration": 56.89,
   "summary": {
-    "total": 3,
-    "passed": 3,
+    "total": 5,
+    "passed": 5,
     "failed": 0,
     "skipped": 0,
     "inconclusive": 0
   },
   "results": [
     {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.AlchemySharedHoverCoversCarryPreparationFuelAndGroundState",
+      "Status": "Passed",
+      "Duration": 14.7887643,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.AlchemyTooltipAcceptsRuntimeDelayOptions",
+      "Status": "Passed",
+      "Duration": 3.763043,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
       "FullName": "XiuXianShop.Tests.ShopPlayableTests.BasicAlchemyWithActualGridAndButtons",
       "Status": "Passed",
-      "Duration": 9.8431874,
+      "Duration": 10.8271939,
       "Message": null,
       "StackTrace": null
     },
     {
       "FullName": "XiuXianShop.Tests.ShopPlayableTests.ComplexAlchemyWithActualGridAndButtons",
       "Status": "Passed",
-      "Duration": 17.7886706,
+      "Duration": 17.8091646,
       "Message": null,
       "StackTrace": null
     },
     {
       "FullName": "XiuXianShop.Tests.ShopPlayableTests.GroundAlchemyWithActualGridAndButtons",
       "Status": "Passed",
-      "Duration": 9.6549398,
+      "Duration": 9.6727379,
       "Message": null,
       "StackTrace": null
     }

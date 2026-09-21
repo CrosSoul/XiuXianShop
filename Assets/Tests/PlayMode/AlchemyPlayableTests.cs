@@ -9,11 +9,49 @@ namespace XiuXianShop.Tests
 {
     public sealed partial class ShopPlayableTests
     {
+        readonly System.Collections.Generic.List<UnityEngine.InputSystem.Mouse> alchemyOtherMice=new System.Collections.Generic.List<UnityEngine.InputSystem.Mouse>();
+        void IsolateAlchemyTestMouse()
+        {
+            // Keep desktop pointer events from interrupting a simulated continuous hover.
+            foreach(var device in UnityEngine.InputSystem.InputSystem.devices)
+                if(device is UnityEngine.InputSystem.Mouse otherMouse && otherMouse!=mouse && otherMouse.enabled)
+                {
+                    alchemyOtherMice.Add(otherMouse);
+                    UnityEngine.InputSystem.InputSystem.DisableDevice(otherMouse);
+                }
+            mouse.MakeCurrent();
+        }
+        [TearDown] public void RestoreAlchemyTestMouse()
+        {
+            foreach(var device in alchemyOtherMice)UnityEngine.InputSystem.InputSystem.EnableDevice(device);
+            alchemyOtherMice.Clear();
+        }
         [UnityTest,Category("DP58")] public IEnumerator BasicAlchemyWithActualGridAndButtons()=>PlayAlchemy("recipe_pill_basic");
         [UnityTest,Category("DP58")] public IEnumerator GroundAlchemyWithActualGridAndButtons()=>PlayAlchemy("recipe_pill_fire_yang");
         [UnityTest,Category("DP58")] public IEnumerator ComplexAlchemyWithActualGridAndButtons()=>PlayAlchemy("recipe_pill_metal_water");
 
         UnityEngine.UI.Text TooltipText()=>shop.GetComponentsInChildren<UnityEngine.UI.Text>().FirstOrDefault(t=>t.name=="ItemTooltipText");
+        [UnityTest,Category("DP58")] public IEnumerator AlchemyTooltipAcceptsRuntimeDelayOptions()
+        {
+            yield return RestartWithTestCatalog(AlchemyVerification.Configure,58);
+            IsolateAlchemyTestMouse();
+            Assert.That(shop.TooltipHoverDelaySeconds,Is.EqualTo(1f));
+            var item=shop.Session.Items.First(i=>i.Definition.id=="herb");
+            foreach(float delay in new[]{0f,.5f,1f,1.5f})
+            {
+                yield return MouseAt(Vector2.zero,false);
+                shop.TooltipHoverDelaySeconds=delay;
+                yield return MouseAt(ItemPoint(item),false);
+                if(delay>0)
+                {
+                    yield return new WaitForSecondsRealtime(delay/2);
+                    Assert.That(TooltipText(),Is.Null,$"Delay {delay}: must not show early");
+                    yield return new WaitForSecondsRealtime(delay/2+.1f);
+                }
+                Assert.That(TooltipText(),Is.Not.Null,$"Delay {delay}: must show after configured delay");
+            }
+            yield return MouseAt(Vector2.zero,false);Assert.That(TooltipText(),Is.Null);
+        }
         IEnumerator HoverItem(GridItem item,string expected)
         {
             yield return MouseAt(ItemPoint(item),false);
@@ -33,6 +71,7 @@ namespace XiuXianShop.Tests
         [UnityTest,Category("DP58")] public IEnumerator AlchemySharedHoverCoversCarryPreparationFuelAndGroundState()
         {
             yield return RestartWithTestCatalog(AlchemyVerification.Configure,58);
+            IsolateAlchemyTestMouse();
             var s=shop.Session;var fruit=s.Items.Single(i=>i.Definition.id=="mat_fire_fruit");
             var fuel=s.Items.Single(i=>i.Definition.id=="stone_mid");
             Assert.That(s.BeginCarrying(0));
@@ -56,6 +95,7 @@ namespace XiuXianShop.Tests
         IEnumerator PlayAlchemy(string recipeId)
         {
             yield return RestartWithTestCatalog(c=>{AlchemyVerification.Configure(c);c.alchemy.debugTimeScale=2;},58);
+            IsolateAlchemyTestMouse();
             var s=shop.Session;var recipe=s.Catalog.alchemy.recipes.Single(r=>r.id==recipeId);
             var pack=s.PortableStorage.Single();Assert.That(s.BeginCarrying(pack.Id));
             var ingredients=recipe.targets.Where(t=>t.kind==AlchemyEventKind.Ingredient).Select(t=>s.Items.Single(i=>i.Definition.id==t.itemId)).ToArray();
@@ -73,7 +113,12 @@ namespace XiuXianShop.Tests
                 if(target.kind==AlchemyEventKind.Ingredient)
                 {
                     item=s.Items.Single(i=>i.Definition.id==target.itemId);shop.SelectItem(item.Id);
-                    if(target.ground){yield return Click("AlchemyGrind");Assert.That(s.Alchemy.Locked);Assert.That(s.CollectAlchemy(),Is.False);yield return new WaitUntil(()=>!s.Alchemy.Locked);}
+                    if(target.ground)
+                    {
+                        yield return Click("AlchemyGrind");
+                        Assert.That(s.Alchemy.Locked,$"{item.Definition.id}: {s.Message}; selected={shop.SelectedId}; phase={s.Alchemy.Phase}; time={s.Alchemy.Time}; pointer={UnityEngine.InputSystem.Mouse.current.position.ReadValue()}");
+                        Assert.That(s.CollectAlchemy(),Is.False);yield return new WaitUntil(()=>!s.Alchemy.Locked);
+                    }
                 }
                 yield return new WaitUntil(()=>s.Alchemy.Time>=target.breaths*s.Catalog.alchemy.breathSeconds);
                 if(item!=null)yield return Click("AlchemyAdd");

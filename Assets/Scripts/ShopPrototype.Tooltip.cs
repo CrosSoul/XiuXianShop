@@ -10,6 +10,11 @@ namespace XiuXianShop
     public sealed partial class ShopPrototype
     {
         [SerializeField, Min(0)] float itemTooltipDelay=1;
+        public float TooltipHoverDelaySeconds
+        {
+            get=>itemTooltipDelay;
+            set=>itemTooltipDelay=value;
+        }
         RectTransform itemTooltip;
         Text itemTooltipText;
         GridItem hoveredItem;
@@ -26,7 +31,7 @@ namespace XiuXianShop
             var item=!IsDragging && handle!=null && handle.shop==this?Session.Find(handle.itemId):null;
             // Views are rebuilt on pricing/resource refresh; hover belongs to the item instance.
             if(item!=hoveredItem){hoveredItem=item;hoverStarted=Time.unscaledTime;}
-            if(item==null || Time.unscaledTime-hoverStarted<itemTooltipDelay)
+            if(item==null || Time.unscaledTime-hoverStarted<TooltipHoverDelaySeconds)
             {
                 if(itemTooltip!=null)itemTooltip.gameObject.SetActive(false);
                 return;

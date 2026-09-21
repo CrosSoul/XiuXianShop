@@ -61,7 +61,10 @@ namespace XiuXianShop
         void Update()
         {
             TickAlchemyPanel();
-            if(Session!=null && displayedPricingRevision!=Session.PricingRevision && !IsDragging) Refresh();
+            // Fuel use changes value continuously. Alchemy updates its own labels; keep grid views
+            // stable during the batch so a stationary pointer can retain its hover target.
+            bool alchemyRunning=Session!=null && Session.IsAtAlchemy && Session.Alchemy?.Phase==AlchemyPhase.Running;
+            if(Session!=null && displayedPricingRevision!=Session.PricingRevision && !IsDragging && !alchemyRunning) Refresh();
             var keyboard=Keyboard.current;
             if(keyboard==null || Session==null) return;
             if(commissionWindow!=null)

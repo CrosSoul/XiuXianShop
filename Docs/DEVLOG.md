@@ -2,6 +2,13 @@
 
 ## 2026-09-20 — DP-58 异地炼丹房灰盒 v1
 
+- 2026-09-21 追加要求完成：悬停逻辑统一读取公开可写的ShopPrototype.TooltipHoverDelaySeconds，默认1秒，沿用原组件字段；无设置界面、持久化或Settings系统。四档补测首跑出现悬停中断，测试现隔离其他鼠标并在TearDown恢复。恢复连接后发现文件仍有InputDevice加入Mouse列表的CS1503，已用明确类型匹配修复并重新编译通过。最终Play Mode5/5通过，包含0/0.5/1/1.5秒四档及原三丹方/四区域交互；复用原playmode.json。最终Console Error0/Warning0、Editor ready/stopped、无编译或Domain Reload，ShopPrototype dirty=false。此前超时阻塞已解除，A+B+C及追加接口统一交付待验收。
+
+- 2026-09-21 同次返修 A+B+C 完成：依据 DP-58 最新描述、G-06 v12、G-04 v14、UI规格 v8。材料记录有效入炉时刻，收丹统一以实际在炉时长评分；预置等待不计时，取消收丹独立分，火候模型不变。沿用现有节奏配置推导目标在炉时长：回气/赤阳16、8秒；金水32、24、16秒。
+- 共享 Item/Grid 悬停 Tooltip 默认1秒（ShopPrototype.TooltipHoverDelaySeconds），显示名称、公开类别、当前基础价值、占格及灵石/丹药/材料状态；不显示内部ID、标签或评分。新增操作区火候/状态/炉钟、研磨剩余时间、物品已研磨标记及结果摘要，右侧保留逐材料时长调试。修改 ShopSession.Alchemy、ShopPrototype及其Alchemy/Tooltip部分、两组Alchemy测试；无Asset、Package或Project Settings配置变更。
+- 本轮验证：Edit Mode21/21（9月20日，本轮计时/结算代码之后未变）、最终Play Mode4/4（9月21日，实际鼠标与按钮，三丹方、四区域Tooltip、移出/切换/延迟/边界、研磨和离场）。首次误在Play中启动Edit测试导致运行器错误；Play暴露供能刷新重建视图使悬停重置，已改为炼制中保留视图、物品增减仍刷新。另有一次复杂丹方按钮未触发，增加失败现场信息后同组回归通过；玩家人工操作手感仍待验收。工具分类筛选曾返回0项，最终按Alchemy名称选择4项，未把0项当通过。复用原Evidence/DP58/editmode.json、playmode.json，未新增截图或报告。最终Console Error0/Warning0，Editor ready/stopped，无编译/Domain Reload，ShopPrototype dirty=false；未主动清日志。
+- 续接时工作区干净，既有返修已在1cdb512；本次收尾变更仅本地未提交/推送。未发现正式规则冲突；8秒节奏、0.5/2秒窗口、悬停延迟及既有评分/耗能/价值倍率仍待人工手感决定，未做Player或平台验证。
+
 - 基线5fe584a，开工工作区干净；本轮仅本地修改，未提交/推送。按DP58、DP10、G06v11、G04v13 AC63–69、G05v5品相接口、G11v9地点基础和G07/G09资源规则实施；仅因候选缺失定向读取物品表v22，未全量阅读GDD。
 - 新增AlchemySettings、ShopSession.Alchemy、ShopPrototype.Alchemy、AlchemyVerification和Edit/Play两组炼丹测试。修改ShopCatalog、ShopSession（实例品相/格子/移动约束）、ShopSession.Travel/LocationItems、ShopPrototype/Travel和Editor/PrototypeBuilder；新.meta由Unity生成。未改Scene、Prefab、Package、Project Settings或正式物品资产。
 - 配置入口：ShopCatalog的Alchemy。炉息/研磨8s，完美±0.5s、合格±2s，三火1/1.5/2，原型耗能0.02下品灵石等价/秒；按原灵石整数精度累计取整扣除，不建立额外资源余额。评分1/0.6/0，阈值0.90/0.70/0.45，品相倍率1/1.2/1.5；备料6×4、供能2×2、输出2×2；showDebug和debugTimeScale可调。全部为灰盒值，非最终平衡。
@@ -13,7 +20,7 @@
 试玩入口与步骤：
 1. 打开ShopPrototype并Play，执行菜单 XiuXianShop > Validation > Start DP58 Alchemy Graybox (resets Play session)。它重置当前Play验证会话，退出Play后恢复原资产。
 2. 出门携带中选择灰盒材料包；把所选丹方材料装包、灵石放手中，出发并选择炼丹房。只在进入地点扣60体力。
-3. 将材料拖到备料格、灵石拖到供能位，选择丹方，点击首味材料后投入，再开炉。按界面炉息流程投料/研磨/换火/收丹；右侧调试区域可滚动查看目标与实际偏差。
+3. 将材料拖到备料格、灵石拖到供能位，选择丹方，点击首味材料后投入，再开炉。按参考节奏投料/研磨/换火/收丹；操作区查看火候、研磨与结果，右侧核对每味材料入炉、目标/实际在炉时长及偏差。四个物品区域悬停约1秒应显示公开信息，移出立即隐藏，切换重计时；炼制持续扣灵气时供能位Tooltip仍能出现。
 4. 把产物、剩余材料及灵石手动收入随身包/左右手。离开有遗留会确认，取消可继续整理。每次访问只能一炉；重复体验可重新运行验证菜单。
 5. 在运行时Catalog副本的Alchemy调整秒数、窗口、倍率、格子和开发时间倍率；需要保留参数时在退出Play后调整正式Catalog中的Alchemy配置，不保存候选物品副本。
 

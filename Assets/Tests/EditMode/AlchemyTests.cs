@@ -13,7 +13,7 @@ namespace XiuXianShop.Tests
         {
             catalog=ScriptableObject.CreateInstance<ShopCatalog>();AlchemyVerification.Configure(catalog);
             s=new ShopSession(catalog,customerSeed:58);
-            var pack=s.Items.Single(i=>i.Definition.id=="test-portable");Assert.That(s.BeginCarrying(pack.Id));
+            var pack=s.Items.Single(i=>i.Definition.id=="test-portable");TravelTestSetup.CloseBusiness(s);Assert.That(s.BeginCarrying(pack.Id));
             foreach(var item in s.Items.Where(i=>i.Definition.category==ItemCategory.Material).ToArray())Put(item,ContainerId.Interior,pack.Id);
             var fuel=s.Items.Single(i=>i.Definition.id=="stone_mid");Assert.That(s.Move(fuel.Id,ContainerId.RightHand,0,0,0,false));
             Assert.That(s.BeginTravel());Assert.That(s.EnterLocation(ShopSession.AlchemyLocationId));

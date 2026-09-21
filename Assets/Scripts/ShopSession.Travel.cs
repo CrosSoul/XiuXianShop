@@ -47,7 +47,7 @@ namespace XiuXianShop
         public bool BeginTravel()
         {
             if(HasTravelledThisTurn)return Fail("本回合已外出，回店后不能再次出发。");
-            if(!IsCarrying || Phase==TurnPhase.Open)return Fail("请在营业外完成携带准备后出发。");
+            if(!IsCarrying || Phase!=TurnPhase.Closed)return Fail("请先结束本回合营业，再完成携带准备后出发。");
             HasTravelledThisTurn=true;IsTravelling=true;CurrentLocationId=null;visitedLocations.Clear();
             return Success("请选择已解锁地点；进入地点时才扣除体力。");
         }

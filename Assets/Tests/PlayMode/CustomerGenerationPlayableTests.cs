@@ -48,7 +48,7 @@ namespace XiuXianShop.Tests
             Assert.That(s.ValidateState(),Is.Null);LogAssert.NoUnexpectedReceived();
         }
 
-        [UnityTest,Category("DP50")]
+        [UnityTest,Category("DP50"),Category("DP27")]
         public IEnumerator PromotionAndOverflowCreateSevenVisitorsOnce()
         {
             yield return RestartWithTestCatalog(c=>{
@@ -56,10 +56,10 @@ namespace XiuXianShop.Tests
                 c.firstLocationStaminaCost=0;
             },52);
             var s=shop.Session;
-            yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");
+            yield return CloseBusinessForOuting();yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");
             yield return Click("TravelLocation_tingfeng-teahouse");yield return Click("TravelLeave");
             yield return Click("TravelReturn");yield return Click("TravelReturnConfirm");yield return Click("CarryReturn");
-            yield return Click("BeginBusiness");yield return Click("EndBusiness");yield return Click("AdvanceTurn");
+            yield return Click("AdvanceTurn");
             Assert.That(s.CustomerCountThisTurn,Is.EqualTo(7));yield return Click("BeginBusiness");
             var offer=s.Offer;var snapshot=s.TodayAttraction;
             for(int i=0;i<3;i++){shop.Refresh();Assert.That(s.BeginBusiness(),Is.False);}

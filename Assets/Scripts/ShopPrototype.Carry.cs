@@ -21,7 +21,7 @@ namespace XiuXianShop
             CancelDrag();
             if(Session.IsTravelling){ShowTravelWindow();return;}
             if(Session.IsCarrying){ShowCarryPanel();return;}
-            if(Session.Phase==TurnPhase.Open){localNotice="请先结束营业再选择出门携带物。";Refresh();return;}
+            if(Session.Phase!=TurnPhase.Closed){localNotice="请先结束本回合营业再选择出门携带物。";Refresh();return;}
             CloseStorage();CloseCarrySelection();selectedPack=0;
             carrySelection=Rect(content,"CarrySelection",0,0,1600,1000);Image(carrySelection,new Color(.02f,.04f,.05f,.95f),true);
             Label(carrySelection,"Title",450,160,700,45,"出门携带 · 选择已有便携储存",27,gold);

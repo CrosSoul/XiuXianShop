@@ -23,7 +23,7 @@ namespace XiuXianShop.Tests
         GridItem Item(string id)=>session.Items.Single(i=>i.Definition.id==id);
         void Depart(string location)
         {
-            Assert.That(session.BeginCarrying(Item("test-portable").Id));
+            TravelTestSetup.CloseBusiness(session);Assert.That(session.BeginCarrying(Item("test-portable").Id));
             Assert.That(session.BeginTravel());Assert.That(session.EnterLocation(location));
         }
         [Test] public void OrdinaryLeaveCancelsWithoutChangesThenDeletesOnlyUncollectedItems()
@@ -64,8 +64,8 @@ namespace XiuXianShop.Tests
             Assert.That(session.ReturnToShop());Assert.That(session.EndCarrying());
             Assert.That(session.Move(id,ContainerId.Storage,0,0,0,false),Is.False);
             Assert.That(session.ValidateState(),Is.Null);
-            session=ShopSession.RestoreSave(catalog,session.CaptureSave());Assert.That(session.Find(id).LocationId,Is.EqualTo("persistent"));
-            Assert.That(session.BeginBusiness());Assert.That(session.EndBusiness());Assert.That(session.AdvanceTurn());
+            Assert.That(session.AdvanceTurn());session=ShopSession.RestoreSave(catalog,session.CaptureSave());Assert.That(session.Find(id).LocationId,Is.EqualTo("persistent"));
+
             Depart("persistent");Assert.That(session.In(ContainerId.Location).Single().Id,Is.EqualTo(id));
             Assert.That(session.Move(id,ContainerId.LeftHand,0,0,0,false));Assert.That(session.LeaveLocation());
             Assert.That(session.Find(other.Id).LocationId,Is.EqualTo("other"));Assert.That(session.ValidateState(),Is.Null);

@@ -26,12 +26,12 @@ namespace XiuXianShop.Tests
             foreach(var device in alchemyOtherMice)UnityEngine.InputSystem.InputSystem.EnableDevice(device);
             alchemyOtherMice.Clear();
         }
-        [UnityTest,Category("DP58")] public IEnumerator BasicAlchemyWithActualGridAndButtons()=>PlayAlchemy("recipe_pill_basic");
-        [UnityTest,Category("DP58")] public IEnumerator GroundAlchemyWithActualGridAndButtons()=>PlayAlchemy("recipe_pill_fire_yang");
-        [UnityTest,Category("DP58")] public IEnumerator ComplexAlchemyWithActualGridAndButtons()=>PlayAlchemy("recipe_pill_metal_water");
+        [UnityTest,Category("DP58"),Category("DP27")] public IEnumerator BasicAlchemyWithActualGridAndButtons()=>PlayAlchemy("recipe_pill_basic");
+        [UnityTest,Category("DP58"),Category("DP27")] public IEnumerator GroundAlchemyWithActualGridAndButtons()=>PlayAlchemy("recipe_pill_fire_yang");
+        [UnityTest,Category("DP58"),Category("DP27")] public IEnumerator ComplexAlchemyWithActualGridAndButtons()=>PlayAlchemy("recipe_pill_metal_water");
 
         UnityEngine.UI.Text TooltipText()=>shop.GetComponentsInChildren<UnityEngine.UI.Text>().FirstOrDefault(t=>t.name=="ItemTooltipText");
-        [UnityTest,Category("DP58")] public IEnumerator AlchemyTooltipAcceptsRuntimeDelayOptions()
+        [UnityTest,Category("DP58"),Category("DP27")] public IEnumerator AlchemyTooltipAcceptsRuntimeDelayOptions()
         {
             yield return RestartWithTestCatalog(AlchemyVerification.Configure,58);
             IsolateAlchemyTestMouse();
@@ -68,13 +68,13 @@ namespace XiuXianShop.Tests
             Assert.That(corners.All(p=>p.x>=0 && p.y>=0 && p.x<=Screen.width && p.y<=Screen.height),"Tooltip stays on screen");
         }
 
-        [UnityTest,Category("DP58")] public IEnumerator AlchemySharedHoverCoversCarryPreparationFuelAndGroundState()
+        [UnityTest,Category("DP58"),Category("DP27")] public IEnumerator AlchemySharedHoverCoversCarryPreparationFuelAndGroundState()
         {
             yield return RestartWithTestCatalog(AlchemyVerification.Configure,58);
             IsolateAlchemyTestMouse();
             var s=shop.Session;var fruit=s.Items.Single(i=>i.Definition.id=="mat_fire_fruit");
             var fuel=s.Items.Single(i=>i.Definition.id=="stone_mid");
-            Assert.That(s.BeginCarrying(0));
+            yield return CloseBusinessForOuting();Assert.That(s.BeginCarrying(0));
             Assert.That(s.Move(fruit.Id,ContainerId.LeftHand,0,0,0,false));
             Assert.That(s.Move(fuel.Id,ContainerId.RightHand,0,0,0,false));
             shop.OpenCarrySelection();yield return null;
@@ -97,7 +97,7 @@ namespace XiuXianShop.Tests
             yield return RestartWithTestCatalog(c=>{AlchemyVerification.Configure(c);c.alchemy.debugTimeScale=2;},58);
             IsolateAlchemyTestMouse();
             var s=shop.Session;var recipe=s.Catalog.alchemy.recipes.Single(r=>r.id==recipeId);
-            var pack=s.PortableStorage.Single();Assert.That(s.BeginCarrying(pack.Id));
+            var pack=s.PortableStorage.Single();yield return CloseBusinessForOuting();Assert.That(s.BeginCarrying(pack.Id));
             var ingredients=recipe.targets.Where(t=>t.kind==AlchemyEventKind.Ingredient).Select(t=>s.Items.Single(i=>i.Definition.id==t.itemId)).ToArray();
             for(int i=0;i<ingredients.Length;i++)Assert.That(s.Move(ingredients[i].Id,ContainerId.Interior,i*2,0,0,false,pack.Id));
             var fuel=s.Items.Single(i=>i.Definition.id=="stone_mid");Assert.That(s.Move(fuel.Id,ContainerId.RightHand,0,0,0,false));

@@ -1,25 +1,144 @@
 {
   "status": "completed",
-  "duration": 2.8,
+  "duration": 84.18,
   "summary": {
-    "total": 2,
-    "passed": 2,
+    "total": 19,
+    "passed": 19,
     "failed": 0,
     "skipped": 0,
     "inconclusive": 0
   },
   "results": [
     {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.AlchemySharedHoverCoversCarryPreparationFuelAndGroundState",
+      "Status": "Passed",
+      "Duration": 15.0809317,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.AlchemyTooltipAcceptsRuntimeDelayOptions",
+      "Status": "Passed",
+      "Duration": 3.8057527,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.BasicAlchemyWithActualGridAndButtons",
+      "Status": "Passed",
+      "Duration": 11.0480982,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.CommissionIsFixedAndPhysicalRewardsMustBeCarriedOrAbandoned",
+      "Status": "Passed",
+      "Duration": 2.4285389,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.ComplexAlchemyWithActualGridAndButtons",
+      "Status": "Passed",
+      "Duration": 18.0214127,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.CurrencyCommissionPaysOnceAndNextMonthOffersNewCommission",
+      "Status": "Passed",
+      "Duration": 2.273837,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
       "FullName": "XiuXianShop.Tests.ShopPlayableTests.EarlyReturnConfirmationEndsOutingWithoutPayingOrDuplicatingPack",
       "Status": "Passed",
-      "Duration": 1.2844532,
+      "Duration": 1.3724616,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.ExpandedReceivingAreaScrollsAndRewardsFitCarriedStorage",
+      "Status": "Passed",
+      "Duration": 1.7973904,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.GroundAlchemyWithActualGridAndButtons",
+      "Status": "Passed",
+      "Duration": 9.8957732,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.LocationDragPickupAndLeaveConfirmationKeepOnlyCarriedItems",
+      "Status": "Passed",
+      "Duration": 2.0880528,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.MultipleActualPacksCancelWithoutChangesAndChosenContentsMoveBetweenHandsAndPack",
+      "Status": "Passed",
+      "Duration": 1.8805984,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.NoPortableChoiceStillCarriesTwoDifferentShapesAndReopensWithoutCopying",
+      "Status": "Passed",
+      "Duration": 1.1227542,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.PersistentLocationShowsSameItemOnNextVisitAndNoOrdinaryCleanupPrompt",
+      "Status": "Passed",
+      "Duration": 2.2026318,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.PromotionAndOverflowCreateSevenVisitorsOnce",
+      "Status": "Passed",
+      "Duration": 2.0790699,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.ResourceChangesRefreshVisibleValueAndKeepDraggedInstance",
+      "Status": "Passed",
+      "Duration": 1.0730385,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.SecretIsVisibleInCalendarBeforeStartWithoutApplyingItsPrice",
+      "Status": "Passed",
+      "Duration": 1.8940588,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.TeaVisitReopensSameNewsAndPromotionChangesOnlyNextBusiness",
+      "Status": "Passed",
+      "Duration": 2.7723107,
       "Message": null,
       "StackTrace": null
     },
     {
       "FullName": "XiuXianShop.Tests.ShopPlayableTests.TravelButtonsChargeOncePreserveHandsAndDisableVisitedAndUnaffordableLocations",
       "Status": "Passed",
-      "Duration": 1.5115523,
+      "Duration": 1.7368518,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.TravelEntryLocksBeforeBusinessDuringBusinessAndAfterMonthAdvance",
+      "Status": "Passed",
+      "Duration": 1.5624633,
       "Message": null,
       "StackTrace": null
     }

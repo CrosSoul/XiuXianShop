@@ -13,7 +13,7 @@ namespace XiuXianShop.Tests
         ShopSession Visit(int seed=49)
         {
             var s=new ShopSession(catalog,false,seed);
-            Assert.That(s.BeginCarrying(0));Assert.That(s.BeginTravel());Assert.That(s.EnterLocation("baishitang"));
+            TravelTestSetup.CloseBusiness(s);Assert.That(s.BeginCarrying(0));Assert.That(s.BeginTravel());Assert.That(s.EnterLocation("baishitang"));
             return s;
         }
         void OnlyPool(string pool)
@@ -28,9 +28,9 @@ namespace XiuXianShop.Tests
             Assert.That(s.CommissionCandidates.Select(t=>t.id),Is.EqualTo(ids));Assert.That(s.Stamina,Is.EqualTo(40));
             Assert.That(s.CompleteCommission("unknown"),Is.False);
             Assert.That(s.LeaveLocation());Assert.That(s.ReturnToShop(true));Assert.That(s.EndCarrying());
-            var restored=ShopSession.RestoreSave(catalog,s.CaptureSave());
+            Assert.That(s.AdvanceTurn());var restored=ShopSession.RestoreSave(catalog,s.CaptureSave());
             Assert.That(restored.CommissionCandidates.Select(t=>t.id),Is.EqualTo(ids));
-            Assert.That(restored.BeginBusiness());Assert.That(restored.EndBusiness());Assert.That(restored.AdvanceTurn());
+            Assert.That(restored.BeginBusiness());Assert.That(restored.EndBusiness());
             foreach(var t in catalog.commissions.templates)t.enabled=false;
             catalog.commissions.templates[0].enabled=true;catalog.commissions.templates[1].enabled=true;catalog.commissions.templates[2].enabled=true;
             Assert.That(restored.BeginCarrying(0));Assert.That(restored.BeginTravel());Assert.That(restored.EnterLocation("baishitang"));
@@ -84,7 +84,7 @@ namespace XiuXianShop.Tests
             Assert.That(s.LeaveLocation(),Is.False);Assert.That(s.Items.Contains(reward));
             Assert.That(s.LeaveLocation(true));Assert.That(s.Items.Count,Is.EqualTo(1));
             Assert.That(s.ReturnToShop(true));Assert.That(s.EndCarrying());Assert.That(s.ValidateState(),Is.Null);
-            var restored=ShopSession.RestoreSave(catalog,s.CaptureSave());Assert.That(restored.CommissionLimitReached);
+            Assert.That(s.AdvanceTurn());var restored=ShopSession.RestoreSave(catalog,s.CaptureSave());Assert.That(restored.CommissionLimitReached);
             Assert.That(restored.Items.Single().Definition.id,Is.EqualTo(reward.Definition.id));
         }
         [Test] public void InvalidCurrencyCapacityDoesNotPartiallyReward()

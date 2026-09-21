@@ -1,5 +1,14 @@
 # XiuXianShop 开发日志
 
+## 2026-09-22 — DP-27 外出阶段门禁返修
+
+- 基线31c9e50，开工工作区干净。核对最新DP-27验收评论10073、G-03/G-11阶段规则和G-04 AC-42；未全量阅读GDD。
+- 生产代码仅改ShopPrototype、ShopPrototype.Carry、ShopSession.Travel：出门按钮在营业前/营业中禁用，打开入口与实际出发要求本回合Closed；推进下月重新锁定。失败不扣体力、不占外出次数。回店后本回合不能再次出发；未改地点、扣费、物品、存档、Package、Asset或Project Settings。
+- 新增门禁跨阶段/跨月测试，并把直接依赖外出的旧测试前置改为先完成营业。存档仍只允许准备阶段，相关测试推进到下月后保存；取消携带改为比较物品实例/位置快照。没有为通过测试放宽产品规则。
+- Edit Mode161/161、Play Mode19/19通过，包含阶段按钮、直接调用、跨月、外出次数、60/30扣费、物流、委托、茶肆、灵石和炼丹。测试工具切换筛选曾返回0项，不计通过；受影响交互统一加入DP27分类并重新编译后实际执行。原始结果复用Evidence/DP27/editmode.json及playmode-travel.json。未重跑日历Play专项，未做Player/平台或玩家手感验收。
+- 手动复验：正常Play→营业前出门禁用→开始营业仍禁用→结束营业可出门→回店不能第二次出发→推进下月再次禁用→新回合闭店恢复。旧灰盒外出入口也须先完成本回合营业。仅本地修改，未提交/推送；交付待人工验收。
+- 最终Unity Pipeline CLI检查：编译完成无错误，Console Error0/Warning0（未主动清日志），Editor ready/stopped、无编译/Domain Reload，ShopPrototype dirty=false；文本diff检查通过。
+
 ## 2026-09-20 — DP-58 异地炼丹房灰盒 v1
 
 - 2026-09-21 追加要求完成：悬停逻辑统一读取公开可写的ShopPrototype.TooltipHoverDelaySeconds，默认1秒，沿用原组件字段；无设置界面、持久化或Settings系统。四档补测首跑出现悬停中断，测试现隔离其他鼠标并在TearDown恢复。恢复连接后发现文件仍有InputDevice加入Mouse列表的CS1503，已用明确类型匹配修复并重新编译通过。最终Play Mode5/5通过，包含0/0.5/1/1.5秒四档及原三丹方/四区域交互；复用原playmode.json。最终Console Error0/Warning0、Editor ready/stopped、无编译或Domain Reload，ShopPrototype dirty=false。此前超时阻塞已解除，A+B+C及追加接口统一交付待验收。

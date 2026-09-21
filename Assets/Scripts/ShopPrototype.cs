@@ -27,7 +27,7 @@ namespace XiuXianShop
         Text header, rent, phaseText, selection, customerTitle, customerDetails, notice, furnaceText, previewText, displaySummary, tradeDetails, tradeStatus, tradeHeading;
         int displayedPricingRevision;
         Text staminaText;
-        Button teaNewsButton;
+        Button teaNewsButton,carryOpenButton;
         TradeOffer displayedOffer;
         TurnPhase displayedPhase;
         public int CustomerSeed { get; set; } = -1;
@@ -126,7 +126,7 @@ namespace XiuXianShop
             Card("Header",24,20,1552,66,panel);
             Label(content,"ShopName",44,30,190,44,"栖云当铺",30,gold);
             MakeButton("CalendarOpen",240,33,100,38,"日历",()=>{CancelDrag();CalendarView.Open();});
-            MakeButton("CarryOpen",720,74,240,34,"出门携带",OpenCarrySelection);
+            carryOpenButton=MakeButton("CarryOpen",720,74,240,34,"出门携带",OpenCarrySelection);
             teaNewsButton=MakeButton("TeaNewsOpen",980,74,240,34,"坊市消息",OpenTeaNews);
             staminaText=Label(content,"Stamina",44,81,660,26,"",17,gold);
             header=Label(content,"Resources",350,34,380,34,"",24,textColor);
@@ -305,6 +305,7 @@ namespace XiuXianShop
             notice.text=localNotice??Session.Message;
             if(locationNotice!=null)locationNotice.text=localNotice??Session.Message;
             beginButton.interactable=Session.Phase==TurnPhase.Preparation;
+            carryOpenButton.interactable=Session.Phase==TurnPhase.Closed;
             nextButton.interactable=Session.Phase==TurnPhase.Open && (offer!=null || Session.RemainingCustomers>0);
             endButton.interactable=Session.Phase==TurnPhase.Open;
             sleepButton.interactable=Session.Phase==TurnPhase.Closed;

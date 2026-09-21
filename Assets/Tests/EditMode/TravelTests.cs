@@ -4,6 +4,15 @@ using UnityEngine;
 
 namespace XiuXianShop.Tests
 {
+    static class TravelTestSetup
+    {
+        public static void CloseBusiness(ShopSession session)
+        {
+            if(session.Phase==TurnPhase.Preparation)Assert.That(session.BeginBusiness());
+            if(session.Phase==TurnPhase.Open)Assert.That(session.EndBusiness());
+        }
+    }
+    [Category("DP27")]
     public sealed class TravelTests
     {
         ShopCatalog catalog;
@@ -21,7 +30,22 @@ namespace XiuXianShop.Tests
             session=new ShopSession(catalog,customerSeed:27);
         }
         [TearDown] public void Cleanup()=>Object.DestroyImmediate(catalog);
-        void Depart(){Assert.That(session.BeginCarrying(0));Assert.That(session.BeginTravel());}
+        [Test] public void DepartureRequiresThisTurnsBusinessToBeClosedAndDoesNotSpendOnFailure()
+        {
+            Assert.That(session.BeginCarrying(0));
+            Assert.That(session.BeginTravel(),Is.False);Assert.That(session.HasTravelledThisTurn,Is.False);
+            Assert.That(session.Stamina,Is.EqualTo(100));Assert.That(session.EndCarrying());
+            Assert.That(session.BeginBusiness());Assert.That(session.BeginTravel(),Is.False);
+            Assert.That(session.EndBusiness());Assert.That(session.BeginCarrying(0));
+            Assert.That(session.BeginTravel());Assert.That(session.Stamina,Is.EqualTo(100));
+            Assert.That(session.ReturnToShop(true));Assert.That(session.BeginTravel(),Is.False);
+            Assert.That(session.EndCarrying());Assert.That(session.AdvanceTurn());
+            Assert.That(session.BeginCarrying(0));Assert.That(session.BeginTravel(),Is.False);
+            Assert.That(session.HasTravelledThisTurn,Is.False);Assert.That(session.Stamina,Is.EqualTo(100));
+            Assert.That(session.EndCarrying());Assert.That(session.BeginBusiness());Assert.That(session.EndBusiness());
+            Assert.That(session.BeginCarrying(0));Assert.That(session.BeginTravel());
+        }
+        void Depart(){Assert.That(session.BeginBusiness());Assert.That(session.EndBusiness());Assert.That(session.BeginCarrying(0));Assert.That(session.BeginTravel());}
 
         [Test] public void EntryPaysOnceAndVisitedOrUnaffordableLocationsCannotBeEntered()
         {
@@ -39,17 +63,17 @@ namespace XiuXianShop.Tests
             Assert.That(session.Stamina,Is.EqualTo(10));Assert.That(session.TrySpendStamina(10));Assert.That(session.Stamina,Is.Zero);
         }
 
-        [Test] public void ConfirmedReturnConsumesThisTurnsOutingAndSurvivesPreparationSave()
+        [Test] public void ConfirmedReturnConsumesOutingAndNextPreparationSaveCannotBypassPhaseGate()
         {
             Assert.That(session.BeginTravel(),Is.False);Depart();
             Assert.That(session.CanReturnWithoutConfirmation,Is.False);
             Assert.That(session.ReturnToShop(),Is.False);Assert.That(session.IsTravelling);
             Assert.That(session.ReturnToShop(true));Assert.That(session.Stamina,Is.EqualTo(100));
             Assert.That(session.BeginTravel(),Is.False);Assert.That(session.EndCarrying());
-            session=ShopSession.RestoreSave(catalog,session.CaptureSave());
-            Assert.That(session.HasTravelledThisTurn);Assert.That(session.BeginCarrying(0));
+            Assert.That(session.HasTravelledThisTurn);Assert.That(()=>session.CaptureSave(),Throws.InvalidOperationException);
+            Assert.That(session.AdvanceTurn());session=ShopSession.RestoreSave(catalog,session.CaptureSave());
+            Assert.That(session.HasTravelledThisTurn,Is.False);Assert.That(session.BeginCarrying(0));
             Assert.That(session.BeginTravel(),Is.False);Assert.That(session.EndCarrying());
-            Assert.That(session.BeginBusiness());Assert.That(session.EndBusiness());Assert.That(session.AdvanceTurn());
             Depart();Assert.That(session.HasVisitedLocation("a"),Is.False);
         }
 
@@ -60,6 +84,7 @@ namespace XiuXianShop.Tests
             var sword=session.Items.Single(i=>i.Definition.id=="sword");
             var warehouseItem=session.Items.Single(i=>i.Definition.id=="pill");
             Assert.That(session.Move(herb.Id,ContainerId.Interior,0,0,0,true,pack.Id));
+            Assert.That(session.BeginBusiness());Assert.That(session.EndBusiness());
             Assert.That(session.BeginCarrying(pack.Id));Assert.That(session.Move(sword.Id,ContainerId.LeftHand,0,0,0,false));
             var original=session.Items.ToArray();Assert.That(session.BeginTravel());
             Assert.That(session.EndCarrying(),Is.False);Assert.That(session.BeginBusiness(),Is.False);
@@ -87,7 +112,7 @@ namespace XiuXianShop.Tests
             Assert.That(session.Stamina,Is.Zero);Assert.That(session.LeaveLocation());
             Assert.That(session.NextLocationStaminaCost,Is.EqualTo(7));
             Assert.That(session.EnterLocation("a"),Is.False);Assert.That(session.ReturnToShop());
-            Assert.That(session.EndCarrying());session=ShopSession.RestoreSave(catalog,session.CaptureSave());
+            Assert.That(session.EndCarrying());Assert.That(session.AdvanceTurn());session=ShopSession.RestoreSave(catalog,session.CaptureSave());
             Assert.That(session.UnlockedLocations.Any(l=>l.id=="locked"));
         }
 

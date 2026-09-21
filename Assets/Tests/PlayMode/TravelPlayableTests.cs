@@ -8,6 +8,31 @@ namespace XiuXianShop.Tests
 {
     public sealed partial class ShopPlayableTests
     {
+        IEnumerator CloseBusinessForOuting()
+        {
+            if(shop.Session.Phase==TurnPhase.Preparation)yield return Click("BeginBusiness");
+            if(shop.Session.Phase==TurnPhase.Open)yield return Click("EndBusiness");
+        }
+        [UnityTest,Category("DP27")]
+        public IEnumerator TravelEntryLocksBeforeBusinessDuringBusinessAndAfterMonthAdvance()
+        {
+            var s=shop.Session;
+            Assert.That(shop.FindButton("CarryOpen").interactable,Is.False);
+            shop.OpenCarrySelection();yield return null;
+            Assert.That(shop.GetComponentsInChildren<UnityEngine.UI.Button>().Any(b=>b.name=="CarryConfirm"),Is.False);
+            yield return Click("BeginBusiness");Assert.That(shop.FindButton("CarryOpen").interactable,Is.False);
+            Assert.That(s.BeginTravel(),Is.False);Assert.That(s.Stamina,Is.EqualTo(100));
+            yield return Click("EndBusiness");Assert.That(shop.FindButton("CarryOpen").interactable);
+            yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");
+            yield return Click("TravelReturn");yield return Click("TravelReturnConfirm");yield return Click("CarryReturn");
+            Assert.That(s.BeginTravel(),Is.False);yield return Click("AdvanceTurn");
+            Assert.That(shop.FindButton("CarryOpen").interactable,Is.False);
+            yield return Click("BeginBusiness");yield return Click("EndBusiness");
+            Assert.That(shop.FindButton("CarryOpen").interactable);
+            yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");
+            Assert.That(s.IsTravelling);Assert.That(s.Stamina,Is.EqualTo(100));
+            LogAssert.NoUnexpectedReceived();
+        }
         [UnityTest,Category("DP27")]
         public IEnumerator TravelButtonsChargeOncePreserveHandsAndDisableVisitedAndUnaffordableLocations()
         {
@@ -21,6 +46,7 @@ namespace XiuXianShop.Tests
                     new TravelLocation{id="locked",title="隐藏地点"}
                 };
             },27);
+            yield return Click("BeginBusiness");yield return Click("EndBusiness");
             var s=shop.Session;var sword=s.Items.Single(i=>i.Definition.id=="sword");
             yield return Click("CarryOpen");yield return Click("CarryConfirm");
             yield return Drag(sword,ContainerId.LeftHand,0,0);
@@ -45,6 +71,7 @@ namespace XiuXianShop.Tests
         public IEnumerator EarlyReturnConfirmationEndsOutingWithoutPayingOrDuplicatingPack()
         {
             yield return RestartWithTestCatalog(c=>c.SetStorageVerificationDefaults(),27);
+            yield return Click("BeginBusiness");yield return Click("EndBusiness");
             var s=shop.Session;var pack=s.PortableStorage.Single();int count=s.Items.Count;
             yield return Click("CarryOpen");yield return Click("CarryOption_"+pack.Id);yield return Click("CarryConfirm");
             yield return Click("TravelBegin");yield return Click("TravelReturn");yield return Click("TravelReturnConfirm");

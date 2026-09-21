@@ -12,7 +12,7 @@ namespace XiuXianShop.Tests
 {
     public sealed partial class ShopPlayableTests
     {
-        [UnityTest,Category("DP49")]
+        [UnityTest,Category("DP49"),Category("DP27")]
         public IEnumerator ExpandedReceivingAreaScrollsAndRewardsFitCarriedStorage()
         {
             yield return RestartWithTestCatalog(c=>{
@@ -21,7 +21,7 @@ namespace XiuXianShop.Tests
                 c.commissions.extraGiftChance=1;
             },51);
             var s=shop.Session;var pack=s.PortableStorage.Single();
-            yield return Click("CarryOpen");yield return Click("CarryOption_"+pack.Id);yield return Click("CarryConfirm");
+            yield return CloseBusinessForOuting();yield return Click("CarryOpen");yield return Click("CarryOption_"+pack.Id);yield return Click("CarryConfirm");
             yield return Click("TravelBegin");yield return Click("TravelLocation_baishitang");
             for(int i=0;i<24;i++)Assert.That(s.AddLocationItem("dew"));
             shop.Refresh();yield return null;
@@ -42,7 +42,7 @@ namespace XiuXianShop.Tests
             Assert.That(s.ValidateState(),Is.Null);LogAssert.NoUnexpectedReceived();
         }
 
-        [UnityTest,Category("DP49")]
+        [UnityTest,Category("DP49"),Category("DP27")]
         public IEnumerator CommissionIsFixedAndPhysicalRewardsMustBeCarriedOrAbandoned()
         {
             yield return RestartWithTestCatalog(c=>{
@@ -52,7 +52,7 @@ namespace XiuXianShop.Tests
                 c.commissions.extraGiftChance=1;
             },49);
             var s=shop.Session;int initial=s.Items.Count;
-            yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");yield return Click("TravelLocation_baishitang");
+            yield return CloseBusinessForOuting();yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");yield return Click("TravelLocation_baishitang");
             var candidates=s.CommissionCandidates.Select(t=>t.id).ToArray();Assert.That(candidates.Length,Is.EqualTo(3));
             for(int i=0;i<2;i++)
             {
@@ -74,7 +74,7 @@ namespace XiuXianShop.Tests
             Assert.That(s.ValidateState(),Is.Null);LogAssert.NoUnexpectedReceived();
         }
 
-        [UnityTest,Category("DP49")]
+        [UnityTest,Category("DP49"),Category("DP27")]
         public IEnumerator CurrencyCommissionPaysOnceAndNextMonthOffersNewCommission()
         {
             yield return RestartWithTestCatalog(c=>{
@@ -82,14 +82,14 @@ namespace XiuXianShop.Tests
                 c.commissions.extraGiftChance=0;
             },50);
             var s=shop.Session;int money=s.Money,count=s.Items.Count;
-            yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");yield return Click("TravelLocation_baishitang");
+            yield return CloseBusinessForOuting();yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");yield return Click("TravelLocation_baishitang");
             yield return Click("CommissionOpen");
             Assert.That(shop.GetComponentsInChildren<Text>().Any(t=>t.text=="配置文案"));
             yield return Click("CommissionComplete_"+s.CommissionCandidates.First().id);
             Assert.That(s.Money-money,Is.InRange(6,10));Assert.That(s.Items.Count,Is.EqualTo(count));
             yield return Click("TravelLeave");yield return Click("TravelReturn");yield return Click("TravelReturnConfirm");yield return Click("CarryReturn");
-            yield return Click("BeginBusiness");yield return Click("EndBusiness");yield return Click("AdvanceTurn");
-            yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");yield return Click("TravelLocation_baishitang");
+            yield return Click("AdvanceTurn");
+            yield return CloseBusinessForOuting();yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");yield return Click("TravelLocation_baishitang");
             Assert.That(s.CommissionLimitReached,Is.False);yield return Click("CommissionOpen");
             Assert.That(shop.FindButton("CommissionComplete_"+s.CommissionCandidates.First().id).interactable,Is.True);
             yield return Click("CommissionComplete_"+s.CommissionCandidates.First().id);

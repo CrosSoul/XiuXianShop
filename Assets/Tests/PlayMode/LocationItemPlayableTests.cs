@@ -8,13 +8,13 @@ namespace XiuXianShop.Tests
 {
     public sealed partial class ShopPlayableTests
     {
-        [UnityTest,Category("DP28")]
+        [UnityTest,Category("DP28"),Category("DP27")]
         public IEnumerator LocationDragPickupAndLeaveConfirmationKeepOnlyCarriedItems()
         {
             yield return RestartWithTestCatalog(c=>c.SetStorageVerificationDefaults(),28);
             var s=shop.Session;var pack=s.PortableStorage.Single();var herb=s.Items.Single(i=>i.Definition.id=="herb");
             Assert.That(s.Move(herb.Id,ContainerId.Interior,0,0,0,false,pack.Id));shop.Refresh();
-            yield return Click("CarryOpen");yield return Click("CarryOption_"+pack.Id);yield return Click("CarryConfirm");
+            yield return CloseBusinessForOuting();yield return Click("CarryOpen");yield return Click("CarryOption_"+pack.Id);yield return Click("CarryConfirm");
             yield return Click("TravelBegin");yield return Click("TravelLocation_baishitang");
             yield return Drag(herb,ContainerId.Location,0,0);Assert.That(herb.Container,Is.EqualTo(ContainerId.Location));
             Assert.That(s.AddLocationItem("pill"));var collected=s.In(ContainerId.Location).Single(i=>i.Id!=herb.Id);
@@ -32,7 +32,7 @@ namespace XiuXianShop.Tests
             Assert.That(s.ValidateState(),Is.Null);LogAssert.NoUnexpectedReceived();
         }
 
-        [UnityTest,Category("DP28")]
+        [UnityTest,Category("DP28"),Category("DP27")]
         public IEnumerator PersistentLocationShowsSameItemOnNextVisitAndNoOrdinaryCleanupPrompt()
         {
             yield return RestartWithTestCatalog(c=>
@@ -41,12 +41,12 @@ namespace XiuXianShop.Tests
                 c.firstLocationStaminaCost=0;
             },28);
             var s=shop.Session;
-            yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");
+            yield return CloseBusinessForOuting();yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");
             yield return Click("TravelLocation_persistent-test");Assert.That(s.AddLocationItem("pill"));var item=s.In(ContainerId.Location).Single();shop.Refresh();
             yield return Click("TravelLeave");Assert.That(s.CurrentLocationId,Is.Null);Assert.That(s.Find(item.Id),Is.SameAs(item));
             yield return Click("TravelReturn");yield return Click("CarryReturn");
-            yield return Click("BeginBusiness");yield return Click("EndBusiness");yield return Click("AdvanceTurn");
-            yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");
+            yield return Click("AdvanceTurn");
+            yield return CloseBusinessForOuting();yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");
             yield return Click("TravelLocation_persistent-test");Assert.That(s.In(ContainerId.Location).Single(),Is.SameAs(item));
             yield return Drag(item,ContainerId.LeftHand,0,0);Assert.That(item.Container,Is.EqualTo(ContainerId.LeftHand));
             yield return Click("TravelLeave");yield return Click("TravelReturn");yield return Click("CarryReturn");

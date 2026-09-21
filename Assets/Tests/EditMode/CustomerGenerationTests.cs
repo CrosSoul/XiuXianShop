@@ -15,9 +15,9 @@ namespace XiuXianShop.Tests
         void Tea(ShopSession s,TeaEffect effect)
         {
             foreach(var e in catalog.teaHouse.effects)e.weight=e.effect==effect?1:0;
-            Assert.That(s.BeginCarrying(0));Assert.That(s.BeginTravel());Assert.That(s.EnterLocation("tingfeng-teahouse"));
+            TravelTestSetup.CloseBusiness(s);Assert.That(s.BeginCarrying(0));Assert.That(s.BeginTravel());Assert.That(s.EnterLocation("tingfeng-teahouse"));
             Assert.That(s.LeaveLocation());Assert.That(s.ReturnToShop(true));Assert.That(s.EndCarrying());
-            Assert.That(s.BeginBusiness());Assert.That(s.EndBusiness());Assert.That(s.AdvanceTurn());
+            Assert.That(s.AdvanceTurn());
         }
         string OfferState(ShopSession s)=>s.Offer.Behavior+"/"+s.Offer.RequestedCategory+"/"+s.Offer.BudgetTier+"/"+s.Offer.RemainingBudget+"/"+string.Join(",",s.Offer.SupplierItems.Select(i=>i.Definition.id));
 

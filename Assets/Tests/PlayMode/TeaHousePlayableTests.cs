@@ -10,13 +10,13 @@ namespace XiuXianShop.Tests
 {
     public sealed partial class ShopPlayableTests
     {
-        [UnityTest,Category("DP48")]
+        [UnityTest,Category("DP48"),Category("DP27")]
         public IEnumerator TeaVisitReopensSameNewsAndPromotionChangesOnlyNextBusiness()
         {
             yield return RestartWithTestCatalog(c=>
             {foreach(var e in c.teaHouse.effects)e.weight=e.effect==TeaEffect.Promotion?1:0;},48);
             var s=shop.Session;
-            yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");
+            yield return CloseBusinessForOuting();yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");
             yield return Click("TravelLocation_tingfeng-teahouse");var result=s.LatestTeaVisit;
             Assert.That(result.effect,Is.EqualTo(TeaEffect.Promotion));Assert.That(s.Stamina,Is.EqualTo(40));
             for(int i=0;i<2;i++)
@@ -26,8 +26,8 @@ namespace XiuXianShop.Tests
             }
             yield return Click("TravelLeave");yield return Click("TravelReturn");yield return Click("TravelReturnConfirm");yield return Click("CarryReturn");
             yield return Click("TeaNewsOpen");yield return Click("TeaNewsClose");Assert.That(s.LatestTeaVisit,Is.SameAs(result));
-            yield return Click("BeginBusiness");Assert.That(s.BuyersToday+s.SuppliersToday+s.TradingCustomersToday,Is.EqualTo(5));
-            yield return Click("EndBusiness");yield return Click("AdvanceTurn");
+            Assert.That(s.BuyersToday+s.SuppliersToday+s.TradingCustomersToday,Is.EqualTo(5));
+            yield return Click("AdvanceTurn");
             Assert.That(shop.FindButton("TeaNewsOpen").GetComponentInChildren<Text>().text,Does.Contain("本月加成"));
             yield return Click("BeginBusiness");Assert.That(s.BuyersToday+s.SuppliersToday+s.TradingCustomersToday,Is.EqualTo(6));
             for(int i=0;i<6;i++)yield return Click("NextCustomer");Assert.That(s.Offer,Is.Null);Assert.That(s.ServedToday,Is.EqualTo(6));
@@ -35,7 +35,7 @@ namespace XiuXianShop.Tests
             Assert.That(s.ValidateState(),Is.Null);LogAssert.NoUnexpectedReceived();
         }
 
-        [UnityTest,Category("DP48")]
+        [UnityTest,Category("DP48"),Category("DP27")]
         public IEnumerator SecretIsVisibleInCalendarBeforeStartWithoutApplyingItsPrice()
         {
             yield return RestartWithTestCatalog(c=>
@@ -44,7 +44,7 @@ namespace XiuXianShop.Tests
                 c.marketEvents=MarketCalendar.PrototypeDefinitions();
             },48);
             var s=shop.Session;var before=s.Calendar.ActiveTags(1).Select(t=>t.id).ToArray();
-            yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");yield return Click("TravelLocation_tingfeng-teahouse");
+            yield return CloseBusinessForOuting();yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");yield return Click("TravelLocation_tingfeng-teahouse");
             Assert.That(s.LatestTeaVisit.effect,Is.EqualTo(TeaEffect.MarketSecret));var secret=s.Calendar.DisclosedEvents.Single();
             Assert.That(secret.startTurn,Is.InRange(3,13));Assert.That(s.Calendar.ActiveTags(1).Select(t=>t.id),Is.EqualTo(before));
             yield return Click("TeaLocationNews");Assert.That(shop.GetComponentsInChildren<Text>().Any(t=>t.text.Contains(secret.title)),Is.True);yield return Click("TeaNewsClose");

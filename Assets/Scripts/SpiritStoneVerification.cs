@@ -3,12 +3,19 @@ using UnityEngine;
 
 namespace XiuXianShop
 {
-    // DP-33 isolated fixture only: never called by normal startup or written to the catalog asset.
+    // Development fixtures only: never called by normal startup or written to the catalog asset.
     public static class SpiritStoneVerification
     {
         public static void Configure(ShopCatalog catalog)
         {
             catalog.SetStorageVerificationDefaults();
+            AddDefinitions(catalog);
+            catalog.startingItems=new[]{"stone_low","stone_mid","stone_mid","stone_high","test-portable"};
+            catalog.marketEvents=System.Array.Empty<MarketEventDefinition>();
+        }
+        // Shared by isolated fixtures and the explicit current-session development menu.
+        public static void AddDefinitions(ShopCatalog catalog)
+        {
             ItemDefinition Stone(string id,string title,ItemCategory category,int equivalents,int shell,bool reusable,int width,int height)
                 => new ItemDefinition {id=id,title=title,category=category,
                     description="DP-33隔离测试：精度0.01、壳价为临时测试值；下品1格、中品1×2竖向、上品2×2为已确认形状。",
@@ -17,9 +24,8 @@ namespace XiuXianShop
             catalog.items=catalog.items.Concat(new[]{
                 Stone("stone_low","下品灵石",ItemCategory.StoneLow,1,0,false,1,1),
                 Stone("stone_mid","中品灵石",ItemCategory.StoneMid,100,7,true,1,2),
-                Stone("stone_high","上品灵石",ItemCategory.StoneHigh,10000,23,true,2,2)}).ToArray();
-            catalog.startingItems=new[]{"stone_low","stone_mid","stone_mid","stone_high","test-portable"};
-            catalog.marketEvents=System.Array.Empty<MarketEventDefinition>();
+                Stone("stone_high","上品灵石",ItemCategory.StoneHigh,10000,23,true,2,2)}
+                .Where(d=>!catalog.items.Any(existing=>existing.id==d.id))).ToArray();
         }
     }
 }

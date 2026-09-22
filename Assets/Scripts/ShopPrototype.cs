@@ -13,6 +13,7 @@ namespace XiuXianShop
     public sealed partial class ShopPrototype : MonoBehaviour
     {
         [SerializeField] ShopCatalog catalog;
+        ShopCatalog runtimeCatalog;
         public ShopSession Session { get; private set; }
         public ShopCatalog Catalog { get=>catalog; set=>catalog=value; }
         public bool IsDragging => dragId!=0;
@@ -53,6 +54,8 @@ namespace XiuXianShop
             previousFrameRate=Application.targetFrameRate;
             Application.runInBackground=true;
             Application.targetFrameRate=60;
+            // Development unlocks extend only this Play session, never the saved catalog asset.
+            runtimeCatalog=Instantiate(catalog);catalog=runtimeCatalog;
             Session=new ShopSession(catalog, customerSeed: CustomerSeed < 0 ? (int?)null : CustomerSeed);
             font=Font.CreateDynamicFontFromOSFont(new[]{"Microsoft YaHei","SimHei","Noto Sans CJK SC","Arial"},24);
             BuildScreen(); Refresh();
@@ -106,6 +109,7 @@ namespace XiuXianShop
         {
             if(Session!=null) {Application.runInBackground=previousRunInBackground;Application.targetFrameRate=previousFrameRate;}
             if(font!=null) Destroy(font);
+            if(runtimeCatalog!=null)Destroy(runtimeCatalog);
         }
 
         void BuildScreen()

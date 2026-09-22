@@ -43,6 +43,25 @@ namespace XiuXianShop
         public bool IsAtAlchemy => IsTravelling && CurrentLocationId==AlchemyLocationId;
         public bool IsAlchemyArea(ContainerId area) => area==ContainerId.AlchemyFuel || area==ContainerId.AlchemyOutput;
 
+        // Explicit development operation. Uses the same inventory/IDs; never resets a Session.
+        public bool GrantAlchemyTestMaterials(string recipeId)
+        {
+            if(IsCarrying || Phase==TurnPhase.Open)return Fail("请在店内营业前或闭店后、未携带时补发测试材料。");
+            var recipe=catalog.alchemy.recipes.Single(r=>r.id==recipeId);
+            var pack=new GridItem {Id=nextId,Definition=catalog.Find(AlchemyVerification.MaterialPackId),Owner=ItemOwner.Player};
+            if(!FindSpace(pack,ContainerId.Storage,out int x,out int y))return Fail("仓库放不下材料包，请整理出 2×3 空位后再补发；未生成物品。");
+            nextId++;Place(pack,ContainerId.Storage,x,y,0,false);items.Add(pack);
+            var ingredients=recipe.targets.Where(t=>t.kind==AlchemyEventKind.Ingredient).Select(t=>t.itemId).Concat(new[]{"stone_mid"}).ToArray();
+            for(int n=0;n<ingredients.Length;n++)
+            {
+                var item=NewItem(catalog.Find(ingredients[n]),ItemOwner.Player);
+                // Three ingredients at most; the fourth slot holds fuel. Known graybox layout.
+                Place(item,ContainerId.Interior,(n%3)*2,(n/3)*2,0,false);
+                item.StorageItemId=pack.Id;items.Add(item);
+            }
+            return Success("测试材料包已放入仓库（内含本丹方材料和中品灵石）；日期、体力及经营进度保持。");
+        }
+
         bool CanMoveAlchemy(GridItem item,ContainerId target,out string reason)
         {
             reason="";

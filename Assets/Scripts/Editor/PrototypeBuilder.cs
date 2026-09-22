@@ -11,6 +11,29 @@ namespace XiuXianShop.Editor
         public const string CatalogPath="Assets/Data/ShopCatalog.asset";
         static ShopCatalog verificationCatalog;
         static bool discountEnabled;
+        [MenuItem("XiuXianShop/Current Play Session/Unlock Alchemy Room (no reset)")]
+        public static void UnlockCurrentAlchemy()
+        {
+            if(!CanStartVerification())return;
+            var shop=Object.FindFirstObjectByType<ShopPrototype>();
+            AlchemyVerification.AddDefinitions(shop.Catalog);
+            shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP59DevelopmentSave.json");
+            shop.Run(()=>shop.Session.UnlockLocation(ShopSession.AlchemyLocationId));
+        }
+        [MenuItem("XiuXianShop/Current Play Session/Grant Alchemy Kit/回气丹")]
+        public static void GrantBasicAlchemyKit()=>GrantCurrentAlchemyKit("recipe_pill_basic");
+        [MenuItem("XiuXianShop/Current Play Session/Grant Alchemy Kit/赤阳丹")]
+        public static void GrantFireAlchemyKit()=>GrantCurrentAlchemyKit("recipe_pill_fire_yang");
+        [MenuItem("XiuXianShop/Current Play Session/Grant Alchemy Kit/金水凝元丹")]
+        public static void GrantComplexAlchemyKit()=>GrantCurrentAlchemyKit("recipe_pill_metal_water");
+        static void GrantCurrentAlchemyKit(string recipeId)
+        {
+            if(!CanStartVerification())return;
+            var shop=Object.FindFirstObjectByType<ShopPrototype>();
+            AlchemyVerification.AddDefinitions(shop.Catalog);
+            shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP59DevelopmentSave.json");
+            shop.Run(()=>shop.Session.GrantAlchemyTestMaterials(recipeId));
+        }
         [MenuItem("XiuXianShop/Validation/Start DP58 Alchemy Graybox (resets Play session)")]
         public static void StartAlchemyExample()
         {
@@ -37,7 +60,6 @@ namespace XiuXianShop.Editor
         {
             if(!CanStartVerification())return;
             var shop=Object.FindFirstObjectByType<ShopPrototype>();
-            if(shop.SavePath!=System.IO.Path.Combine(Application.dataPath,"../Temp/DP28VerificationSave.json"))return;
             shop.Run(()=>shop.Session.AddLocationItem("pill"));
         }
         [MenuItem("XiuXianShop/Validation/DP45 Spend Configured Test Stamina (Play session)")]
@@ -193,8 +215,11 @@ namespace XiuXianShop.Editor
         [MenuItem("XiuXianShop/Open Playable Prototype")]
         public static void OpenPrototype()
         {
+            if(EditorApplication.isPlayingOrWillChangePlaymode)return;
             if(EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) EditorSceneManager.OpenScene(ScenePath);
         }
+        [MenuItem("XiuXianShop/Open Playable Prototype",true)]
+        static bool CanOpenPrototype()=>!EditorApplication.isPlayingOrWillChangePlaymode;
         public static string Build()
         {
             if(AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath)!=null) return "Prototype scene already exists; no changes made.";

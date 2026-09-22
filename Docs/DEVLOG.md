@@ -1,5 +1,14 @@
 # XiuXianShop 开发日志
 
+## 2026-09-22 — DP-59 默认 Play 连续会话集成
+
+- 基线 884baa4，开工工作区干净。读取 DP-59 最新要求及 DP25/27/28/31/45/48/49/50/58 实时交付记录，未全量阅读 GDD。普通外出、茶肆、百事堂已有正常入口，主要缺口为炼丹重置式验证；沿用已有正式行为，无规则冲突。
+- ShopPrototype 开始时持有配置副本；AlchemyVerification/SpiritStoneVerification 提取只补缺失定义的入口，旧隔离 Configure 保留。PrototypeBuilder 新增当前会话解锁炼丹房/三丹方补料菜单，ShopSession.Alchemy 直接发放真实材料包；不重建 Session、不复制库存，不绕过阶段、体力或外出次数。开发保存改用原有 SavePath 的 Temp 路径保护正常存档，不扩展保存系统。当前地点补丹药也解除旧隔离路径限制。
+- 检查用户所报 compiler error：当前重编译无 C# 错误；初始 Console 实为 Play 中调用 OpenPrototype 的 InvalidOperationException。入口新增 Play 检查与菜单禁用，避免运行时调用编辑模式场景保存。没有清空 Console 掩盖异常。
+- 新增 IntegrationTests / IntegrationPlayableTests（.meta 由 Unity 生成）。Edit165/165；默认场景 Play3/3，使用真实按钮/拖动，覆盖连续四个月与同 Session 炼丹后继续经营。首轮2/3中补包因仓库空间不足未生成，测试改为先用现有储物匣整理，重跑3/3。没有改容量、概率、成本或输入配置资产。
+- 单一交付说明 Docs/DP59_DEFAULT_PLAY.md，测试原始结果 Docs/Evidence/DP59。保留旧隔离菜单并说明用途，不新增通用 Debug 框架/正式美术/剧情解锁；未做玩家手感验收、Player 或平台测试。当前仅本地未提交/推送。
+- 收尾：DP58 隔离 Play5/5，最终 DP59 Play3/3（含 Play 内直接调用 OpenPrototype 无异常）。工具切换筛选曾返回0项，未计通过；Unity编译API刷新发现后实际运行。最终 MCP Console Error0/Warning0，Editor ready/stopped，无编译/Domain Reload；ShopPrototype isDirty=false，未主动清日志。文本diff检查通过。
+
 ## 2026-09-22 — DP-27 外出阶段门禁返修
 
 - 基线31c9e50，开工工作区干净。核对最新DP-27验收评论10073、G-03/G-11阶段规则和G-04 AC-42；未全量阅读GDD。

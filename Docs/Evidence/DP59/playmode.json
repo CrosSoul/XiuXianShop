@@ -1,0 +1,84 @@
+{
+  "defaultSession": {
+    "status": "completed",
+    "duration": 33.05,
+    "summary": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "inconclusive": 0
+    },
+    "results": [
+      {
+        "FullName": "XiuXianShop.Tests.ShopPlayableTests.DefaultSessionAlchemyDevelopmentMenusPreserveProgressAndContinueBusiness",
+        "Status": "Passed",
+        "Duration": 20.8484337,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "XiuXianShop.Tests.ShopPlayableTests.DefaultSessionKeepsTeaCommissionsAndItemsAcrossContinuousMonths",
+        "Status": "Passed",
+        "Duration": 8.7322579,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "XiuXianShop.Tests.ShopPlayableTests.DefaultSessionOverflowDoesNotAccumulateExtraVisitors",
+        "Status": "Passed",
+        "Duration": 3.4479162,
+        "Message": null,
+        "StackTrace": null
+      }
+    ]
+  },
+  "isolatedAlchemyRegression": {
+    "status": "completed",
+    "duration": 57.75,
+    "summary": {
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "inconclusive": 0
+    },
+    "results": [
+      {
+        "FullName": "XiuXianShop.Tests.ShopPlayableTests.AlchemySharedHoverCoversCarryPreparationFuelAndGroundState",
+        "Status": "Passed",
+        "Duration": 15.0420778,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "XiuXianShop.Tests.ShopPlayableTests.AlchemyTooltipAcceptsRuntimeDelayOptions",
+        "Status": "Passed",
+        "Duration": 3.7795296,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "XiuXianShop.Tests.ShopPlayableTests.BasicAlchemyWithActualGridAndButtons",
+        "Status": "Passed",
+        "Duration": 11.0213943,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "XiuXianShop.Tests.ShopPlayableTests.ComplexAlchemyWithActualGridAndButtons",
+        "Status": "Passed",
+        "Duration": 18.0057934,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "XiuXianShop.Tests.ShopPlayableTests.GroundAlchemyWithActualGridAndButtons",
+        "Status": "Passed",
+        "Duration": 9.8752605,
+        "Message": null,
+        "StackTrace": null
+      }
+    ]
+  }
+}

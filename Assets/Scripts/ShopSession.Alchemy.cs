@@ -39,9 +39,53 @@ namespace XiuXianShop
     public sealed partial class ShopSession
     {
         public const string AlchemyLocationId="alchemy-room";
+        public const string ShopFurnaceDefinitionId="device_alchemy_furnace";
+        public int ShopFurnaceId { get; private set; }
+        public bool IsAtShopAlchemy => ShopFurnaceId!=0;
+        public bool IsUsingAlchemy => IsAtAlchemy || IsAtShopAlchemy;
+        public ContainerId AlchemyPreparationArea => IsAtShopAlchemy?ContainerId.AlchemyPreparation:ContainerId.Location;
         public AlchemyBatch Alchemy { get; private set; }
         public bool IsAtAlchemy => IsTravelling && CurrentLocationId==AlchemyLocationId;
-        public bool IsAlchemyArea(ContainerId area) => area==ContainerId.AlchemyFuel || area==ContainerId.AlchemyOutput;
+        public bool IsAlchemyArea(ContainerId area) => area==ContainerId.AlchemyFuel || area==ContainerId.AlchemyOutput || area==ContainerId.AlchemyPreparation;
+
+        public bool GrantShopFurnace()
+        {
+            if(IsCarrying || IsAtShopAlchemy || Phase==TurnPhase.Open)return Fail("请在店内营业前或闭店后关闭设备，再补发测试炉。");
+            var device=new GridItem {Id=nextId,Definition=catalog.Find(ShopFurnaceDefinitionId),Owner=ItemOwner.Player};
+            if(!FindSpace(device,ContainerId.Storage,out int x,out int y))return Fail("仓库需要 3×3 空位；未生成设备。");
+            nextId++;Place(device,ContainerId.Storage,x,y,0,false);items.Add(device);
+            return Success("微缩炼丹炉已放入仓库；点击真实设备打开，闭店后可开炉。");
+        }
+
+        public bool OpenShopAlchemy(int deviceId)
+        {
+            if(IsCarrying)return Fail("请先结束携带，再使用店内炼丹炉。");
+            var device=Find(deviceId);
+            if(device==null || device.ForSale || device.Definition.id!=ShopFurnaceDefinitionId || device.Container!=ContainerId.Storage)
+                return Fail("请使用仓库根层的微缩炼丹炉。");
+            if(IsAtShopAlchemy)return deviceId==ShopFurnaceId?Success("继续操作当前炼丹炉。"):Fail("请先关闭当前炼丹炉；v1不支持同时操作多设备。");
+            ShopFurnaceId=deviceId;Alchemy=null;
+            return Success("店内炼丹：手动从仓库备料；成功开炉时支付本炉体力。");
+        }
+
+        public bool CloseShopAlchemy()
+        {
+            if(!IsAtShopAlchemy)return Fail("当前没有打开店内炼丹炉。");
+            if(Alchemy!=null && (Alchemy.Locked || Alchemy.Phase==AlchemyPhase.Running))return Fail("请先收丹或中止；炼制中不能关闭设备。");
+            if(items.Any(i=>IsAlchemyArea(i.Container)))return Fail("请先把备料、灵石和产物手动收回仓库，再关闭设备。");
+            if(Alchemy!=null && Alchemy.Phase==AlchemyPhase.Preparing && Alchemy.completedTargets.Count>0)return Fail("首味材料已入炉，请先开炉或明确中止本炉。");
+            ShopFurnaceId=0;Alchemy=null;return Success("已关闭炼丹炉，设备与物品保持原实例。");
+        }
+
+        public bool PrepareNextShopBatch()
+        {
+            if(!IsAtShopAlchemy || Alchemy==null || (Alchemy.Phase!=AlchemyPhase.Finished && Alchemy.Phase!=AlchemyPhase.Aborted))return Fail("请先完成或中止当前炉次。");
+            if(In(ContainerId.AlchemyOutput).Any())return Fail("请先收回上一炉产物。");
+            var recipe=Alchemy.Recipe;var ground=Alchemy.groundItems.ToArray();
+            Alchemy=new AlchemyBatch {Recipe=recipe};
+            foreach(int id in ground)if(Find(id)!=null)Alchemy.groundItems.Add(id);
+            return Success("下一炉备料中；成功开炉时再次扣体力。");
+        }
 
         // Explicit development operation. Uses the same inventory/IDs; never resets a Session.
         public bool GrantAlchemyTestMaterials(string recipeId)
@@ -65,8 +109,10 @@ namespace XiuXianShop
         bool CanMoveAlchemy(GridItem item,ContainerId target,out string reason)
         {
             reason="";
-            if((IsAlchemyArea(item.Container) || IsAlchemyArea(target)) && !IsAtAlchemy){reason="只能操作当前炼丹房设施。";return false;}
-            if(!IsAtAlchemy)return true;
+            if(item.Id==ShopFurnaceId){reason="请先关闭炼丹炉再移动设备。";return false;}
+            if((IsAlchemyArea(item.Container) || IsAlchemyArea(target)) && !IsUsingAlchemy){reason="只能操作当前炼丹设施。";return false;}
+            if(!IsUsingAlchemy)return true;
+            if(IsAtShopAlchemy && (item.Container==ContainerId.Interior || target==ContainerId.Interior)) {reason="请先把容器内材料手动取到仓库根层，再操作炼丹炉。";return false;}
             if(Alchemy!=null && (Alchemy.Locked || Alchemy.Phase==AlchemyPhase.Running))
             {reason="炼制或研磨期间不能搬运物品，请操作已备好的材料。";return false;}
             if(target==ContainerId.AlchemyOutput){reason="收丹位仅供本炉产物使用。";return false;}
@@ -77,21 +123,22 @@ namespace XiuXianShop
 
         public bool SelectAlchemyRecipe(string recipeId)
         {
-            if(!IsAtAlchemy)return Fail("请先进入炼丹房。");
+            if(!IsUsingAlchemy)return Fail("请先打开炼丹设施。");
             var cfg=catalog.alchemy;
             if(cfg.breathSeconds<=0 || cfg.grindSeconds<=0 || cfg.spiritEquivalentsPerSecond<=0 ||
                 cfg.lowHeatMultiplier<=0 || cfg.mediumHeatMultiplier<=0 || cfg.highHeatMultiplier<=0 ||
                 cfg.perfectWindow<0 || cfg.acceptableWindow<cfg.perfectWindow || cfg.debugTimeScale<=0)
                 throw new ArgumentException("炼丹灰盒时长、窗口与耗能配置无效。");
-            if(Alchemy!=null && (Alchemy.Locked || Alchemy.Phase!=AlchemyPhase.Preparing || Alchemy.completedTargets.Count>0))return Fail("本炉已操作，不能更换丹方；完成或中止后本次访问不能再开炉。");
+            if(Alchemy!=null && (Alchemy.Locked || Alchemy.Phase!=AlchemyPhase.Preparing || Alchemy.completedTargets.Count>0))return Fail(IsAtShopAlchemy?"本炉已操作，不能更换丹方；完成或中止后请先准备下一炉。":"本炉已操作，不能更换丹方；完成或中止后本次访问不能再开炉。");
             Alchemy=new AlchemyBatch {Recipe=catalog.alchemy.recipes.Single(r=>r.id==recipeId)};
             return Success("已选择丹方。先备料、安装灵石，并投入第一味材料。");
         }
 
         bool CanAlchemyAct(bool runningOnly=false)
         {
-            if(!IsAtAlchemy || Alchemy==null)return Fail("请先选择丹方。");
-            if(Alchemy.Phase==AlchemyPhase.Finished || Alchemy.Phase==AlchemyPhase.Aborted)return Fail("本次访问已用完一炉机会。");
+            if(!IsUsingAlchemy || Alchemy==null)return Fail("请先选择丹方。");
+            if(IsAtShopAlchemy && Phase!=TurnPhase.Closed)return Fail("店内炼丹仅在本回合营业结束后执行。");
+            if(Alchemy.Phase==AlchemyPhase.Finished || Alchemy.Phase==AlchemyPhase.Aborted)return Fail(IsAtShopAlchemy?"本炉已结束，请先取走产物并准备下一炉。":"本次访问已用完一炉机会。");
             if(Alchemy.Locked)return Fail("正在研磨，完成前不能进行其他手动动作。");
             if(runningOnly && Alchemy.Phase!=AlchemyPhase.Running)return Fail("请先开炉。");
             return true;
@@ -113,7 +160,7 @@ namespace XiuXianShop
         {
             if(!CanAlchemyAct())return false;
             var item=Find(itemId);
-            if(item==null || item.Container!=ContainerId.Location || item.LocationId!=AlchemyLocationId || item.Definition.category!=ItemCategory.Material)
+            if(item==null || item.Container!=AlchemyPreparationArea || (!IsAtShopAlchemy && item.LocationId!=AlchemyLocationId) || item.Definition.category!=ItemCategory.Material)
                 return Fail("只能投入已摆到备料格中的材料，灵石不是原料。");
             var a=Alchemy;
             int index=Array.FindIndex(a.Recipe.targets,t=>t.kind==AlchemyEventKind.Ingredient && !a.completedTargets.Contains(Array.IndexOf(a.Recipe.targets,t)));
@@ -151,11 +198,13 @@ namespace XiuXianShop
         {
             if(!CanAlchemyAct())return false;
             if(Alchemy.Phase!=AlchemyPhase.Preparing)return Fail("本炉已经运行。");
+            if(IsAtShopAlchemy && !CanSpendStamina(catalog.alchemy.shopStaminaCost,out var reason))return Fail(reason);
             var fuel=In(ContainerId.AlchemyFuel).SingleOrDefault();
             if(fuel==null || fuel.SpiritUnits<Math.Ceiling(AlchemyMinimumEnergy()*fuel.Definition.spiritResource.UnitsPerEquivalent-1e-6))
                 return Fail("安装灵石的剩余灵气不足标准炉程需要。");
             var output=new GridItem {Definition=catalog.Find(Alchemy.Recipe.productId)};
             if(In(ContainerId.AlchemyOutput).Any() || !Fits(output,ContainerId.AlchemyOutput,0,0,0,false))return Fail("收丹位必须为空并能容纳本炉产物。");
+            if(IsAtShopAlchemy)Stamina-=catalog.alchemy.shopStaminaCost;
             Alchemy.Phase=AlchemyPhase.Running;Alchemy.fuelId=fuel.Id;
             return Success("已开炉，中火；炉钟与灵气持续运行。");
         }
@@ -165,7 +214,7 @@ namespace XiuXianShop
             if(!CanAlchemyAct())return false;
             if(!Alchemy.Recipe.allowGrinding)return Fail("本丹方不需要研磨。");
             var item=Find(itemId);
-            if(item==null || item.Container!=ContainerId.Location || item.LocationId!=AlchemyLocationId || item.Definition.category!=ItemCategory.Material)return Fail("请选择备料区材料。");
+            if(item==null || item.Container!=AlchemyPreparationArea || (!IsAtShopAlchemy && item.LocationId!=AlchemyLocationId) || item.Definition.category!=ItemCategory.Material)return Fail("请选择备料区材料。");
             if(Alchemy.groundItems.Contains(itemId))return Fail("这件材料已经研磨。");
             Alchemy.GrindingItemId=itemId;Alchemy.GrindingRemaining=catalog.alchemy.grindSeconds;
             Alchemy.Actions.Add($"{Alchemy.Time:0.00}s 开始研磨 {item.Definition.title}");
@@ -186,7 +235,7 @@ namespace XiuXianShop
 
         public void TickAlchemy(double seconds)
         {
-            if(!IsAtAlchemy || Alchemy==null || seconds<=0)return;
+            if(!IsUsingAlchemy || Alchemy==null || seconds<=0)return;
             var a=Alchemy;
             if(a.Phase==AlchemyPhase.Finished || a.Phase==AlchemyPhase.Aborted)return;
             bool exhausted=false;

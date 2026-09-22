@@ -66,7 +66,7 @@ namespace XiuXianShop
             TickAlchemyPanel();
             // Fuel use changes value continuously. Alchemy updates its own labels; keep grid views
             // stable during the batch so a stationary pointer can retain its hover target.
-            bool alchemyRunning=Session!=null && Session.IsAtAlchemy && Session.Alchemy?.Phase==AlchemyPhase.Running;
+            bool alchemyRunning=Session!=null && Session.IsUsingAlchemy && Session.Alchemy?.Phase==AlchemyPhase.Running;
             if(Session!=null && displayedPricingRevision!=Session.PricingRevision && !IsDragging && !alchemyRunning) Refresh();
             var keyboard=Keyboard.current;
             if(keyboard==null || Session==null) return;
@@ -173,7 +173,12 @@ namespace XiuXianShop
             selection=ScrollableText("Selection",824,677,730,198);
             Card("Furnace",802,906,774,70,panel);
             furnaceText=Label(content,"Recipe",824,918,470,46,"",16,muted);
-            craftButton=MakeButton("Craft",1300,919,254,43,"炼制回气丹",()=>Run(()=>Session.Craft()));
+            craftButton=MakeButton("Craft",1300,919,254,43,"打开仓库炼丹炉",()=>
+            {
+                var device=Session.In(ContainerId.Storage).FirstOrDefault(i=>i.Definition.id==ShopSession.ShopFurnaceDefinitionId);
+                if(device==null){localNotice="仓库中还没有微缩炼丹炉。";Refresh();return;}
+                SelectItem(device.Id);
+            });
             var calendarObject=new GameObject("CalendarOverlay",typeof(RectTransform),typeof(ShopCalendarView));
             calendarObject.transform.SetParent(content,false);CalendarView=calendarObject.GetComponent<ShopCalendarView>();CalendarView.Initialize(this,font);
             var negotiationObject=new GameObject("NegotiationOverlay",typeof(RectTransform),typeof(ShopNegotiationView));
@@ -298,7 +303,7 @@ namespace XiuXianShop
             SetButtonTitle(acceptButton,"打开谈判 / 查看报价");
             SetButtonTitle(nextButton,offer==null?"呼叫下一位顾客":"送别并接待下一位");
             acceptButton.gameObject.SetActive(!closed);rejectButton.gameObject.SetActive(!closed);sleepButton.gameObject.SetActive(closed);
-            furnaceText.text=$"丹炉（保留功能） · 凝气草 {Count(catalog.herbId)} / 灵露 {Count(catalog.dewId)}\n1 草 + 1 露 → 1 丹";
+            furnaceText.text=$"店内微缩炉 · 每炉 {catalog.alchemy.shopStaminaCost} 体力（灰盒）\n需仓库中的真实设备、手动备料与实体灵石供能";
             displayedPricingRevision=Session.PricingRevision;
             if(displayedOffer!=offer || displayedPhase!=Session.Phase)
             {
@@ -340,7 +345,8 @@ namespace XiuXianShop
         public void SelectItem(int id)
         {
             if(IsDragging)return;selectedId=id;localNotice=null;
-            if(Session.Find(id).Definition.IsStorage)OpenStorage(id);
+            if(Session.Find(id).Definition.IsStorage && !Session.IsAtShopAlchemy)OpenStorage(id);
+            if(Session.Find(id).Definition.id==ShopSession.ShopFurnaceDefinitionId && !Session.IsAtShopAlchemy)OpenShopAlchemyPage(id);
             Refresh();
             Canvas.ForceUpdateCanvases();selection.GetComponentInParent<ScrollRect>().verticalNormalizedPosition=1;
         }
@@ -403,7 +409,7 @@ namespace XiuXianShop
 
         public void BeginItemDrag(int id,Vector2 screen)
         {
-            if(Session.IsAtAlchemy && Session.Alchemy!=null && (Session.Alchemy.Locked || Session.Alchemy.Phase==AlchemyPhase.Running))return;
+            if(Session.IsUsingAlchemy && Session.Alchemy!=null && (Session.Alchemy.Locked || Session.Alchemy.Phase==AlchemyPhase.Running))return;
             var item=Session.Find(id); if(item==null || IsDragging)return;
             selectedId=dragId=id; dragRotation=item.Rotation; dragFlipped=item.Flipped;pointer=screen;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(grids[item.Container],screen,null,out var point);
@@ -421,7 +427,7 @@ namespace XiuXianShop
         {
             var shape=Session.Find(dragId).Definition.Shape(dragRotation,dragFlipped);
             int offsetX=Mathf.Clamp(grabCell.x,0,shape.Max(p=>p.x)),offsetY=Mathf.Clamp(grabCell.y,0,shape.Max(p=>p.y));
-            foreach(var pair in grids.Where(p=>!Session.IsTravelling || ShopSession.IsHand(p.Key) || p.Key==ContainerId.Interior || p.Key==ContainerId.Location || Session.IsAlchemyArea(p.Key)).OrderByDescending(p=>p.Key==ContainerId.Interior || p.Key==ContainerId.Location || Session.IsAlchemyArea(p.Key)))
+            foreach(var pair in grids.Where(p=>(!Session.IsAtShopAlchemy || p.Key==ContainerId.Storage || Session.IsAlchemyArea(p.Key)) && (!Session.IsTravelling || ShopSession.IsHand(p.Key) || p.Key==ContainerId.Interior || p.Key==ContainerId.Location || Session.IsAlchemyArea(p.Key))).OrderByDescending(p=>p.Key==ContainerId.Interior || p.Key==ContainerId.Location || Session.IsAlchemyArea(p.Key)))
                 if(pair.Value.gameObject.activeInHierarchy && (pair.Key==ContainerId.Interior || storageWindow==null || !RectTransformUtility.RectangleContainsScreenPoint(storageWindow,screen,null)) && (carryWindow==null || pair.Key==ContainerId.Interior || ShopSession.IsHand(pair.Key) || !RectTransformUtility.RectangleContainsScreenPoint(carryWindow,screen,null)) && carrySelection==null && RectTransformUtility.RectangleContainsScreenPoint(pair.Value,screen,null))
                 {
                     RectTransformUtility.ScreenPointToLocalPointInRectangle(pair.Value,screen,null,out var p);

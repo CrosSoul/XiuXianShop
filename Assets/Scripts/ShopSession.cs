@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace XiuXianShop
 {
-    public enum ContainerId { Storage, Display, Counter, CustomerCounter, Interior, LeftHand, RightHand, CarriedPack, Location, AlchemyFuel, AlchemyOutput }
+    public enum ContainerId { Storage, Display, Counter, CustomerCounter, Interior, LeftHand, RightHand, CarriedPack, Location, AlchemyFuel, AlchemyOutput, AlchemyPreparation }
     public enum TurnPhase { Preparation, Open, Closed }
     public enum ItemOwner { Player, Customer }
     public enum TradeDirection { CustomerBuys, CustomerSells }
@@ -145,6 +145,7 @@ namespace XiuXianShop
         }
         public string CaptureSave()
         {
+            if(IsAtShopAlchemy)throw new InvalidOperationException("请先收回炼丹设施物品并关闭炼丹炉；当前不保存设备在制状态。");
             if(items.Any(i=>i.QualityValueMultiplier!=1))throw new InvalidOperationException("当前灰盒不保存炼丹品相，请勿用旧存档入口保存炼丹验证结果。");
             if(IsCarrying)throw new InvalidOperationException("请先结束携带状态再保存；当前版本不保存外出携带过程。" );
             if(Phase!=TurnPhase.Preparation)throw new InvalidOperationException("仅营业准备阶段可存档；请先闭店并结束回合。");
@@ -212,7 +213,7 @@ namespace XiuXianShop
         public GridItem Find(int id) => items.FirstOrDefault(i=>i.Id==id);
         public IEnumerable<GridItem> In(ContainerId container, int storageItemId=0) => items.Where(i=>i.Container==container && i.StorageItemId==storageItemId && (container!=ContainerId.Location || i.LocationId==CurrentLocationId));
         public Vector2Int GridSize(ContainerId container,int storageItemId=0,string locationId=null) => container==ContainerId.Interior ? Find(storageItemId).Definition.storageSize :
-            container==ContainerId.AlchemyFuel ? catalog.alchemy.fuelSize : container==ContainerId.AlchemyOutput ? catalog.alchemy.outputSize :
+            container==ContainerId.AlchemyPreparation ? catalog.alchemy.preparationSize : container==ContainerId.AlchemyFuel ? catalog.alchemy.fuelSize : container==ContainerId.AlchemyOutput ? catalog.alchemy.outputSize :
             container==ContainerId.Location ? LocationGridSize(locationId??CurrentLocationId) : Size(container);
         public int Occupied(ContainerId container) => In(container).Sum(i=>i.Cells.Length);
         GridItem NewItem(ItemDefinition def, ItemOwner owner) => new GridItem{Id=nextId++, Definition=def, Owner=owner,SpiritUnits=def.spiritResource?.CapacityUnits??0};
@@ -338,6 +339,7 @@ namespace XiuXianShop
 
         public bool BeginBusiness()
         {
+            if(IsAtShopAlchemy)return Fail("请先收回设施物品并关闭炼丹炉，再开始营业。");
             if(IsCarrying)return Fail("请先结束携带状态再营业。" );
             if (Phase!=TurnPhase.Preparation) return Fail("本月已经营业过；闭店后推进下个月。" );
             var attraction=PreviewAttraction();
@@ -492,6 +494,7 @@ namespace XiuXianShop
         }
         public bool AdvanceTurn()
         {
+            if(IsAtShopAlchemy)return Fail("请先完成或中止炼丹，收回设施物品并关闭炼丹炉，再推进月份。");
             if(IsCarrying)return Fail("请先结束携带状态再推进月份。" );
             if(Phase!=TurnPhase.Closed) return Fail("请先开始并结束本回合营业，再结束回合。" );
             int due=RentDebt;

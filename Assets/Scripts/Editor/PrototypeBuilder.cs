@@ -11,6 +11,15 @@ namespace XiuXianShop.Editor
         public const string CatalogPath="Assets/Data/ShopCatalog.asset";
         static ShopCatalog verificationCatalog;
         static bool discountEnabled;
+        [MenuItem("XiuXianShop/Current Play Session/Grant Miniature Alchemy Furnace (no reset)")]
+        public static void GrantCurrentShopFurnace()
+        {
+            if(!CanStartVerification())return;
+            var shop=Object.FindFirstObjectByType<ShopPrototype>();
+            AlchemyVerification.AddShopFurnaceDefinition(shop.Catalog);
+            shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP59DevelopmentSave.json");
+            shop.Run(shop.Session.GrantShopFurnace);
+        }
         [MenuItem("XiuXianShop/Current Play Session/Unlock Alchemy Room (no reset)")]
         public static void UnlockCurrentAlchemy()
         {

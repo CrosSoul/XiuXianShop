@@ -29,6 +29,8 @@ namespace XiuXianShop
     [Serializable]
     public sealed class AlchemySettings
     {
+        [Min(0), Tooltip("店内微缩炉每次成功开炉的体力；20仅为灰盒测试值。")]
+        public int shopStaminaCost=20;
         [Tooltip("DP58灰盒时序，不是最终平衡。")]
         public float breathSeconds=8, grindSeconds=8, perfectWindow=.5f, acceptableWindow=2;
         [Tooltip("每秒消耗的下品灵石等价量；转换为原灵石实例的整数精度扣除。")]

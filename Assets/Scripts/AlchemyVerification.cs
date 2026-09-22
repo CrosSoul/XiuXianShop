@@ -16,6 +16,16 @@ namespace XiuXianShop
             catalog.travelLocations.Single(l=>l.id==ShopSession.AlchemyLocationId).initiallyUnlocked=true;
         }
         public const string MaterialPackId="alchemy-test-pack";
+        public static void AddShopFurnaceDefinition(ShopCatalog catalog)
+        {
+            AddDefinitions(catalog);
+            if(catalog.items.Any(d=>d.id==ShopSession.ShopFurnaceDefinitionId))return;
+            catalog.items=catalog.items.Concat(new[]{new ItemDefinition {
+                id=ShopSession.ShopFurnaceDefinitionId,title="微缩炼丹炉（灰盒）",category=ItemCategory.ProductionEquipment,
+                baseValue=240,cells=Enumerable.Range(0,9).Select(n=>new Vector2Int(n%3,n/3)).ToArray(),
+                supplierAvailable=false,color=new Color(.55f,.47f,.38f),description="点击打开店内炼丹。3×3与价值240取自候选数据，仅作灰盒参考。"
+            }}).ToArray();
+        }
         public static void AddDefinitions(ShopCatalog catalog)
         {
             SpiritStoneVerification.AddDefinitions(catalog);

@@ -13,6 +13,7 @@ namespace XiuXianShop
 
         public bool BeginCarrying(int packId)
         {
+            if(IsAtShopAlchemy)return Fail("请先收回设施物品并关闭炼丹炉，再准备外出。");
             if(IsCarrying || Phase==TurnPhase.Open)return Fail("请在营业外选择携带物；携带期间不能更换背包。" );
             var pack=packId==0?null:Find(packId);
             if(packId!=0 && (pack==null || pack.Owner!=ItemOwner.Player || pack.Container!=ContainerId.Storage || pack.Definition.category!=ItemCategory.PortableContainer))

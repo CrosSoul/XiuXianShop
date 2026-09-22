@@ -113,10 +113,16 @@ namespace XiuXianShop
         }
         void CloseTravelWindow()
         {
+            if(originalStorageGrid!=null)
+            {
+                grids[ContainerId.Storage]=originalStorageGrid;cellSizes[ContainerId.Storage]=originalStorageCell;
+                originalStorageGrid=null;
+            }
             if(travelWindow!=null){travelWindow.gameObject.SetActive(false);Destroy(travelWindow.gameObject);}
             travelWindow=null;
             alchemyStatus=null;alchemyDebug=null;alchemyRecipeText=null;
             grids.Remove(ContainerId.AlchemyFuel);grids.Remove(ContainerId.AlchemyOutput);
+            grids.Remove(ContainerId.AlchemyPreparation);cellSizes.Remove(ContainerId.AlchemyPreparation);
             cellSizes.Remove(ContainerId.AlchemyFuel);cellSizes.Remove(ContainerId.AlchemyOutput);
             locationNotice=null;grids.Remove(ContainerId.Location);cellSizes.Remove(ContainerId.Location);
         }

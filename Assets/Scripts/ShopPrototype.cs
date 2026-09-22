@@ -346,7 +346,7 @@ namespace XiuXianShop
         {
             if(IsDragging)return;selectedId=id;localNotice=null;
             if(Session.Find(id).Definition.IsStorage && !Session.IsAtShopAlchemy)OpenStorage(id);
-            if(Session.Find(id).Definition.id==ShopSession.ShopFurnaceDefinitionId && !Session.IsAtShopAlchemy)OpenShopAlchemyPage(id);
+            if(Session.Find(id).Definition.id==ShopSession.ShopFurnaceDefinitionId && !IsShopAlchemyWindowOpen)OpenShopAlchemyPage(id);
             Refresh();
             Canvas.ForceUpdateCanvases();selection.GetComponentInParent<ScrollRect>().verticalNormalizedPosition=1;
         }
@@ -409,7 +409,8 @@ namespace XiuXianShop
 
         public void BeginItemDrag(int id,Vector2 screen)
         {
-            if(Session.IsUsingAlchemy && Session.Alchemy!=null && (Session.Alchemy.Locked || Session.Alchemy.Phase==AlchemyPhase.Running))return;
+            if(Session.IsUsingAlchemy && Session.Alchemy!=null && (Session.Alchemy.Locked || Session.Alchemy.Phase==AlchemyPhase.Running) &&
+                (!Session.IsAtShopAlchemy || Session.IsAlchemyArea(Session.Find(id).Container)))return;
             var item=Session.Find(id); if(item==null || IsDragging)return;
             selectedId=dragId=id; dragRotation=item.Rotation; dragFlipped=item.Flipped;pointer=screen;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(grids[item.Container],screen,null,out var point);
@@ -428,7 +429,7 @@ namespace XiuXianShop
             var shape=Session.Find(dragId).Definition.Shape(dragRotation,dragFlipped);
             int offsetX=Mathf.Clamp(grabCell.x,0,shape.Max(p=>p.x)),offsetY=Mathf.Clamp(grabCell.y,0,shape.Max(p=>p.y));
             foreach(var pair in grids.Where(p=>(!Session.IsAtShopAlchemy || p.Key==ContainerId.Storage || Session.IsAlchemyArea(p.Key)) && (!Session.IsTravelling || ShopSession.IsHand(p.Key) || p.Key==ContainerId.Interior || p.Key==ContainerId.Location || Session.IsAlchemyArea(p.Key))).OrderByDescending(p=>p.Key==ContainerId.Interior || p.Key==ContainerId.Location || Session.IsAlchemyArea(p.Key)))
-                if(pair.Value.gameObject.activeInHierarchy && (pair.Key==ContainerId.Interior || storageWindow==null || !RectTransformUtility.RectangleContainsScreenPoint(storageWindow,screen,null)) && (carryWindow==null || pair.Key==ContainerId.Interior || ShopSession.IsHand(pair.Key) || !RectTransformUtility.RectangleContainsScreenPoint(carryWindow,screen,null)) && carrySelection==null && RectTransformUtility.RectangleContainsScreenPoint(pair.Value,screen,null))
+                if(pair.Value.gameObject.activeInHierarchy && (!IsShopAlchemyWindowOpen || Session.IsAlchemyArea(pair.Key) || !RectTransformUtility.RectangleContainsScreenPoint(travelWindow,screen,null)) && (pair.Key==ContainerId.Interior || storageWindow==null || !RectTransformUtility.RectangleContainsScreenPoint(storageWindow,screen,null)) && (carryWindow==null || pair.Key==ContainerId.Interior || ShopSession.IsHand(pair.Key) || !RectTransformUtility.RectangleContainsScreenPoint(carryWindow,screen,null)) && carrySelection==null && RectTransformUtility.RectangleContainsScreenPoint(pair.Value,screen,null))
                 {
                     RectTransformUtility.ScreenPointToLocalPointInRectangle(pair.Value,screen,null,out var p);
                     container=pair.Key; if(ShopSession.IsHand(container)){x=y=0;return true;} x=Mathf.FloorToInt(p.x/cellSizes[container])-offsetX; y=Mathf.FloorToInt(-p.y/cellSizes[container])-offsetY; return true;

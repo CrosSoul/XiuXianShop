@@ -48,6 +48,35 @@ namespace XiuXianShop.Tests
         [UnityTest,Category("DP60")] public IEnumerator ShopBasicAlchemyTwoBatchesAndNextMonth()=>PlayShopAlchemy("recipe_pill_basic",2);
         [UnityTest,Category("DP60")] public IEnumerator ShopGroundAlchemyUsesSameKernel()=>PlayShopAlchemy("recipe_pill_fire_yang",1);
         [UnityTest,Category("DP60")] public IEnumerator ShopComplexAlchemyUsesSameKernel()=>PlayShopAlchemy("recipe_pill_metal_water",1);
+        [UnityTest,Category("DP60")] public IEnumerator ShopAlchemyWindowKeepsMainGridAndLoadedInstancesOnReopenAndFailedDrops()
+        {
+            yield return CreateShopAlchemyKit("recipe_pill_basic");yield return CloseBusinessForOuting();
+            var s=shop.Session;var device=s.Items.Single(i=>i.Definition.id==ShopSession.ShopFurnaceDefinitionId);
+            var warehouse=shop.ItemView(device.Id).parent;var position=warehouse.position;
+            yield return ClickGridItem(device);yield return Click("AlchemyRecipe_recipe_pill_basic");
+            var batch=s.Alchemy;var herb=s.In(ContainerId.Storage).Single(i=>i.Definition.id=="herb");
+            var dew=s.In(ContainerId.Storage).Single(i=>i.Definition.id=="dew");var fuel=s.In(ContainerId.Storage).Single(i=>i.Definition.id=="stone_mid");
+            var ids=s.Items.ToArray();int spirit=fuel.SpiritUnits;
+            yield return Drag(herb,ContainerId.AlchemyPreparation,0,0);
+            yield return Drag(fuel,ContainerId.AlchemyFuel,0,0);
+            yield return Drag(dew,ContainerId.AlchemyPreparation,0,0);Assert.That(dew.Container,Is.EqualTo(ContainerId.Storage));
+            yield return Drag(dew,ContainerId.AlchemyFuel,0,0);Assert.That(dew.Container,Is.EqualTo(ContainerId.Storage));
+            yield return Drag(dew,ContainerId.AlchemyPreparation,5,3);Assert.That(dew.Container,Is.EqualTo(ContainerId.Storage));
+            yield return Click("ShopAlchemyClose");Assert.That(shop.IsShopAlchemyWindowOpen,Is.False);
+            Assert.That(s.HasPendingShopAlchemy);Assert.That(s.AdvanceTurn(),Is.False);
+            yield return ClickGridItem(device);Assert.That(shop.IsShopAlchemyWindowOpen);
+            Assert.That(s.Alchemy,Is.SameAs(batch));Assert.That(s.Items,Is.EqualTo(ids));Assert.That(fuel.SpiritUnits,Is.EqualTo(spirit));
+            Assert.That(shop.ItemView(device.Id).parent,Is.SameAs(warehouse));Assert.That(warehouse.position,Is.EqualTo(position));
+            var window=(RectTransform)shop.GetComponentsInChildren<RectTransform>().Single(t=>t.name=="ShopAlchemyWindow");
+            Assert.That(warehouse.IsChildOf(window),Is.False);Assert.That(window.GetComponentsInChildren<RectTransform>().Any(t=>t.name=="StorageGrid"),Is.False);
+            var title=(RectTransform)window.Find("ShopAlchemyTitleBar");var from=RectTransformUtility.WorldToScreenPoint(null,title.TransformPoint(title.rect.center));
+            var before=window.anchoredPosition;
+            yield return MouseAt(from,false);yield return MouseAt(from,true);yield return MouseAt(from+new Vector2(-30,20),true);yield return MouseAt(from+new Vector2(-30,20),false);
+            Assert.That(window.anchoredPosition,Is.Not.EqualTo(before));
+            yield return DragIntoFreeSpace(herb,ContainerId.Storage);yield return DragIntoFreeSpace(fuel,ContainerId.Storage);
+            yield return Click("ShopAlchemyClose");Assert.That(s.IsAtShopAlchemy,Is.False);Assert.That(s.Items,Is.EqualTo(ids));
+            Assert.That(s.Stamina,Is.EqualTo(100));LogAssert.NoUnexpectedReceived();
+        }
         [UnityTest,Category("DP60")] public IEnumerator ShopShortcutWithoutDeviceCannotUseOldInstantCraft()
         {
             IsolateAlchemyTestMouse();var s=shop.Session;var items=s.Items.ToArray();
@@ -64,7 +93,9 @@ namespace XiuXianShop.Tests
             string assetBefore=JsonUtility.ToJson(asset);
             yield return CreateShopAlchemyKit(recipeId,batches);
             var device=s.Items.Single(i=>i.Definition.id==ShopSession.ShopFurnaceDefinitionId);
+            var warehouse=shop.ItemView(device.Id).parent;
             yield return ClickGridItem(device);Assert.That(s.ShopFurnaceId,Is.EqualTo(device.Id));
+            Assert.That(shop.ItemView(device.Id).parent,Is.SameAs(warehouse),"Opening the furnace must not replace the main warehouse grid.");
             yield return Click("AlchemyRecipe_"+recipeId);
             Assert.That(s.StartAlchemy(),Is.False);Assert.That(shop.FindButton("AlchemyStart").interactable,Is.False);
             yield return Click("ShopAlchemyClose");Assert.That(s.Find(device.Id),Is.SameAs(device));
@@ -85,6 +116,13 @@ namespace XiuXianShop.Tests
                 yield return ClickGridItem(ingredients[0]);yield return Click("AlchemyAdd");
                 int stamina=s.Stamina;yield return Click("AlchemyStart");Assert.That(s.Stamina,Is.EqualTo(stamina-20));
                 Assert.That(s.AdvanceTurn(),Is.False);Assert.That(s.CloseShopAlchemy(),Is.False);
+                if(recipeId=="recipe_pill_basic" && batch==0)
+                {
+                    var running=s.Alchemy;double time=running.Time;
+                    yield return Click("ShopAlchemyClose");Assert.That(shop.IsShopAlchemyWindowOpen,Is.False);
+                    yield return new WaitForSeconds(.2f);Assert.That(running.Time,Is.GreaterThan(time));
+                    yield return ClickGridItem(device);Assert.That(s.Alchemy,Is.SameAs(running));Assert.That(s.Stamina,Is.EqualTo(stamina-20));
+                }
                 foreach(var target in recipe.targets.Skip(1))
                 {
                     GridItem item=null;
@@ -100,6 +138,10 @@ namespace XiuXianShop.Tests
                 }
                 Assert.That(s.Alchemy.Phase,Is.EqualTo(AlchemyPhase.Finished));Assert.That(s.Alchemy.Quality,Is.Not.EqualTo(PillQuality.Ruined));
                 var product=s.In(ContainerId.AlchemyOutput).Single();if(firstProduct==null)firstProduct=product;
+                var finished=s.Alchemy;var quality=product.QualityValueMultiplier;
+                yield return Click("ShopAlchemyClose");yield return ClickGridItem(device);
+                Assert.That(s.Alchemy,Is.SameAs(finished));Assert.That(s.In(ContainerId.AlchemyOutput).Single(),Is.SameAs(product));
+                Assert.That(product.QualityValueMultiplier,Is.EqualTo(quality));Assert.That(shop.ItemView(device.Id).parent,Is.SameAs(warehouse));
                 yield return HoverItem(product,"品相：");
                 Assert.That(s.PrepareNextShopBatch(),Is.False);yield return DragIntoFreeSpace(product,ContainerId.Storage);
                 Assert.That(s.Find(product.Id),Is.SameAs(product));Assert.That(s.Stamina,Is.EqualTo(stamina-20));

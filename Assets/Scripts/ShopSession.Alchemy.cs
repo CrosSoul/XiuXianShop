@@ -42,6 +42,9 @@ namespace XiuXianShop
         public const string ShopFurnaceDefinitionId="device_alchemy_furnace";
         public int ShopFurnaceId { get; private set; }
         public bool IsAtShopAlchemy => ShopFurnaceId!=0;
+        public bool HasPendingShopAlchemy => IsAtShopAlchemy && (items.Any(i=>IsAlchemyArea(i.Container)) ||
+            (Alchemy!=null && (Alchemy.Locked || Alchemy.Phase==AlchemyPhase.Running ||
+                (Alchemy.Phase==AlchemyPhase.Preparing && Alchemy.completedTargets.Count>0))));
         public bool IsUsingAlchemy => IsAtAlchemy || IsAtShopAlchemy;
         public ContainerId AlchemyPreparationArea => IsAtShopAlchemy?ContainerId.AlchemyPreparation:ContainerId.Location;
         public AlchemyBatch Alchemy { get; private set; }
@@ -113,7 +116,8 @@ namespace XiuXianShop
             if((IsAlchemyArea(item.Container) || IsAlchemyArea(target)) && !IsUsingAlchemy){reason="只能操作当前炼丹设施。";return false;}
             if(!IsUsingAlchemy)return true;
             if(IsAtShopAlchemy && (item.Container==ContainerId.Interior || target==ContainerId.Interior)) {reason="请先把容器内材料手动取到仓库根层，再操作炼丹炉。";return false;}
-            if(Alchemy!=null && (Alchemy.Locked || Alchemy.Phase==AlchemyPhase.Running))
+            if(Alchemy!=null && (Alchemy.Locked || Alchemy.Phase==AlchemyPhase.Running) &&
+                (!IsAtShopAlchemy || IsAlchemyArea(item.Container) || IsAlchemyArea(target)))
             {reason="炼制或研磨期间不能搬运物品，请操作已备好的材料。";return false;}
             if(target==ContainerId.AlchemyOutput){reason="收丹位仅供本炉产物使用。";return false;}
             if(target==ContainerId.AlchemyFuel && (item.Definition.spiritResource==null || In(target).Any(i=>i.Id!=item.Id)))

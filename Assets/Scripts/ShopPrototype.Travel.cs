@@ -113,11 +113,6 @@ namespace XiuXianShop
         }
         void CloseTravelWindow()
         {
-            if(originalStorageGrid!=null)
-            {
-                grids[ContainerId.Storage]=originalStorageGrid;cellSizes[ContainerId.Storage]=originalStorageCell;
-                originalStorageGrid=null;
-            }
             if(travelWindow!=null){travelWindow.gameObject.SetActive(false);Destroy(travelWindow.gameObject);}
             travelWindow=null;
             alchemyStatus=null;alchemyDebug=null;alchemyRecipeText=null;

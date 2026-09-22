@@ -9,25 +9,26 @@ namespace XiuXianShop
     {
         Text alchemyStatus,alchemyDebug,alchemyRecipeText,alchemyGrinding;
         Button[] alchemyActions;
-        RectTransform originalStorageGrid;
-        float originalStorageCell;
         Text shopAlchemyNotice;
+        public bool IsShopAlchemyWindowOpen => Session.IsAtShopAlchemy && travelWindow!=null;
         void OpenShopAlchemyPage(int deviceId)
         {
             if(!Session.OpenShopAlchemy(deviceId)){localNotice=Session.Message;return;}
             CloseStorage();CloseTravelWindow();CancelDrag();
-            travelWindow=Rect(content,"ShopAlchemyWindow",0,0,1600,1000);Image(travelWindow,new Color(.035f,.06f,.07f),true);
-            Label(travelWindow,"ShopAlchemyTitle",100,40,1370,55,"店内微缩炼丹炉 · 仓库手动备料",29,gold);
-            AddAlchemyGrid(ContainerId.AlchemyPreparation,100,180,"");
-            originalStorageGrid=grids[ContainerId.Storage];originalStorageCell=cellSizes[ContainerId.Storage];
-            AddAlchemyGrid(ContainerId.Storage,100,525,"仓库根层");
-            Label(travelWindow,"ShopAlchemyHint",740,525,490,180,"从仓库手动拖入备料和供能位。\n收丹后把产物拖回仓库，再准备下一炉。\n关闭前请收回备料、灵石及产物。",22,textColor);
-            shopAlchemyNotice=Label(travelWindow,"ShopAlchemyNotice",740,725,490,150,"",21,gold);
+            travelWindow=Rect(content,"ShopAlchemyWindow",790,105,790,870);Image(travelWindow,panel,true);
+            var title=Rect(travelWindow,"ShopAlchemyTitleBar",0,0,660,44);Image(title,line,true);
+            title.gameObject.AddComponent<StorageWindowDrag>().window=travelWindow;
+            Label(title,"Title",12,8,640,30,"微缩炼丹炉 · 拖动标题移动窗口",21,gold);
+            AddAlchemyGrid(ContainerId.AlchemyPreparation,20,165,"");
+            Label(travelWindow,"ShopAlchemyHint",20,760,510,86,"直接从左侧主仓库拖入材料 / 灵石，收丹后拖回。\n关闭浮窗保留炉内内容，炼制仍继续。\n收回设施物品并关闭后，才能外出或推进月份。",17,textColor);
+            shopAlchemyNotice=Label(travelWindow,"ShopAlchemyNotice",20,670,510,85,"",18,gold);
             BuildAlchemyPanel();Refresh();
         }
         void CloseShopAlchemyPage()
         {
-            if(!Session.CloseShopAlchemy()){RefreshAlchemyPanel();return;}
+            CancelDrag();
+            // Closing a view never discards a loaded or running batch. Release the device only when empty.
+            if(!Session.HasPendingShopAlchemy)Session.CloseShopAlchemy();
             CloseTravelWindow();Refresh();
         }
         void BuildAlchemyPanel()
@@ -61,6 +62,26 @@ namespace XiuXianShop
             alchemyDebug=Label(viewport,"AlchemyDebug",8,8,278,510,"",16,muted);
             alchemyDebug.alignment=TextAnchor.UpperLeft;
             var scroll=viewport.gameObject.AddComponent<ScrollRect>();scroll.viewport=viewport;scroll.content=alchemyDebug.rectTransform;scroll.horizontal=false;scroll.scrollSensitivity=30;
+            if(Session.IsAtShopAlchemy)
+            {
+                // Same controls and handlers, arranged in a secondary window beside the real warehouse.
+                void Place(string name,float x,float y,float width,float height)
+                {
+                    var rect=(RectTransform)travelWindow.Find(name);
+                    rect.anchoredPosition=new Vector2(x,-y);rect.sizeDelta=new Vector2(width,height);
+                }
+                Place("PreparationTitle",20,133,290,30);
+                Place("AlchemyFuelTitle",330,133,100,30);Place("AlchemyFuelGrid",330,165,96,96);
+                Place("AlchemyOutputTitle",440,133,100,30);Place("AlchemyOutputGrid",440,165,96,96);
+                for(int i=0;i<Session.Catalog.alchemy.recipes.Length;i++)Place("AlchemyRecipe_"+Session.Catalog.alchemy.recipes[i].id,20+i*250,53,240,38);
+                Place("AlchemyRecipe",20,95,745,38);Place("AlchemyStatus",20,385,510,85);
+                for(int i=0;i<alchemyActions.Length;i++)Place(alchemyActions[i].name,20+i*130,475,125,38);
+                for(int i=0;i<3;i++)Place("AlchemyHeat_"+(AlchemyHeat)i,20+i*130,523,125,38);
+                Place("AlchemyAbort",410,523,125,38);Place("AlchemyGrinding",150,568,385,35);
+                Place("ShopAlchemyClose",667,4,115,36);Place("AlchemyNextBatch",20,615,300,38);
+                Place("AlchemyDebugViewport",550,165,225,675);
+                alchemyDebug.rectTransform.sizeDelta=new Vector2(203,659);
+            }
             RefreshAlchemyPanel();
         }
         void AddAlchemyGrid(ContainerId area,float x,float y,string title)
@@ -112,7 +133,8 @@ namespace XiuXianShop
                 string.Join("\n",a.Recipe.targets.Where(t=>t.kind==AlchemyEventKind.Heat).Select(t=>$"{t.breaths*cfg.breathSeconds:0.00}s {Title(t)}"))+"\n逐材料在炉时长 / 火候判定：\n"+
                 string.Join("\n",a.Judgements.Select(j=>j.EntryTime.HasValue && a.Phase!=AlchemyPhase.Finished?
                     $"{j.Action}：入炉{j.EntryTime:0.00}s / 目标在炉{j.TargetTime:0.00}s / 实际{a.Time-j.EntryTime.Value:0.00}s / 偏差{a.Time-j.EntryTime.Value-j.TargetTime:+0.00;-0.00;0.00}s · 待收丹":j.ToString()).Concat(a.Actions).Concat(a.StructuralErrors)):"";
-            alchemyDebug.rectTransform.sizeDelta=new Vector2(278,Mathf.Max(510,alchemyDebug.preferredHeight+20));
+            var debugViewport=(RectTransform)alchemyDebug.transform.parent;
+            alchemyDebug.rectTransform.sizeDelta=new Vector2(debugViewport.rect.width-22,Mathf.Max(debugViewport.rect.height-16,alchemyDebug.preferredHeight+20));
         }
     }
 }

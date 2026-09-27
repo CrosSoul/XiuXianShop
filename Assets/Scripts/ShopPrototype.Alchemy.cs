@@ -69,6 +69,8 @@ namespace XiuXianShop
                 {
                     var rect=(RectTransform)travelWindow.Find(name);
                     rect.anchoredPosition=new Vector2(x,-y);rect.sizeDelta=new Vector2(width,height);
+                    if(rect.TryGetComponent<UnityEngine.UI.Button>(out var button))
+                        button.GetComponentInChildren<UnityEngine.UI.Text>().rectTransform.sizeDelta=new Vector2(width-12,height-4);
                 }
                 Place("PreparationTitle",20,133,290,30);
                 Place("AlchemyFuelTitle",330,133,100,30);Place("AlchemyFuelGrid",330,165,96,96);

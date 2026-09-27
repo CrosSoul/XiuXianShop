@@ -61,7 +61,7 @@ namespace XiuXianShop.Tests
             yield return Drag(fuel,ContainerId.AlchemyFuel,0,0);
             yield return Drag(dew,ContainerId.AlchemyPreparation,0,0);Assert.That(dew.Container,Is.EqualTo(ContainerId.Storage));
             yield return Drag(dew,ContainerId.AlchemyFuel,0,0);Assert.That(dew.Container,Is.EqualTo(ContainerId.Storage));
-            yield return Drag(dew,ContainerId.AlchemyPreparation,5,3);Assert.That(dew.Container,Is.EqualTo(ContainerId.Storage));
+            yield return Drag(dew,ContainerId.AlchemyPreparation,6,3);Assert.That(dew.Container,Is.EqualTo(ContainerId.Storage));
             yield return Click("ShopAlchemyClose");Assert.That(shop.IsShopAlchemyWindowOpen,Is.False);
             Assert.That(s.HasPendingShopAlchemy);Assert.That(s.AdvanceTurn(),Is.False);
             yield return ClickGridItem(device);Assert.That(shop.IsShopAlchemyWindowOpen);

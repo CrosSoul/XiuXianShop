@@ -266,5 +266,305 @@
         }
       ]
     }
-  ]
+  ],
+  "floatingWindowRevision": {
+    "date": "2026-09-27",
+    "baseCommit": "aa6761f",
+    "runs": [
+      {
+        "run": "revisionCliPlay",
+        "status": "completed",
+        "duration": 108.93,
+        "summary": {
+          "total": 5,
+          "passed": 4,
+          "failed": 1,
+          "skipped": 0,
+          "inconclusive": 0
+        },
+        "results": [
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.ShopAlchemyWindowKeepsMainGridAndLoadedInstancesOnReopenAndFailedDrops",
+            "Status": "Failed",
+            "Duration": 3.1320525,
+            "Message": "  Expected: Storage\r\n  But was:  AlchemyPreparation\r\n",
+            "StackTrace": "at XiuXianShop.Tests.ShopPlayableTests+<ShopAlchemyWindowKeepsMainGridAndLoadedInstancesOnReopenAndFailedDrops>d__37.MoveNext () [0x00334] in D:\\Unity\\UnityProjects\\XiuXianShop\\Assets\\Tests\\PlayMode\\ShopAlchemyPlayableTests.cs:64\r\nat UnityEngine.TestTools.TestEnumerator+<Execute>d__8.MoveNext () [0x0003a] in .\\Library\\PackageCache\\com.unity.test-framework@7a3849e09bd0\\UnityEngine.TestRunner\\NUnitExtensions\\Attributes\\TestEnumerator.cs:52\r\n"
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.ShopBasicAlchemyTwoBatchesAndNextMonth",
+            "Status": "Passed",
+            "Duration": 42.1493781,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.ShopComplexAlchemyUsesSameKernel",
+            "Status": "Passed",
+            "Duration": 39.667819,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.ShopGroundAlchemyUsesSameKernel",
+            "Status": "Passed",
+            "Duration": 23.4109766,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.ShopShortcutWithoutDeviceCannotUseOldInstantCraft",
+            "Status": "Passed",
+            "Duration": 0.5435053,
+            "Message": null,
+            "StackTrace": null
+          }
+        ]
+      },
+      {
+        "run": "revisionCliWindow",
+        "status": "completed",
+        "duration": 3.8,
+        "summary": {
+          "total": 1,
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "inconclusive": 0
+        },
+        "results": [
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.ShopAlchemyWindowKeepsMainGridAndLoadedInstancesOnReopenAndFailedDrops",
+            "Status": "Passed",
+            "Duration": 3.7816279,
+            "Message": null,
+            "StackTrace": null
+          }
+        ]
+      },
+      {
+        "run": "revisionCliRemote",
+        "status": "completed",
+        "duration": 82.99,
+        "summary": {
+          "total": 19,
+          "passed": 18,
+          "failed": 1,
+          "skipped": 0,
+          "inconclusive": 0
+        },
+        "results": [
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.AlchemySharedHoverCoversCarryPreparationFuelAndGroundState",
+            "Status": "Passed",
+            "Duration": 15.0361487,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.AlchemyTooltipAcceptsRuntimeDelayOptions",
+            "Status": "Passed",
+            "Duration": 3.8162322,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.BasicAlchemyWithActualGridAndButtons",
+            "Status": "Passed",
+            "Duration": 11.0117777,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.CommissionIsFixedAndPhysicalRewardsMustBeCarriedOrAbandoned",
+            "Status": "Passed",
+            "Duration": 2.386712,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.ComplexAlchemyWithActualGridAndButtons",
+            "Status": "Passed",
+            "Duration": 17.9989473,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.CurrencyCommissionPaysOnceAndNextMonthOffersNewCommission",
+            "Status": "Passed",
+            "Duration": 2.2536907,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.EarlyReturnConfirmationEndsOutingWithoutPayingOrDuplicatingPack",
+            "Status": "Passed",
+            "Duration": 1.3381217,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.ExpandedReceivingAreaScrollsAndRewardsFitCarriedStorage",
+            "Status": "Passed",
+            "Duration": 1.7792777,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.GroundAlchemyWithActualGridAndButtons",
+            "Status": "Passed",
+            "Duration": 9.8750586,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.LocationDragPickupAndLeaveConfirmationKeepOnlyCarriedItems",
+            "Status": "Passed",
+            "Duration": 2.0620113,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.MultipleActualPacksCancelWithoutChangesAndChosenContentsMoveBetweenHandsAndPack",
+            "Status": "Passed",
+            "Duration": 1.8783514,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.NoPortableChoiceStillCarriesTwoDifferentShapesAndReopensWithoutCopying",
+            "Status": "Passed",
+            "Duration": 1.1215872,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.PersistentLocationShowsSameItemOnNextVisitAndNoOrdinaryCleanupPrompt",
+            "Status": "Failed",
+            "Duration": 1.2778036,
+            "Message": "  Missing button: CarryConfirm\r\n  Expected: not null\r\n  But was:  null\r\n",
+            "StackTrace": "at XiuXianShop.Tests.ShopPlayableTests+<Click>d__54.MoveNext () [0x000cc] in D:\\Unity\\UnityProjects\\XiuXianShop\\Assets\\Tests\\PlayMode\\ShopPlayableTests.cs:94\r\nat UnityEngine.TestTools.TestEnumerator+<Execute>d__8.MoveNext () [0x0003a] in .\\Library\\PackageCache\\com.unity.test-framework@7a3849e09bd0\\UnityEngine.TestRunner\\NUnitExtensions\\Attributes\\TestEnumerator.cs:52\r\n"
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.PromotionAndOverflowCreateSevenVisitorsOnce",
+            "Status": "Passed",
+            "Duration": 2.0999001,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.ResourceChangesRefreshVisibleValueAndKeepDraggedInstance",
+            "Status": "Passed",
+            "Duration": 1.0737988,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.SecretIsVisibleInCalendarBeforeStartWithoutApplyingItsPrice",
+            "Status": "Passed",
+            "Duration": 1.8871848,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.TeaVisitReopensSameNewsAndPromotionChangesOnlyNextBusiness",
+            "Status": "Passed",
+            "Duration": 2.7729059,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.TravelButtonsChargeOncePreserveHandsAndDisableVisitedAndUnaffordableLocations",
+            "Status": "Passed",
+            "Duration": 1.7372813,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.TravelEntryLocksBeforeBusinessDuringBusinessAndAfterMonthAdvance",
+            "Status": "Passed",
+            "Duration": 1.5462126,
+            "Message": null,
+            "StackTrace": null
+          }
+        ]
+      },
+      {
+        "run": "revisionCliLocationRetry",
+        "status": "completed",
+        "duration": 2.4,
+        "summary": {
+          "total": 1,
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "inconclusive": 0
+        },
+        "results": [
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.PersistentLocationShowsSameItemOnNextVisitAndNoOrdinaryCleanupPrompt",
+            "Status": "Passed",
+            "Duration": 2.373617,
+            "Message": null,
+            "StackTrace": null
+          }
+        ]
+      },
+      {
+        "run": "revisionCliIntegration",
+        "status": "completed",
+        "duration": 33.46,
+        "summary": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0,
+          "skipped": 0,
+          "inconclusive": 0
+        },
+        "results": [
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.DefaultSessionAlchemyDevelopmentMenusPreserveProgressAndContinueBusiness",
+            "Status": "Passed",
+            "Duration": 20.8985051,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.DefaultSessionKeepsTeaCommissionsAndItemsAcrossContinuousMonths",
+            "Status": "Passed",
+            "Duration": 9.0694566,
+            "Message": null,
+            "StackTrace": null
+          },
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.DefaultSessionOverflowDoesNotAccumulateExtraVisitors",
+            "Status": "Passed",
+            "Duration": 3.4582456,
+            "Message": null,
+            "StackTrace": null
+          }
+        ]
+      },
+      {
+        "run": "revisionCliStorage",
+        "status": "completed",
+        "duration": 2.25,
+        "summary": {
+          "total": 1,
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "inconclusive": 0
+        },
+        "results": [
+          {
+            "FullName": "XiuXianShop.Tests.ShopPlayableTests.StorageWindowDragsContentsAndBoxThenRestoresActualSave",
+            "Status": "Passed",
+            "Duration": 2.2268708,
+            "Message": null,
+            "StackTrace": null
+          }
+        ]
+      }
+    ]
+  }
 }

@@ -17,7 +17,6 @@ namespace XiuXianShop.Editor
             if(!CanStartVerification())return;
             var shop=Object.FindFirstObjectByType<ShopPrototype>();
             AlchemyVerification.AddShopFurnaceDefinition(shop.Catalog);
-            shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP59DevelopmentSave.json");
             shop.Run(shop.Session.GrantShopFurnace);
         }
         [MenuItem("XiuXianShop/Current Play Session/Unlock Alchemy Room (no reset)")]
@@ -26,7 +25,6 @@ namespace XiuXianShop.Editor
             if(!CanStartVerification())return;
             var shop=Object.FindFirstObjectByType<ShopPrototype>();
             AlchemyVerification.AddDefinitions(shop.Catalog);
-            shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP59DevelopmentSave.json");
             shop.Run(()=>shop.Session.UnlockLocation(ShopSession.AlchemyLocationId));
         }
         [MenuItem("XiuXianShop/Current Play Session/Grant Alchemy Kit/回气丹")]
@@ -40,7 +38,6 @@ namespace XiuXianShop.Editor
             if(!CanStartVerification())return;
             var shop=Object.FindFirstObjectByType<ShopPrototype>();
             AlchemyVerification.AddDefinitions(shop.Catalog);
-            shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP59DevelopmentSave.json");
             shop.Run(()=>shop.Session.GrantAlchemyTestMaterials(recipeId));
         }
         [MenuItem("XiuXianShop/Validation/Start DP58 Alchemy Graybox (resets Play session)")]

@@ -8,6 +8,8 @@ namespace XiuXianShop
     {
         string[] commissionCandidates = Array.Empty<string>();
         int commissionTurn, commissionsCompleted, commissionGridHeight;
+        string completedCommissionId;
+        public string CompletedCommissionId => completedCommissionId;
         public IEnumerable<CommissionTemplate> CommissionCandidates => commissionCandidates.Select(id=>catalog.commissions.templates.Single(t=>t.id==id));
         public bool CommissionLimitReached => commissionsCompleted>=catalog.commissions.completionLimitPerTurn;
         public string CommissionResult { get; private set; } = "";
@@ -35,7 +37,7 @@ namespace XiuXianShop
                 for(int i=0;i<available.Count;i++){roll-=available[i].weight;if(roll<0){index=i;break;}}
                 selected.Add(available[index].id);available.RemoveAt(index);
             }
-            commissionCandidates=selected.ToArray();commissionTurn=Turn;commissionsCompleted=0;CommissionResult="";
+            commissionCandidates=selected.ToArray();commissionTurn=Turn;commissionsCompleted=0;completedCommissionId=null;CommissionResult="";
         }
 
         CommissionRewardPool CommissionPool(string id) => catalog.commissions.rewardPools.Single(p=>p.id==id && p.enabled);
@@ -95,7 +97,7 @@ namespace XiuXianShop
                     if(!AddLocationItem(id))throw new InvalidOperationException("百事堂扩展领取区后仍无法放置已核对奖励。");
                 }
             }
-            Money+=money;commissionsCompleted++;
+            Money+=money;commissionsCompleted++;completedCommissionId=templateId;
             CommissionResult=template.title+"已完成 · 经营货币 +"+money+" · 实物 "+rewards.Count+" 件"+
                 (gift?"（含意外谢礼 "+catalog.commissions.extraGiftCount+" 件）":"")+"。请手动带走领取区物品。";
             return Success(CommissionResult);

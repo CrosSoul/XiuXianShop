@@ -70,6 +70,16 @@ namespace XiuXianShop
         int customerDraws;
         readonly List<GridItem> items = new List<GridItem>();
         readonly Dictionary<string, PriceTag> priceTags = new Dictionary<string, PriceTag>();
+        // Stable namespaced IDs, e.g. story:met-alchemist / profession:alchemy / recipe:recipe_pill_basic.
+        // This stores unlock decisions only; it does not implement future story or profession systems.
+        readonly HashSet<string> progressFlags = new HashSet<string>();
+        public IEnumerable<string> ProgressFlags => progressFlags;
+        public bool HasProgressFlag(string id) => progressFlags.Contains(id);
+        public void SetProgressFlag(string id)
+        {
+            if(string.IsNullOrWhiteSpace(id))throw new ArgumentException("进度标记必须使用非空稳定ID。");
+            progressFlags.Add(id);
+        }
         readonly Queue<(TradeDirection direction, string[] definitionIds, ItemCategory category, int budget, CustomerBehavior behavior, CustomerBudgetTier tier, bool promoted)> queue
             = new Queue<(TradeDirection,string[],ItemCategory,int,CustomerBehavior,CustomerBudgetTier,bool)>();
         int nextId = 1;
@@ -143,32 +153,44 @@ namespace XiuXianShop
             for(int date=NextRentTurn;date<turn;date+=catalog.rentPeriod) amount=(int)Math.Ceiling(amount*1.05);
             return amount;
         }
+        public bool CanSave(out string reason)
+        {
+            if(Phase==TurnPhase.Open){reason="营业中不能保存，请先结束营业。";return false;}
+            if(IsCarrying || IsTravelling){reason="请先回店并结束携带，再保存。";return false;}
+            if(IsAtShopAlchemy){reason="请先完成或中止炼丹、收回设施物品并关闭炼丹炉，再保存。";return false;}
+            reason="";return true;
+        }
         public string CaptureSave()
         {
-            if(IsAtShopAlchemy)throw new InvalidOperationException("请先收回炼丹设施物品并关闭炼丹炉；当前不保存设备在制状态。");
-            if(items.Any(i=>i.QualityValueMultiplier!=1))throw new InvalidOperationException("当前灰盒不保存炼丹品相，请勿用旧存档入口保存炼丹验证结果。");
-            if(IsCarrying)throw new InvalidOperationException("请先结束携带状态再保存；当前版本不保存外出携带过程。" );
-            if(Phase!=TurnPhase.Preparation)throw new InvalidOperationException("仅营业准备阶段可存档；请先闭店并结束回合。");
-            return JsonUtility.ToJson(new ShopSave {catalogSignature=Hash128.Compute(JsonUtility.ToJson(catalog)).ToString(),
+            if(!CanSave(out var reason))throw new InvalidOperationException(reason);
+            return JsonUtility.ToJson(new ShopSave {schemaVersion=ShopSave.CurrentSchemaVersion,phase=Phase,
+                hasAlchemyDefinitions=catalog.items.Any(d=>d.id==AlchemyVerification.MaterialPackId),
+                hasSpiritDefinitions=catalog.items.Any(d=>d.id=="stone_mid"),hasFurnaceDefinition=catalog.items.Any(d=>d.id==ShopFurnaceDefinitionId),
                 turn=Turn,money=Money,rent=Rent,debt=RentDebt,nextId=nextId,customerSeed=customerSeedValue,customerDraws=customerDraws,
+                openingMoney=OpeningMoney,incomeToday=IncomeToday,expensesToday=ExpensesToday,servedToday=ServedToday,
+                buyersToday=BuyersToday,suppliersToday=SuppliersToday,tradingCustomersToday=TradingCustomersToday,lastCustomerResult=LastCustomerResult,
                 hasStaminaState=true,stamina=Stamina,staminaOverflowCustomer=HasStaminaOverflowCustomer,
                 hasTravelledThisTurn=HasTravelledThisTurn,unlockedLocationIds=unlockedLocations.ToArray(),
+                visitedLocationIds=visitedLocations.ToArray(),progressFlags=progressFlags.ToArray(),
                 latestTeaVisit=LatestTeaVisit,activeTeaEffect=ActiveTeaEffect,
                 hasLatestTeaVisit=LatestTeaVisit!=null,hasActiveTeaEffect=ActiveTeaEffect!=null,
                 commissionTurn=commissionTurn,commissionsCompleted=commissionsCompleted,commissionCandidates=commissionCandidates,
+                completedCommissionId=completedCommissionId,commissionResult=CommissionResult,
                 crafted=Crafted,purchases=Purchases,sales=Sales,calendar=Calendar.Capture(),tags=priceTags.Values.Select(t=>t.Copy()).ToArray(),
                 items=items.Select(i=>new SavedShopItem{id=i.Id,definitionId=i.Definition.id,container=i.Container,storageItemId=i.StorageItemId,locationId=i.LocationId,x=i.X,y=i.Y,
                     rotation=i.Rotation,flipped=i.Flipped,hasPurchaseValue=i.PurchaseValue.HasValue,purchaseValue=i.PurchaseValue??0,
-                    hasSpiritResource=i.Definition.spiritResource!=null,spiritUnits=i.SpiritUnits}).ToArray()},true);
+                    hasSpiritResource=i.Definition.spiritResource!=null,spiritUnits=i.SpiritUnits,spiritCapacityUnits=i.Definition.spiritResource?.CapacityUnits??0,
+                    quality=i.Quality,qualityValueMultiplier=i.QualityValueMultiplier.ToString(System.Globalization.CultureInfo.InvariantCulture)}).ToArray()},true);
         }
         public static ShopSession RestoreSave(ShopCatalog catalog,string json)
         {
             var save=JsonUtility.FromJson<ShopSave>(json);
-            if(save!=null && save.version==1)throw new ArgumentException("这是旧日制存档，不能将日序号直接转换为月份。原文件保留，请使用月度新存档。");
-            if(save!=null && save.version==2)throw new ArgumentException("这是旧月度 v2 存档，原文件保留；储存物品版本使用独立 v3 存档。" );
-            if(save==null || save.version!=3 || save.catalogSignature!=Hash128.Compute(JsonUtility.ToJson(catalog)).ToString())
-                throw new ArgumentException("存档版本或商品配置不匹配，当前会话未改变。");
+            if(save==null || save.schemaVersion!=ShopSave.CurrentSchemaVersion)
+                throw new ArgumentException("存档schemaVersion不兼容，当前会话未改变；不自动迁移旧存档。");
             if(save.turn<1 || save.money<0 || save.rent<1 || save.debt<0 || save.nextId<1 || save.items==null || save.tags==null ||
+                (save.phase!=TurnPhase.Preparation && save.phase!=TurnPhase.Closed) || save.progressFlags==null || save.visitedLocationIds==null ||
+                save.progressFlags.Any(string.IsNullOrWhiteSpace) || save.progressFlags.Distinct().Count()!=save.progressFlags.Length ||
+                save.openingMoney<0 || save.incomeToday<0 || save.expensesToday<0 || save.servedToday<0 || save.crafted<0 || save.purchases<0 || save.sales<0 ||
                 save.customerDraws<0 || save.customerDraws>10000000)throw new ArgumentException("存档数据不完整或无效。");
             var session=new ShopSession(catalog,false,save.customerSeed,new MarketCalendar(save.calendar));
             if(!save.hasStaminaState || save.stamina<0 || save.stamina>catalog.maximumStamina)throw new ArgumentException("存档体力状态缺失或无效，当前会话未改变。");
@@ -177,17 +199,24 @@ namespace XiuXianShop
                 throw new ArgumentException("存档地点状态缺失或无效，当前会话未改变。");
             session.HasTravelledThisTurn=save.hasTravelledThisTurn;
             session.unlockedLocations.Clear();session.unlockedLocations.UnionWith(save.unlockedLocationIds);
+            if(save.visitedLocationIds.Any(id=>!session.unlockedLocations.Contains(id)))throw new ArgumentException("存档访问地点无效。");
+            session.visitedLocations.UnionWith(save.visitedLocationIds);session.progressFlags.UnionWith(save.progressFlags);
             session.LatestTeaVisit=save.hasLatestTeaVisit?save.latestTeaVisit:null;session.ActiveTeaEffect=save.hasActiveTeaEffect?save.activeTeaEffect:null;
-            session.Turn=save.turn;session.Money=save.money;session.OpeningMoney=save.money;session.Rent=save.rent;session.RentDebt=save.debt;
+            session.Turn=save.turn;session.Phase=save.phase;session.Money=save.money;session.OpeningMoney=save.openingMoney;session.Rent=save.rent;session.RentDebt=save.debt;
+            session.IncomeToday=save.incomeToday;session.ExpensesToday=save.expensesToday;session.ServedToday=save.servedToday;
+            session.BuyersToday=save.buyersToday;session.SuppliersToday=save.suppliersToday;session.TradingCustomersToday=save.tradingCustomersToday;session.LastCustomerResult=save.lastCustomerResult;
             session.ValidateSavedTeaState();
             if(save.commissionTurn<0 || save.commissionTurn>save.turn || save.commissionsCompleted<0 ||
                 save.commissionsCompleted>catalog.commissions.completionLimitPerTurn)
                 throw new ArgumentException("存档委托状态无效。");
             session.commissionTurn=save.commissionTurn;session.commissionsCompleted=save.commissionsCompleted;
             session.commissionCandidates=save.commissionCandidates??Array.Empty<string>();
+            session.completedCommissionId=save.completedCommissionId;session.CommissionResult=save.commissionResult;
             if(session.commissionCandidates.Any(id=>!catalog.commissions.templates.Any(t=>t.id==id)) ||
                 session.commissionCandidates.Distinct().Count()!=session.commissionCandidates.Length)
                 throw new ArgumentException("存档委托候选无效。");
+            if(!string.IsNullOrEmpty(save.completedCommissionId) && !session.commissionCandidates.Contains(save.completedCommissionId))
+                throw new ArgumentException("存档已完成委托无效。");
             session.nextId=save.nextId;session.Crafted=save.crafted;session.Purchases=save.purchases;session.Sales=save.sales;
             for(int i=0;i<save.customerDraws;i++)session.customerRandom.NextDouble();
             session.customerDraws=save.customerDraws;
@@ -196,15 +225,19 @@ namespace XiuXianShop
             foreach(var i in save.items)
             {
                 if(i==null || i.id<1 || i.id>=save.nextId || !Enum.IsDefined(typeof(ContainerId),i.container) ||
+                    i.container==ContainerId.CarriedPack || IsHand(i.container) || session.IsAlchemyArea(i.container) ||
                     i.rotation<0 || i.rotation>3 || (i.hasPurchaseValue && i.purchaseValue<1))throw new ArgumentException("存档物品数据无效。");
                 var definition=catalog.Find(i.definitionId);
-                if(i.hasSpiritResource!=(definition.spiritResource!=null))throw new ArgumentException("存档灵气配置不匹配。");
+                if(i.hasSpiritResource!=(definition.spiritResource!=null) || i.spiritCapacityUnits!=(definition.spiritResource?.CapacityUnits??0))throw new ArgumentException("存档灵气容量配置不匹配。");
+                if(!Enum.IsDefined(typeof(PillQuality),i.quality) || !decimal.TryParse(i.qualityValueMultiplier,System.Globalization.NumberStyles.Number,
+                    System.Globalization.CultureInfo.InvariantCulture,out var multiplier) || multiplier<=0)throw new ArgumentException("存档品相状态无效。");
                 session.items.Add(new GridItem {Id=i.id,Definition=definition,Owner=ItemOwner.Player,Container=i.container,StorageItemId=i.storageItemId,
-                    LocationId=i.locationId,X=i.x,Y=i.y,Rotation=i.rotation,Flipped=i.flipped,PurchaseValue=i.hasPurchaseValue?(int?)i.purchaseValue:null,SpiritUnits=i.spiritUnits});
+                    LocationId=i.locationId,X=i.x,Y=i.y,Rotation=i.rotation,Flipped=i.flipped,PurchaseValue=i.hasPurchaseValue?(int?)i.purchaseValue:null,SpiritUnits=i.spiritUnits,
+                    Quality=i.quality,QualityValueMultiplier=multiplier});
             }
             string error=session.ValidateState();if(error!=null)throw new ArgumentException("存档库存无效："+error);
             session.Calendar.Between(MarketCalendar.YearStart(session.Turn),MarketCalendar.YearStart(session.Turn)+11);
-            session.Message=$"已恢复{session.DateLabel}营业准备；市场安排与历史购买价值已保留。";
+            session.Message=$"已恢复{session.DateLabel}{(session.Phase==TurnPhase.Preparation?"营业准备":"营业结束")}；已生成结果与物品实例状态已保留。";
             return session;
         }
 

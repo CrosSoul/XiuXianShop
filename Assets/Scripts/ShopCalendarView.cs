@@ -12,7 +12,7 @@ namespace XiuXianShop
         Text heading,rentInfo,details,message;
         RectTransform rows;
         ScrollRect scroll;
-        Button previous,save,load;
+        Button previous;
         int firstTurn;
         string selectedEventId;
         public int FirstTurn => firstTurn;
@@ -38,9 +38,8 @@ namespace XiuXianShop
             scroll.movementType=ScrollRect.MovementType.Clamped;scroll.scrollSensitivity=30;
             details=Label(root,"CalendarEventDetails",100,650,1396,145,"",20,ink);
             message=Label(root,"CalendarMessage",100,803,1396,28,"点击持续条查看完整名称与价格效果；重叠事件分行显示。",17,gold);
-            save=Button(root,"CalendarSave",100,852,188,40,"保存营业准备",()=>{shop.SavePreparation();Refresh();});
-            load=Button(root,"CalendarLoad",302,852,188,40,"读取营业准备",()=>{shop.LoadPreparation();Show(MarketCalendar.YearStart(shop.Session.Turn));});
-            Label(root,"CalendarSaveHint",518,852,960,44,"仅营业准备阶段存取储存版 v3；旧月度 v2 / 日制存档保留，不自动转换。",17,ink);
+            Button(root,"CalendarSystemMenu",100,852,280,40,"保存 / 读取（系统菜单）",()=>{Close();shop.OpenSystemMenu();});
+            Label(root,"CalendarSaveHint",418,852,1060,44,"Esc 打开系统菜单。营业前或闭店后稳定状态可保存；读取前确认替换进度。",17,ink);
             gameObject.SetActive(false);
         }
         public void Open() {gameObject.SetActive(true);transform.SetAsLastSibling();Show(MarketCalendar.YearStart(shop.Session.Turn));}
@@ -56,7 +55,7 @@ namespace XiuXianShop
             var session=shop.Session;
             heading.text=$"年度日历 · 第 {(firstTurn-1)/12+1} 年   |   当前：{session.DateLabel}";
             rentInfo.text=$"下次收租：第 {session.NextRentTurn} 回合结束，{session.Rent} 灵石；待付房租 {session.RentDebt}。\n每6回合收租，结束本月时结算；翻阅不扣款。行情采用隔离测试配置，非正式平衡。";
-            previous.interactable=firstTurn>1;save.interactable=load.interactable=session.Phase==TurnPhase.Preparation;
+            previous.interactable=firstTurn>1;
             message.text=shop.CalendarMessage??"行情开始时公开，茶肆秘闻可提前获知。金色未开始、绿色生效中、灰色已结束；获知不提前改变价格。";
             foreach(Transform child in rows) {child.gameObject.SetActive(false);Destroy(child.gameObject);}
             var segments=session.Calendar.Segments(firstTurn,session.Turn);

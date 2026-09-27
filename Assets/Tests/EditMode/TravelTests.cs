@@ -70,7 +70,7 @@ namespace XiuXianShop.Tests
             Assert.That(session.ReturnToShop(),Is.False);Assert.That(session.IsTravelling);
             Assert.That(session.ReturnToShop(true));Assert.That(session.Stamina,Is.EqualTo(100));
             Assert.That(session.BeginTravel(),Is.False);Assert.That(session.EndCarrying());
-            Assert.That(session.HasTravelledThisTurn);Assert.That(()=>session.CaptureSave(),Throws.InvalidOperationException);
+            Assert.That(session.HasTravelledThisTurn);Assert.That(ShopSession.RestoreSave(catalog,session.CaptureSave()).HasTravelledThisTurn);
             Assert.That(session.AdvanceTurn());session=ShopSession.RestoreSave(catalog,session.CaptureSave());
             Assert.That(session.HasTravelledThisTurn,Is.False);Assert.That(session.BeginCarrying(0));
             Assert.That(session.BeginTravel(),Is.False);Assert.That(session.EndCarrying());

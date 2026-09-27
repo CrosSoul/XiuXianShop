@@ -9,9 +9,10 @@ namespace XiuXianShop.Tests
 {
     public sealed partial class ShopPlayableTests
     {
-        [UnityTest] public IEnumerator StorageWindowDragsContentsAndBoxThenRestoresActualSave()
+        [UnityTest,Category("DP61")] public IEnumerator StorageWindowDragsContentsAndBoxThenRestoresActualSave()
         {
             yield return RestartWithTestCatalog(c=>c.SetStorageVerificationDefaults(),17);
+            IsolateAlchemyTestMouse();
             shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP30-storage-play.json");
             var s=shop.Session;var box=s.Items.Single(i=>i.Definition.id=="test-storage-case");
             var herb=s.Items.Single(i=>i.Definition.id=="herb");var sword=s.Items.Single(i=>i.Definition.id=="sword");
@@ -32,12 +33,12 @@ namespace XiuXianShop.Tests
             yield return Drag(box,ContainerId.Storage,spot.x,spot.y);
             p=ItemPoint(box);yield return MouseAt(p,false);yield return MouseAt(p,true);yield return MouseAt(p,false);
             Assert.That(s.Find(herb.Id),Is.SameAs(herb));Assert.That(shop.ItemView(herb.Id),Is.Not.Null);
-            yield return Click("StorageClose");yield return Click("CalendarOpen");yield return Click("CalendarSave");
-            string saved=System.IO.File.ReadAllText(shop.SavePath),legacy=saved.Replace("\"version\": 3","\"version\": 2");
-            System.IO.File.WriteAllText(shop.SavePath,legacy);yield return Click("CalendarLoad");
-            Assert.That(shop.Session,Is.SameAs(s));Assert.That(shop.CalendarMessage,Does.Contain("旧月度 v2"));
-            Assert.That(System.IO.File.ReadAllText(shop.SavePath),Is.EqualTo(legacy));
-            System.IO.File.WriteAllText(shop.SavePath,saved);yield return Click("CalendarLoad");yield return Click("CalendarClose");
+            yield return Click("StorageClose");shop.OpenSystemMenu();yield return Click("SaveSlot_1");
+            string path=shop.SaveSlots.PathFor(1),saved=System.IO.File.ReadAllText(path),legacy=saved.Replace("\"schemaVersion\": 1","\"schemaVersion\": 999");
+            System.IO.File.WriteAllText(path,legacy);yield return Click("LoadSlot_1");yield return Click("SaveConfirm");
+            Assert.That(shop.Session,Is.SameAs(s));
+            Assert.That(System.IO.File.ReadAllText(path),Is.EqualTo(legacy));
+            System.IO.File.WriteAllText(path,saved);yield return Click("LoadSlot_1");yield return Click("SaveConfirm");yield return Click("SystemResume");
             Assert.That(shop.Session.In(ContainerId.Interior,box.Id).Count(),Is.EqualTo(2));
             herb=shop.Session.Find(herb.Id);Assert.That(herb.Flipped);
             box=shop.Session.Find(box.Id);p=ItemPoint(box);yield return MouseAt(p,false);yield return MouseAt(p,true);yield return MouseAt(p,false);
@@ -46,7 +47,7 @@ namespace XiuXianShop.Tests
             sword=shop.Session.Find(sword.Id);Assert.That(shop.Session.FindSpace(sword,ContainerId.Storage,out x,out y));
             yield return Drag(sword,ContainerId.Storage,x,y);Assert.That(shop.Session.Find(sword.Id),Is.SameAs(sword));
             Assert.That(shop.Session.In(ContainerId.Interior,box.Id),Is.Empty);
-            System.IO.File.Delete(shop.SavePath);LogAssert.NoUnexpectedReceived();
+            System.IO.File.Delete(path);LogAssert.NoUnexpectedReceived();
         }
     }
 }

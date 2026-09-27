@@ -27,11 +27,11 @@ namespace XiuXianShop.Tests
             Advance(restored,13);Assert.That(restored.Year,Is.EqualTo(2));Assert.That(restored.Month,Is.EqualTo(1));
             Assert.That(restored.Money,Is.EqualTo(79));Assert.That(restored.NextRentTurn,Is.EqualTo(18));
         }
-        [Test,Category("DP25")] public void LegacyDailySaveIsRejectedWithoutChangingSession()
+        [Test,Category("DP25")] public void IncompatibleSchemaIsRejectedWithoutChangingSession()
         {
-            var s=Session();string current=s.CaptureSave();string old=current.Replace("\"version\": 3","\"version\": 1");
+            var s=Session();string current=s.CaptureSave();string old=current.Replace("\"schemaVersion\": 1","\"schemaVersion\": 999");
             Assert.That(old,Is.Not.EqualTo(current));
-            Assert.That(()=>ShopSession.RestoreSave(catalog,old),Throws.ArgumentException.With.Message.Contains("旧日制"));
+            Assert.That(()=>ShopSession.RestoreSave(catalog,old),Throws.ArgumentException.With.Message.Contains("schemaVersion"));
             Assert.That(s.CaptureSave(),Is.EqualTo(current));
         }
         [Test,Category("DP25")] public void DisclosedMarketContinuesAcrossYearAndRestoreWithoutReroll()

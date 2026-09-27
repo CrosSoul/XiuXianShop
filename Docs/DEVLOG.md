@@ -1,5 +1,16 @@
 # XiuXianShop 开发日志
 
+## 2026-09-28 — DP-61 正式存档 / 读档 v1
+
+- 基线 `84feb5b`；沿用本次 DP-61 未提交改动完成切片。正式依据为 G-14 v1、G-04 v21 AC-77—83、UI 规格 v11 的系统菜单段及已验收 DP-59。没有扩展到后续剧情、内容管线或设置页；无正式规则冲突。
+- 新增 `ShopPrototype.SaveMenu.cs`、`ShopSaveSlots.cs`：Esc 系统菜单提供继续、3 个手动槽、1 个自动槽与退出确认；覆盖 / 读取均确认，空槽不可读，槽位显示年月、阶段、实际保存时间。`manualSaveSlotCount` 是 Inspector 原型配置，默认 3。普通存档路径为 `Application.persistentDataPath/Saves`（当前 Windows 为 `C:/Users/zzrzz/AppData/LocalLow/DefaultCompany/XiuXianShop/Saves`），自动槽 `auto.json`，手动槽 `manual-1.json` 至 `manual-3.json`。沿用临时文件替换写入；写失败保留原槽。
+- 修改 `ShopSave.cs`、`ShopSession.cs`、`ShopSession.Commissions.cs`：明确 `schemaVersion=1`，恢复新 Session 后才替换当前状态；保存准备 / 闭店安全状态、年月货币体力 / 溢出、实例 ID / 格子 / 旋转翻转 / 储物关系 / 历史购买价 / 品相 / 灵气与容量 / 设备、地点解锁访问、市场与已生成茶肆 / 委托结果。只用 `SetProgressFlag` / `HasProgressFlag` 和稳定字符串标记作为后续剧情、职业、知识、配方解锁的最小接口，没有预建其玩法。已用灰盒定义在新的运行时 Catalog 副本中按现有入口恢复，不写配置资产。旧准备版 v3 文件保留、不迁移、不再作为默认路径；这取代 DP-59 日志中临时单文件保存的当时限制。
+- 修改 `ShopPrototype.cs`、`ShopCalendarView.cs`、`Editor/PrototypeBuilder.cs`：日历进入同一系统菜单，默认会话开发补料不再切走正式保存目录；成功跨月完成初始化后覆盖自动槽，读取不再发放恢复 / 溢出。营业中、携带 / 外出、炉内尚有流程、其他 Unity Scene 和拖拽 / 交易操作禁止保存；读取可替换当前流程并清理旧浮窗。修复闭店读档后刷新误读不存在的 TodayAttraction；UI 提交在文件验证 catch 之外，内部界面错误不会伪装为“当前会话未变”。确认对话框挡住后方按钮，菜单使用不透明底板避免旧界面文字干扰。
+- 验证：Edit Mode **183/183**；Play Mode **32 个不同用例全部通过**（DP61 5、DP59 3、DP60 5、DP27 19），最后菜单微调再定向 **1/1**。新增 Persistence Edit / Play 测试并更新存储、日历、外出旧断言；覆盖写入失败保留文件、覆盖确认 / 取消、读档替换 / 取消、未知版本及损坏数据拒绝、随机结果不重抽、重复读取不重复结算、储物匣真实拖拽、外出 / 炼丹运行中不可存但可加载安全档并清理窗口。原始结果仅两份：`Evidence/DP61/EditMode.json`、`Evidence/DP61/PlayMode.json`。早期只读属性测试编译错误、闭店读档 UI 失败均已修正；本次一轮输入模拟曾为 3/5，储物匣加入已有鼠标隔离后整组 5/5，保留失败结果，不声称首轮全绿。
+- 独立实际 Play 启停验证：正常场景加载测试槽、写手动槽 3 → Stop → fresh Play → 系统菜单确认读取槽 3，完整规范化快照一致。恢复 14 件物品，其中匣内 7 件；微缩炉 ID 10、中品灵石 ID 14 / 9951/10000 灵气、丹药 ID 16 / Superior / 1.5 品相倍率一致；推进按钮可用，ValidateState 无错误。槽文件在隔离 Temp 路径，未覆盖用户正常槽。通过实际画面查看菜单和确认框；未留下截图资产。最终 MCP Error 0 / Warning 0、scriptCompilationFailed=false、Editor ready/stopped、无编译 / Domain Reload、ShopPrototype 场景 dirty=false；未清空日志。没有修改场景、配置 Asset、Package 或 Project Settings，尚未提交或推送。
+- 人工复验：正常 ShopPrototype Play 按 Esc → 手动槽保存；整理物品后读取并确认，应恢复旧布局；营业中保存禁用，闭店可保存；外出或开炉中按 Esc 保存禁用，回店 / 收回炉内物品并关闭后恢复可存；推进月份后读取自动槽，应保持同一体力与顾客数。通过 Current Play Session 菜单发炉 / 材料包，在本轮 Session 手动炼丹后保存、Stop / Play 再读取，应保留品相、灵气与匣内关系。未执行 Player 构建、独立可执行程序重启、跨平台验证或玩家手感验收；剧情 Runner 尚未实现，其实际演出门禁需后续接入现有安全保存规则。槽数、菜单布局为原型参数，不实现设置页或设置持久化。
+- Jira 已写入交付评论 `10125`，并流转 `Ready for Review`；独立回读确认评论及状态。未标记 Done，等待用户验收。
+
 ## 2026-09-22 — DP-60 店内微缩炼丹炉 v1
 
 - 2026-09-27 同任务浮窗返修收尾（以下初版全屏页与仓库重绘记录已废止）：依据G-06 v13、G-04 v17 AC70/73/74、UI规格v10，浮窗主体已在用户提交aa6761f。移除仓库视图替换/恢复字段和浮窗内仓库；主仓库原格保持不变。复用StorageWindowDrag标题移动、同一Grid拖拽与物品实例，所有炼丹操作/状态/调试置于浮窗，窗口遮挡处不穿透放置。
@@ -421,3 +432,9 @@ M ProjectSettings/QualitySettings.asset
 
 DP-58 最终状态补充：Unity Pipeline CLI 检查 Console Error0/Warning0（未清日志），Editor ready/stopped、无编译/Domain Reload；ShopPrototype dirty=false。文本 git diff --check 通过。
 
+
+## 2026-09-27 — 编译错误复查
+
+- 当前日志中的 CS0200 来自 PersistenceTests 曾直接赋值 GridItem 的 Quality、QualityValueMultiplier、PurchaseValue；检查时源文件已经改为通过存档 DTO 准备数据，本轮未修改脚本或 Unity 资产。
+- 通过 Unity MCP 请求脚本编译，Editor.log 记录 build success；重载后 scriptCompilationFailed=false，Console 捕获 Error 0 / Warning 0，Editor ready/stopped，无编译或 Domain Reload。未清空 Console。
+- 本次仅验证编译状态，未运行玩法测试，不代表尚在开发的存读档功能已经验收。

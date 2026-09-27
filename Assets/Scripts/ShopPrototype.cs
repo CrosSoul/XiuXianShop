@@ -70,39 +70,17 @@ namespace XiuXianShop
             if(Session!=null && displayedPricingRevision!=Session.PricingRevision && !IsDragging && !alchemyRunning) Refresh();
             var keyboard=Keyboard.current;
             if(keyboard==null || Session==null) return;
-            if(commissionWindow!=null)
+            if(keyboard.escapeKey.wasPressedThisFrame)
             {
-                if(keyboard.escapeKey.wasPressedThisFrame)CloseCommissions();
+                if(IsSystemMenuOpen)CloseSystemMenu();
+                else if(IsDragging)CancelDrag();
+                else OpenSystemMenu();
                 return;
             }
-            if(teaWindow!=null)
-            {
-                if(keyboard.escapeKey.wasPressedThisFrame)CloseTeaNews();
-                return;
-            }
-            if(travelConfirmation!=null)
-            {
-                if(keyboard.escapeKey.wasPressedThisFrame)CloseTravelConfirmation();
-                return;
-            }
-            if(carrySelection!=null)
-            {
-                if(keyboard.escapeKey.wasPressedThisFrame)CloseCarrySelection();
-                return;
-            }
-            if(CalendarView!=null && CalendarView.IsOpen)
-            {
-                if(keyboard.escapeKey.wasPressedThisFrame)CalendarView.Close();
-                return;
-            }
-            if(NegotiationView!=null && NegotiationView.IsOpen)
-            {
-                if(keyboard.escapeKey.wasPressedThisFrame)NegotiationView.Close();
-                return;
-            }
+            if(IsSystemMenuOpen || commissionWindow!=null || teaWindow!=null || travelConfirmation!=null || carrySelection!=null ||
+                (CalendarView!=null && CalendarView.IsOpen) || (NegotiationView!=null && NegotiationView.IsOpen))return;
             if(keyboard.rKey.wasPressedThisFrame) RotateSelected();
             if(keyboard.fKey.wasPressedThisFrame) FlipSelected();
-            if(keyboard.escapeKey.wasPressedThisFrame) CancelDrag();
         }
         void OnApplicationFocus(bool focused) { if(!focused && IsDragging) CancelDrag(); }
         void OnDestroy()
@@ -267,8 +245,8 @@ namespace XiuXianShop
             }
             var selected=Session.Find(selectedId);
             selection.text=selected==null?"点击物品查看价值、标签与说明。\n仓库中的预估价值等于基础价值；放入谈判柜台后按本次报价显示。":ItemDescription(selected);
-            var attraction=Session.Phase==TurnPhase.Preparation?Session.PreviewAttraction():Session.TodayAttraction;
-            string preferredCategory=string.Join("、",attraction.BuyingCategories.Where(c=>c.DisplayedCount>0).Select(c=>ShopCatalog.CategoryName(c.Category)));
+            var attraction=Session.Phase==TurnPhase.Preparation?Session.PreviewAttraction():null;
+            string preferredCategory=attraction==null?"":string.Join("、",attraction.BuyingCategories.Where(c=>c.DisplayedCount>0).Select(c=>ShopCatalog.CategoryName(c.Category)));
             if(preferredCategory=="")preferredCategory="空展示 · 各类别基础权重";
             displaySummary.text=Session.Phase==TurnPhase.Preparation?$"本回合 {Session.CustomerCountThisTurn} 位 · 只求购 {attraction.BuyingChance:P0} / 只出售 {attraction.SellingChance:P0} / 同时买卖 {attraction.TradingChance:P0}\n展示加权：{preferredCategory}\n预算按求购类别与普通 / 富裕 / 阔绰档配置":$"本月只求购 {Session.BuyersToday} / 只出售 {Session.SuppliersToday} / 同时买卖 {Session.TradingCustomersToday}\n已离场 {Session.ServedToday} · 待到访 {Session.RemainingCustomers}\n开门时的展示效果已锁定";
             var offer=Session.Offer;
@@ -341,7 +319,13 @@ namespace XiuXianShop
         }
         int Count(string definitionId)=>Session.In(ContainerId.Storage).Count(i=>i.Definition.id==definitionId && i.Owner==ItemOwner.Player);
         static void SetButtonTitle(Button b,string value)=>b.GetComponentInChildren<Text>().text=value;
-        public void Run(Func<bool> action) { if(IsDragging) {localNotice="请先放下物品，或按 Esc 取消拖动。";notice.text=localNotice;return;} localNotice=null; action(); Refresh(); }
+        public void Run(Func<bool> action)
+        {
+            if(IsDragging){localNotice="请先放下物品，或按 Esc 取消拖动。";notice.text=localNotice;return;}
+            localNotice=null;int turn=Session.Turn;
+            if(action() && Session.Turn>turn)AutoSaveAfterAdvance();
+            Refresh();
+        }
         public void SelectItem(int id)
         {
             if(IsDragging)return;selectedId=id;localNotice=null;
@@ -354,37 +338,12 @@ namespace XiuXianShop
         // Explicit developer/test entry. The Editor menu supplies a temporary catalog clone.
         public void StartVerificationSession(ShopCatalog configuration,int seed,MarketCalendar calendar=null)
         {
+            CloseSystemMenu();
             CloseCommissions();CloseTeaNews();CloseTravelConfirmation();CloseCarryPanel();CloseTravelWindow();CloseCarrySelection();CloseStorage();CancelDrag();catalog=configuration;Session=new ShopSession(catalog,customerSeed:seed,calendar:calendar);
             CalendarMessage=null;CalendarView.Close();NegotiationView.Close();
             selectedId=0;localNotice=null;Refresh();
         }
 
-        string PreparationSavePath => SavePath??System.IO.Path.Combine(Application.dataPath,"../UserSettings/ShopStoragePreparation-v3.json");
-        public void SavePreparation()
-        {
-            try
-            {
-                string json=Session.CaptureSave(),path=PreparationSavePath;
-                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
-                System.IO.File.WriteAllText(path+".tmp",json);
-                if(System.IO.File.Exists(path))System.IO.File.Replace(path+".tmp",path,null);
-                else System.IO.File.Move(path+".tmp",path);
-                CalendarMessage=$"已保存{Session.DateLabel}营业准备。";
-            }
-            catch(Exception e){CalendarMessage="无法保存："+e.Message;}
-        }
-        public void LoadPreparation()
-        {
-            if(Session.IsCarrying){CalendarMessage="请先结束携带状态再读取存档。";return;}
-            if(Session.Phase!=TurnPhase.Preparation){CalendarMessage="仅营业准备阶段可读档。";return;}
-            try
-            {
-                var restored=ShopSession.RestoreSave(catalog,System.IO.File.ReadAllText(PreparationSavePath));
-                CloseStorage();CancelDrag();Session=restored;selectedId=0;localNotice=null;
-                CalendarMessage=$"已读取{Session.DateLabel}营业准备，行情未重抽。";Refresh();
-            }
-            catch(Exception e){CalendarMessage="未读取，当前经营保留："+e.Message;}
-        }
 
         RectTransform DrawItem(Transform parent,GridItem item,int rotation,bool flipped,float cell,bool interactive)
         {

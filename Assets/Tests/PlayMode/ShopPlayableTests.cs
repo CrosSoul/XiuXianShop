@@ -34,6 +34,7 @@ namespace XiuXianShop.Tests
             yield return null;yield return null;
             shop=Object.FindFirstObjectByType<ShopPrototype>();
             Assert.That(shop,Is.Not.Null);Assert.That(shop.Session,Is.Not.Null,"Saved scene must start without manual configuration.");
+            shop.SaveDirectory=System.IO.Path.Combine(Application.dataPath,"../Temp/PlayModeSaveSlots-"+System.Guid.NewGuid().ToString("N"));
             mouse=InputSystem.AddDevice<Mouse>();keyboard=InputSystem.AddDevice<Keyboard>();
             yield return null;
             Canvas.ForceUpdateCanvases();
@@ -91,7 +92,7 @@ namespace XiuXianShop.Tests
                 yield return Click("NegotiationConfirm");yield break;
             }
             var button=shop.GetComponentsInChildren<UnityEngine.UI.Button>(true).FirstOrDefault(b=>b.name==name);
-            Assert.That(button,Is.Not.Null,$"Missing button: {name}");Assert.That(button.interactable,Is.True,$"{name} must be enabled at this step.");
+            Assert.That(button,Is.Not.Null,$"Missing button: {name}");Assert.That(button.interactable,Is.True,$"{name} must be enabled at this step. Phase={shop.Session.Phase}, message={shop.Session.Message}");
             var rect=(RectTransform)button.transform;var center=RectTransformUtility.WorldToScreenPoint(null,rect.TransformPoint(rect.rect.center));
             yield return MouseAt(center,false);yield return MouseAt(center,true);yield return MouseAt(center,false);
         }
@@ -237,29 +238,27 @@ namespace XiuXianShop.Tests
             yield return Click("CalendarOpen");yield return Click("CalendarClose");Assert.That(shop.CalendarView.IsOpen,Is.False);
             LogAssert.NoUnexpectedReceived();
         }
-        [UnityTest] public IEnumerator CalendarSaveLoadButtonsRestoreActualFileAndDoNotRepeatRent()
+        [UnityTest,Category("DP61")] public IEnumerator SystemSaveLoadButtonsRestoreActualFileAndDoNotRepeatRent()
         {
-            yield return CalendarFixture(7);var s=shop.Session;
-            string before=JsonUtility.ToJson(s.Calendar.Capture());
-            yield return Click("CalendarOpen");yield return Click("CalendarSave");
-            Assert.That(System.IO.File.Exists(shop.SavePath));Assert.That(CalendarText("CalendarMessage"),Does.Contain("已保存第 1 年 7 月"));
-            yield return Click("CalendarClose");
+            yield return CalendarFixture(7);IsolateAlchemyTestMouse();var s=shop.Session;
+            string before=JsonUtility.ToJson(s.Calendar.Capture());shop.OpenSystemMenu();yield return Click("SaveSlot_1");
+            Assert.That(shop.SaveSlots.Exists(1));yield return Click("SystemResume");
             yield return Drag(s.Items[0],ContainerId.Counter,0,0);
-            yield return Click("CalendarOpen");yield return Click("CalendarLoad");
+            shop.OpenSystemMenu();yield return Click("LoadSlot_1");yield return Click("SaveConfirm");
             Assert.That(shop.Session.Items[0].Container,Is.EqualTo(ContainerId.Storage));Assert.That(shop.Session.Money,Is.EqualTo(100));
             Assert.That(JsonUtility.ToJson(shop.Session.Calendar.Capture()),Is.EqualTo(before));
-            yield return Click("CalendarClose");yield return Click("BeginBusiness");
-            yield return Click("CalendarOpen");Assert.That(shop.FindButton("CalendarSave").interactable,Is.False);Assert.That(shop.FindButton("CalendarLoad").interactable,Is.False);
-            yield return Click("CalendarClose");yield return Click("EndBusiness");yield return Click("AdvanceTurn");
+            yield return Click("SystemResume");yield return Click("BeginBusiness");
+            shop.OpenSystemMenu();Assert.That(shop.FindButton("SaveSlot_1").interactable,Is.False);
+            yield return Click("SystemResume");yield return Click("EndBusiness");yield return Click("AdvanceTurn");
+            Assert.That(shop.Session.Turn,Is.EqualTo(8));Assert.That(shop.Session.Money,Is.EqualTo(100));Assert.That(shop.SaveSlots.Exists(0));
+            shop.OpenSystemMenu();yield return Click("LoadSlot_0");yield return Click("SaveConfirm");
+            yield return Click("LoadSlot_0");yield return Click("SaveConfirm");
             Assert.That(shop.Session.Turn,Is.EqualTo(8));Assert.That(shop.Session.Money,Is.EqualTo(100));
-            yield return Click("CalendarOpen");yield return Click("CalendarSave");yield return Click("CalendarLoad");yield return Click("CalendarLoad");
-            Assert.That(shop.Session.Turn,Is.EqualTo(8));Assert.That(shop.Session.Money,Is.EqualTo(100));
+            var current=shop.Session;System.IO.File.WriteAllText(shop.SaveSlots.PathFor(1),"broken save");
+            yield return Click("LoadSlot_1");yield return Click("SaveConfirm");Assert.That(shop.Session,Is.SameAs(current));
+            yield return Click("SystemResume");yield return Click("CalendarOpen");
             Assert.That(CalendarText("CalendarRent"),Does.Contain("第 12 回合结束，21 灵石"));
-            Assert.That(CalendarText("CalendarHeading"),Does.Contain("当前：第 1 年 8 月"));
-            System.IO.File.WriteAllText(shop.SavePath,"broken save");yield return Click("CalendarLoad");
-            Assert.That(CalendarText("CalendarMessage"),Does.Contain("当前经营保留"));Assert.That(shop.Session.Money,Is.EqualTo(100));
-            System.IO.File.Delete(shop.SavePath);
-            LogAssert.NoUnexpectedReceived();
+            Assert.That(CalendarText("CalendarHeading"),Does.Contain("当前：第 1 年 8 月"));LogAssert.NoUnexpectedReceived();
         }
         [UnityTest] public IEnumerator CalendarDayChangesRefreshRealPricesBudgetAndSettlement()
         {

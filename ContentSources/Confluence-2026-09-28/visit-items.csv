@@ -1,0 +1,15 @@
+field_name,type,configuration
+条目名称,text,
+条目ID,text,
+来访ID,text,
+用途,tag,
+物品ID,text,
+数量,number,number_format:number
+实例预设ID,text,
+数据状态,tag,
+备注,text,
+
+view_name,layout,filters,sorts,hidden_fields,is_default,is_current
+全部固定物品,table,,,,true,true
+
+

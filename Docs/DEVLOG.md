@@ -432,6 +432,23 @@ M ProjectSettings/QualitySettings.asset
 
 DP-58 最终状态补充：Unity Pipeline CLI 检查 Console Error0/Warning0（未清日志），Editor ready/stopped、无编译/Domain Reload；ShopPrototype dirty=false。文本 git diff --check 通过。
 
+## 2026-09-28 — 当前编译状态复查
+
+- 根据用户报告检查当前工作区；保留已有内容同步工具改动，本轮未修改 C#、场景、资产或工程设置。
+- 通过 Unity Pipeline CLI 请求重新编译，返回 completed、failed=false、errors=[]；随后 EditorUtility.scriptCompilationFailed=false。
+- Console Error 0 / Warning 0，Editor ready/stopped，无编译或 Domain Reload；未清空日志。当前未复现 compiler error，无法确认先前提示的具体原因。
+- 本轮仅核对编译和编辑器状态，未运行玩法测试，不代表其他开发任务已经完成。
+
+## 2026-09-28 — DP-64 内容同步工具 v1
+
+- 新增统一 Content Sync Editor 窗口、四域适配器、CSV 读取与静态 AuthoredContent；接入 04.4–04.7，中间数据挂在现有 ShopCatalog，不实现特殊顾客或剧情 Runner。
+- Validate 只读；Preview 与 Import 共用结果，源文件或目标变更必须重验。按稳定 ID 合并，草稿跳过、遗漏保留、显式停用；可选空值保留原值。失败阻止写入，重复导入幂等。
+- 通过 Unity API 创建空 AuthoredContent.asset 并设置 Catalog 引用；保存时 Unity 一并序列化已有 AlchemySettings 默认字段，已比较 JSON 确认与原默认值一致。未修改场景、Package 或 Project Settings。
+- 当前 Confluence 导出 nodes.csv 第 25 行 alchemy_hint_001 数据状态错位，保留原件并阻止导入。窗口实际显示该错误，Import disabled；未修改远端数据，也未把草稿升格为正式内容。customerId 可跨来访复用，遵循正式 G-15，而不是 Jira 中含糊的身份唯一表述。
+- 实际 Edit Mode 200/200（含 DP64 17），正式场景开局 Play Mode 1/1，DP14 Python 6/6。原始 Unity 结果在 Evidence/DP64。测试首次参数 name 被运行器拒绝，改为 testName 后才实际执行，不计作测试通过。
+- 最终 Console Error 0 / Warning 0，Editor ready/stopped，无编译或 Domain Reload，未清日志。文本 diff --check 通过；Unity 自动序列化的 5 个空 itemId 行有尾随空格，未手改 YAML。未执行 Player 构建或人工窗口操作验收。
+- 使用步骤与未接入目录见 ContentSources/README.md。职业、知识、实例预设未知目标明确阻止；物品/配方沿用 DP14 校验路径，后续域尚未迁入。仅本地未提交，交付到 Ready for Review，不标 Done。
+
 
 ## 2026-09-27 — 编译错误复查
 

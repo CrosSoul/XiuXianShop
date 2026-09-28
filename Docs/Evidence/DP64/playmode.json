@@ -1,0 +1,20 @@
+{
+  "status": "completed",
+  "duration": 0.6,
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.SavedSceneStartsFreshAndAllContainersAreVisible",
+      "Status": "Passed",
+      "Duration": 0.5676519,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

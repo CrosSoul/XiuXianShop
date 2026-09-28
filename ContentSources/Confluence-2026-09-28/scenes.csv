@@ -1,0 +1,12 @@
+field_name,type,configuration
+场景名称,text,
+SceneID,text,
+说明,text,
+数据状态,tag,
+修改说明,text,
+
+view_name,layout,filters,sorts,hidden_fields,is_default,is_current
+全部剧情场景,table,,,,true,true
+
+_id,场景名称,SceneID,说明,数据状态,修改说明
+1,炼丹求学线索到店｜灰盒,scene_alchemy_hint_arrival,特殊顾客提供炼丹求学线索的占位场景；正式角色名和文本后续替换。,草稿,用于DP-62与DP-52联调。

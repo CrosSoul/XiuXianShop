@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23ccc4918895cb44092fa11381c60e88, type: 3}
   m_Name: ShopCatalog
   m_EditorClassIdentifier: XiuXianShop.Runtime::XiuXianShop.ShopCatalog
+  authoredContent: {fileID: 11400000, guid: 1debda0bbeef6ac4c84143e5eb755161, type: 2}
   priceModelVersion: 1
   items:
   - id: herb
@@ -494,6 +495,109 @@ MonoBehaviour:
         - pill
         minimumCount: 1
         maximumCount: 1
+  alchemy:
+    shopStaminaCost: 20
+    breathSeconds: 8
+    grindSeconds: 8
+    perfectWindow: 0.5
+    acceptableWindow: 2
+    spiritEquivalentsPerSecond: 0.02
+    lowHeatMultiplier: 1
+    mediumHeatMultiplier: 1.5
+    highHeatMultiplier: 2
+    perfectScore: 1
+    acceptableScore: 0.6
+    severeScore: 0
+    superiorThreshold: 0.9
+    goodThreshold: 0.7
+    ordinaryThreshold: 0.45
+    ordinaryValue: 1
+    goodValue: 1.2
+    superiorValue: 1.5
+    preparationSize: {x: 6, y: 4}
+    fuelSize: {x: 2, y: 2}
+    outputSize: {x: 2, y: 2}
+    showDebug: 1
+    debugTimeScale: 1
+    recipes:
+    - id: recipe_pill_basic
+      title: "\u56DE\u6C14\u4E39"
+      productId: pill
+      allowGrinding: 0
+      allowHeatChange: 0
+      targets:
+      - kind: 0
+        breaths: 0
+        itemId: herb
+        ground: 0
+        heat: 1
+      - kind: 0
+        breaths: 1
+        itemId: dew
+        ground: 0
+        heat: 1
+      - kind: 2
+        breaths: 2
+        itemId: 
+        ground: 0
+        heat: 1
+    - id: recipe_pill_fire_yang
+      title: "\u8D64\u9633\u4E39"
+      productId: pill_fire_yang
+      allowGrinding: 1
+      allowHeatChange: 0
+      targets:
+      - kind: 0
+        breaths: 0
+        itemId: mat_fire_herb
+        ground: 0
+        heat: 1
+      - kind: 0
+        breaths: 1
+        itemId: mat_fire_fruit
+        ground: 1
+        heat: 1
+      - kind: 2
+        breaths: 2
+        itemId: 
+        ground: 0
+        heat: 1
+    - id: recipe_pill_metal_water
+      title: "\u91D1\u6C34\u51DD\u5143\u4E39"
+      productId: pill_metal_water
+      allowGrinding: 1
+      allowHeatChange: 1
+      targets:
+      - kind: 0
+        breaths: 0
+        itemId: mat_metal_herb
+        ground: 0
+        heat: 1
+      - kind: 0
+        breaths: 1
+        itemId: mat_water_fruit
+        ground: 1
+        heat: 1
+      - kind: 1
+        breaths: 1
+        itemId: 
+        ground: 0
+        heat: 2
+      - kind: 0
+        breaths: 2
+        itemId: mat_metal_fruit
+        ground: 1
+        heat: 1
+      - kind: 1
+        breaths: 3
+        itemId: 
+        ground: 0
+        heat: 0
+      - kind: 2
+        breaths: 4
+        itemId: 
+        ground: 0
+        heat: 1
   travelLocations:
   - id: baishitang
     title: "\u767E\u4E8B\u5802"

@@ -50,6 +50,8 @@ namespace XiuXianShop
     [CreateAssetMenu(menuName = "XiuXianShop/Prototype Catalog")]
     public sealed class ShopCatalog : ScriptableObject
     {
+        [Tooltip("内容同步工具生成的静态来访与剧情数据；不保存玩家进度。")]
+        public AuthoredContent authoredContent;
         [HideInInspector] public int priceModelVersion;
         public ItemDefinition[] items;
         public string[] startingItems = { "sign", "herb", "dew", "pill", "cinnabar", "jade", "sword" };

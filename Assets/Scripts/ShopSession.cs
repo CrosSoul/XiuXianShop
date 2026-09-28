@@ -34,6 +34,9 @@ namespace XiuXianShop
 
     public sealed class TradeOffer
     {
+        public string VisitId { get; internal set; }
+        public string CustomerId { get; internal set; }
+        public string PortraitId { get; internal set; }
         public CustomerBehavior Behavior { get; internal set; }
         public CustomerBudgetTier BudgetTier { get; internal set; }
         public bool WealthyPromotion { get; internal set; }
@@ -80,8 +83,18 @@ namespace XiuXianShop
             if(string.IsNullOrWhiteSpace(id))throw new ArgumentException("进度标记必须使用非空稳定ID。");
             progressFlags.Add(id);
         }
-        readonly Queue<(TradeDirection direction, string[] definitionIds, ItemCategory category, int budget, CustomerBehavior behavior, CustomerBudgetTier tier, bool promoted)> queue
-            = new Queue<(TradeDirection,string[],ItemCategory,int,CustomerBehavior,CustomerBudgetTier,bool)>();
+        sealed class CustomerRequest
+        {
+            public TradeDirection direction;
+            public string[] definitionIds;
+            public ItemCategory category;
+            public int budget;
+            public CustomerBehavior behavior;
+            public CustomerBudgetTier tier;
+            public bool promoted;
+            public AuthoredVisit visit;
+        }
+        readonly Queue<CustomerRequest> queue = new Queue<CustomerRequest>();
         int nextId = 1;
         public IReadOnlyList<GridItem> Items => items;
         public ShopCatalog Catalog => catalog;
@@ -155,6 +168,7 @@ namespace XiuXianShop
         }
         public bool CanSave(out string reason)
         {
+            if(PendingVisitScene!=null){reason="请先结束当前剧情，再保存。";return false;}
             if(Phase==TurnPhase.Open){reason="营业中不能保存，请先结束营业。";return false;}
             if(IsCarrying || IsTravelling){reason="请先回店并结束携带，再保存。";return false;}
             if(IsAtShopAlchemy){reason="请先完成或中止炼丹、收回设施物品并关闭炼丹炉，再保存。";return false;}
@@ -172,6 +186,7 @@ namespace XiuXianShop
                 hasStaminaState=true,stamina=Stamina,staminaOverflowCustomer=HasStaminaOverflowCustomer,
                 hasTravelledThisTurn=HasTravelledThisTurn,unlockedLocationIds=unlockedLocations.ToArray(),
                 visitedLocationIds=visitedLocations.ToArray(),progressFlags=progressFlags.ToArray(),
+                visits=visitProgress.Values.ToArray(),specialVisitsThisTurn=SpecialVisitsThisTurn,
                 latestTeaVisit=LatestTeaVisit,activeTeaEffect=ActiveTeaEffect,
                 hasLatestTeaVisit=LatestTeaVisit!=null,hasActiveTeaEffect=ActiveTeaEffect!=null,
                 commissionTurn=commissionTurn,commissionsCompleted=commissionsCompleted,commissionCandidates=commissionCandidates,
@@ -203,6 +218,9 @@ namespace XiuXianShop
             session.visitedLocations.UnionWith(save.visitedLocationIds);session.progressFlags.UnionWith(save.progressFlags);
             session.LatestTeaVisit=save.hasLatestTeaVisit?save.latestTeaVisit:null;session.ActiveTeaEffect=save.hasActiveTeaEffect?save.activeTeaEffect:null;
             session.Turn=save.turn;session.Phase=save.phase;session.Money=save.money;session.OpeningMoney=save.openingMoney;session.Rent=save.rent;session.RentDebt=save.debt;
+            session.RestoreVisitProgress(save.visits);
+            if(save.specialVisitsThisTurn<0)throw new ArgumentException("存档来访人数无效。");
+            session.SpecialVisitsThisTurn=save.specialVisitsThisTurn;
             session.IncomeToday=save.incomeToday;session.ExpensesToday=save.expensesToday;session.ServedToday=save.servedToday;
             session.BuyersToday=save.buyersToday;session.SuppliersToday=save.suppliersToday;session.TradingCustomersToday=save.tradingCustomersToday;session.LastCustomerResult=save.lastCustomerResult;
             session.ValidateSavedTeaState();
@@ -302,6 +320,7 @@ namespace XiuXianShop
         {
             var item=Find(id);
             reason="";
+            if(PendingVisitScene!=null){reason="请先结束当前剧情。";return false;}
             if(IsCarrying && id==CarriedPackId){reason="携带期间不能移动或更换已选背包，请先返回。";return false;}
             if (item==null) { reason="物品已不在这里。"; return false; }
             if(!CanMoveAlchemy(item,target,out reason))return false;
@@ -378,6 +397,7 @@ namespace XiuXianShop
             var attraction=PreviewAttraction();
             queue.Clear();ServedToday=0;BuyersToday=0;SuppliersToday=0;TradingCustomersToday=0;
             if(!GenerateOrdinaryCustomers(attraction))return false;
+            AddAuthoredVisits();
             TodayAttraction=attraction;
             Phase=TurnPhase.Open;
             return NextCustomer();
@@ -386,16 +406,20 @@ namespace XiuXianShop
         public bool NextCustomer()
         {
             if (Phase!=TurnPhase.Open) return Fail("请先开始营业。" );
+            if(PendingVisitScene!=null)return Fail("请先结束当前来访剧情。");
+            if(RequestVisitSkip())return Success("请先处理送别剧情，再呼叫下一位。");
             // Departure is explicit, even after a successful sale or with an unfinished basket.
             if (Offer!=null) { LastCustomerResult="已主动送别上一位顾客。"; CancelOffer(); ServedToday++; }
             if (queue.Count==0) return Success("本月顾客已接待完。可以结束营业，炼丹整理，再结束回合。" );
             var request=queue.Dequeue();
             Offer=new TradeOffer{Direction=request.direction, SupplierItems=request.definitionIds.Select(id=>NewItem(catalog.Find(id),ItemOwner.Customer)).ToArray(),
-                CustomerName=request.direction==TradeDirection.CustomerSells?"采药客 · 阿青":"散修 · 云生",
+                CustomerName=request.visit?.displayName??(request.direction==TradeDirection.CustomerSells?"采药客 · 阿青":"散修 · 云生"),
+                VisitId=request.visit?.id,CustomerId=request.visit?.customerId,PortraitId=request.visit?.portraitId,
                 RequestedCategory=request.category,RemainingBudget=request.budget,
                 Behavior=request.behavior,BudgetTier=request.tier,WealthyPromotion=request.promoted};
             var current=Offer;current.CurrentPrice=()=>current.SupplierItem==null?0:Quote(current.SupplierItem).Amount;
             TryPlaceSupplierItems();
+            if(request.visit!=null)RecordVisitArrival(request.visit);
             var intention=request.behavior==CustomerBehavior.Selling?"顾客只出售，没有求购计划。":$"顾客求购{ShopCatalog.CategoryName(request.category)}，预算 {request.budget}。";
             return Success(intention+"可交易来货在顾客柜台，确认前仍属顾客；可继续交易或随时下一位。" );
         }
@@ -435,6 +459,7 @@ namespace XiuXianShop
         {
             reason="当前没有可结算的交易。";
             if(Phase!=TurnPhase.Open || Offer==null)return false;
+            if(PendingVisitScene!=null){reason="请先结束当前来访剧情。";return false;}
             if(quote.Lines.Count==0){reason="柜台为空，请摆入商品或从谈判入口请求买入来货。";return false;}
             if(quote.Lines.Select(l=>l.Item.Id).Distinct().Count()!=quote.Lines.Count || ValidateState()!=null)
             {reason="物品位置或所有权无效，本次未成交。";return false;}
@@ -490,6 +515,8 @@ namespace XiuXianShop
             Money+=(int)quote.ActualNet;IncomeToday+=(int)(quote.SaleTotal-quote.Shortfall);ExpensesToday+=(int)quote.PurchaseTotal;
             Offer.RemainingBudget-=(int)Math.Max(0,quote.ActualNet);
             Offer.SupplierItems=Offer.SupplierItems.Where(i=>i.ForSale).ToArray();
+            TryPlaceSupplierItems();
+            RecordVisitTrade();
             LastCustomerResult=$"成交 {quote.Lines.Count} 件，报价净额 {quote.Net:+0;-0;0}，实际净额 {quote.ActualNet:+0;-0;0}，少收 {quote.Shortfall}。";
             return Success($"{LastCustomerResult} 顾客剩余预算 {Offer.RemainingBudget}，可继续交易或主动下一位。");
         }
@@ -497,6 +524,8 @@ namespace XiuXianShop
         public bool RejectTrade()
         {
             if (Offer==null) return Fail("当前没有需要拒绝的交易。" );
+            if(PendingVisitScene!=null)return Fail("请先结束当前来访剧情。");
+            if(RequestVisitSkip())return Success("请先处理送别剧情，再送别顾客。");
             CancelOffer(); ServedToday++;
             LastCustomerResult="已拒绝本次交易，顾客离开。";
             return Success("已拒绝交易。玩家物品和灵石未减少，顾客已离开。" );
@@ -510,6 +539,7 @@ namespace XiuXianShop
         public bool EndBusiness()
         {
             if(Phase!=TurnPhase.Open) return Fail("当前没有营业。" );
+            if(PendingVisitScene!=null)return Fail("请先结束当前来访剧情。");
             CancelOffer(); queue.Clear(); Phase=TurnPhase.Closed;
             return Success($"本月已闭店。收入 {IncomeToday}，支出 {ExpensesToday}，余额变化 {BalanceChange:+0;-0;0}。查看结算后可进入下个月。" );
         }
@@ -534,7 +564,7 @@ namespace XiuXianShop
             if(Turn%catalog.rentPeriod==0) { due+=Rent; Rent=(int)Math.Ceiling(Rent*1.05); }
             int paid=Math.Min(Money,due); Money-=paid; RentDebt=due-paid;
             Turn++; Phase=TurnPhase.Preparation; ServedToday=0;TodayAttraction=null;BuyersToday=0;SuppliersToday=0;TradingCustomersToday=0; queue.Clear();
-            HasTravelledThisTurn=false;visitedLocations.Clear();
+            HasTravelledThisTurn=false;visitedLocations.Clear();SpecialVisitsThisTurn=0;
             ActiveTeaEffect=LatestTeaVisit?.ApplyTurn==Turn?LatestTeaVisit:null;
             long recovered=(long)Stamina+catalog.staminaRecoveryPerTurn;
             HasStaminaOverflowCustomer=recovered>MaximumStamina;

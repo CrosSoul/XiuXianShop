@@ -20,6 +20,8 @@ namespace XiuXianShop
         public bool hasTravelledThisTurn;
         public string[] unlockedLocationIds;
         public string[] visitedLocationIds,progressFlags;
+        public VisitProgress[] visits;
+        public int specialVisitsThisTurn;
         public TeaVisitResult latestTeaVisit,activeTeaEffect;
         public bool hasLatestTeaVisit,hasActiveTeaEffect;
         public int commissionTurn, commissionsCompleted;

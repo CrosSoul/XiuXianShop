@@ -11,6 +11,7 @@ namespace XiuXianShop.Tests
         IEnumerator CloseBusinessForOuting()
         {
             if(shop.Session.Phase==TurnPhase.Preparation)yield return Click("BeginBusiness");
+            while(shop.Session.PendingVisitScene!=null)yield return Click("VisitSceneContinue");
             if(shop.Session.Phase==TurnPhase.Open)yield return Click("EndBusiness");
         }
         [UnityTest,Category("DP27")]
@@ -22,6 +23,7 @@ namespace XiuXianShop.Tests
             Assert.That(shop.GetComponentsInChildren<UnityEngine.UI.Button>().Any(b=>b.name=="CarryConfirm"),Is.False);
             yield return Click("BeginBusiness");Assert.That(shop.FindButton("CarryOpen").interactable,Is.False);
             Assert.That(s.BeginTravel(),Is.False);Assert.That(s.Stamina,Is.EqualTo(100));
+            while(s.PendingVisitScene!=null)yield return Click("VisitSceneContinue");
             yield return Click("EndBusiness");Assert.That(shop.FindButton("CarryOpen").interactable);
             yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");
             yield return Click("TravelReturn");yield return Click("TravelReturnConfirm");yield return Click("CarryReturn");

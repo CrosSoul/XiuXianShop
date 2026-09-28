@@ -32,6 +32,27 @@ namespace XiuXianShop.Tests
         void Add(string id)=>Assert.That(s.AddAlchemyIngredient(Id(id)),Is.True,s.Message);
         void Select(string id)=>Assert.That(s.SelectAlchemyRecipe(id),Is.True,s.Message);
 
+        [Test,Category("DP52")] public void PendingStoryPausesFurnaceClockAndFuelUntilReturn()
+        {
+            Select("recipe_pill_basic");Add("herb");Assert.That(s.StartAlchemy());s.TickAlchemy(2);
+            double time=s.Alchemy.Time;int fuelId=Id("stone_mid");var fuel=s.Find(fuelId).SpiritUnits;
+            var content=ScriptableObject.CreateInstance<AuthoredContent>();
+            try
+            {
+                content.scenes=new[]{new AuthoredScene{id="pause",entryNodeId="end"}};
+                content.nodes=new[]{new AuthoredNode{id="end",sceneId="pause",type="End"}};
+                content.visits=new[]{new AuthoredVisit{id="pause_visit",customerId="test",queuePhase="BeforeOrdinary",arrivalSceneId="pause",completion="SceneEnd"}};
+                catalog.authoredContent=content;var caller=new ShopSession(catalog);Assert.That(caller.BeginBusiness());
+                // Inject a real invocation at the kernel boundary to exercise pausing an already-running furnace.
+                // Ordinary gameplay currently cannot open business while the furnace is running.
+                typeof(ShopSession).GetProperty(nameof(ShopSession.PendingVisitScene)).SetValue(s,caller.PendingVisitScene);
+                s.TickAlchemy(20);Assert.That(s.Alchemy.Time,Is.EqualTo(time));Assert.That(s.Find(fuelId).SpiritUnits,Is.EqualTo(fuel));
+                Assert.That(s.FinishVisitScene(s.PendingVisitScene,false));s.TickAlchemy(1);
+                Assert.That(s.Alchemy.Time,Is.EqualTo(time+1));Assert.That(s.Find(fuelId).SpiritUnits,Is.LessThan(fuel));
+            }
+            finally{catalog.authoredContent=null;UnityEngine.Object.DestroyImmediate(content);}
+        }
+
         [TestCase("recipe_pill_basic",48)]
         [TestCase("recipe_pill_fire_yang",48)]
         [TestCase("recipe_pill_metal_water",104)]

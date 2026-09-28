@@ -239,6 +239,7 @@ namespace XiuXianShop
 
         public void TickAlchemy(double seconds)
         {
+            if(PendingVisitScene!=null)return;
             if(!IsUsingAlchemy || Alchemy==null || seconds<=0)return;
             var a=Alchemy;
             if(a.Phase==AlchemyPhase.Finished || a.Phase==AlchemyPhase.Aborted)return;

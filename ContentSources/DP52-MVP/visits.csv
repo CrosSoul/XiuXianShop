@@ -1,0 +1,2 @@
+来访名称,来访ID,顾客ID,显示名,立绘ID,类型,固定回合,最早回合,最晚回合,必须Flag,禁止Flag,前置来访ID,队列阶段,同阶段顺序,求购类别,预算,到店SceneID,交易成功SceneID,跳过SceneID,完成条件,数据状态
+"炼丹求学线索（灰盒）","visit_alchemy_hint_01","alchemy_hint_customer","来访顾客","","Story","","1","","","","","BeforeOrdinary","10","","","scene_alchemy_hint_arrival","","","SceneEnd","待同步"

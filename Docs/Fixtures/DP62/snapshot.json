@@ -1,0 +1,5 @@
+{
+  "formatVersion": 1,
+  "snapshotId": "DP62-isolated-graybox-v1",
+  "description": "隔离联调样例，不是批准的正式剧情；仅验证来访、交易和线索解锁。"
+}

@@ -102,8 +102,8 @@ namespace XiuXianShop
                     int count=1+DrawCustomerWeight(new double[]{s.oneSupplyWeight,s.twoSuppliesWeight});
                     supplies=Enumerable.Range(0,count).Select(_=>pool.SupplyIds[DrawCustomerNumber(0,pool.SupplyIds.Length)]).ToArray();
                 }
-                queue.Enqueue((behavior==CustomerBehavior.Buying?TradeDirection.CustomerBuys:TradeDirection.CustomerSells,
-                    supplies,category,budget,behavior,(CustomerBudgetTier)tier,promoted));
+                queue.Enqueue(new CustomerRequest {direction=behavior==CustomerBehavior.Buying?TradeDirection.CustomerBuys:TradeDirection.CustomerSells,
+                    definitionIds=supplies,category=category,budget=budget,behavior=behavior,tier=(CustomerBudgetTier)tier,promoted=promoted});
                 if(behavior==CustomerBehavior.Buying)BuyersToday++;
                 else if(behavior==CustomerBehavior.Selling)SuppliersToday++;
                 else TradingCustomersToday++;

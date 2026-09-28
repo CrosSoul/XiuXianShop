@@ -1,0 +1,27 @@
+{
+  "status": "completed",
+  "duration": 0.75,
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.AuthoredVisitDialogueCancelDoesNotUnlockOrComplete",
+      "Status": "Passed",
+      "Duration": 0.4137153,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.AuthoredVisitDialogueClicksUnlockOnlyAfterCompletionAndPersist",
+      "Status": "Passed",
+      "Duration": 0.3246277,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

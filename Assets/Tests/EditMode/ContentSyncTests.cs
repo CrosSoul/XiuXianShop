@@ -89,6 +89,65 @@ namespace XiuXianShop.Tests
             Assert.That(content.scenes[0].description,Is.EqualTo("隔离校验"));
             Assert.That(content.nodes[0].conditionKey,Is.EqualTo("story.hint"));
         }
+        [Test,Category("DP62")] public void ImportedEditsChangeVisitScheduleBudgetGoodsAndDialogueWithoutNewIdentity()
+        {
+            using(var plan=Review())ContentSync.Import(plan);
+            ShopSession AtTurn(int turn)
+            {
+                var session=new ShopSession(catalog);
+                while(session.Turn<turn){session.BeginBusiness();if(session.PendingVisitScene!=null)session.FinishVisitScene(session.PendingVisitScene,false);session.EndBusiness();session.AdvanceTurn();}
+                Assert.That(session.BeginBusiness());return session;
+            }
+            Assert.That(AtTurn(2).Offer.VisitId,Is.Null);
+            var first=AtTurn(3);Assert.That(first.Offer.VisitId,Is.EqualTo("visit_a"));
+            Assert.That(first.Offer.SupplierItems.Count,Is.EqualTo(2));
+            Assert.That(AtTurn(4).Offer.VisitId,Is.Null);
+            visit["显示名"]="更新后的客人";visit["预算"]="88";visit["固定回合"]="4";
+            visit["求购类别"]="Material";visit["到店SceneID"]="scene_b";
+            scene["SceneID"]="scene_b";dialogue["SceneID"]="scene_b";end["SceneID"]="scene_b";
+            dialogue["NodeID"]="node_b";end["NodeID"]="end_b";dialogue["NextNodeID"]="end_b";
+            dialogue["文本"]="更新后的灰盒对白";item["物品ID"]="herb";WriteAll();
+            using(var plan=Review())ContentSync.Import(plan);
+            Assert.That(content.visits.Length,Is.EqualTo(1));Assert.That(AtTurn(3).Offer.VisitId,Is.Null);
+            var changed=AtTurn(4);Assert.That(changed.Offer.CustomerName,Is.EqualTo("更新后的客人"));
+            Assert.That(changed.Offer.RemainingBudget,Is.EqualTo(88));
+            Assert.That(changed.Offer.RequestedCategory,Is.EqualTo(ItemCategory.Material));
+            Assert.That(changed.PendingVisitScene.Scene.id,Is.EqualTo("scene_b"));
+            Assert.That(changed.Offer.SupplierItems.All(i=>i.Definition.id=="herb"));
+            Assert.That(new VisitSceneGraybox(changed,changed.PendingVisitScene).Lines.Single(),Does.Contain("更新后的灰盒对白"));
+            var second=new Dictionary<string,string>(visit);second["来访ID"]="visit_b";second["同阶段顺序"]="20";
+            Write("visits.csv",visit,second);using(var plan=Review())ContentSync.Import(plan);
+            Assert.That(content.visits.Length,Is.EqualTo(2));Assert.That(AtTurn(4).Offer.VisitId,Is.EqualTo("visit_a"));
+            second["同阶段顺序"]="5";Write("visits.csv",visit,second);using(var plan=Review())ContentSync.Import(plan);
+            Assert.That(AtTurn(4).Offer.VisitId,Is.EqualTo("visit_b"));
+        }
+
+        [Test,Category("DP52")] public void StoryLocationVisualAndConditionalChoicesUseTheSameImporter()
+        {
+            columns["scenes.csv"]=columns["scenes.csv"].Concat(new[]{"触发地点ID"}).ToArray();
+            columns["nodes.csv"]=columns["nodes.csv"].Concat(new[]{"背景","立绘槽","立绘显示","分镜","选项条件类型","选项条件键","选项条件值","背景图片"}).ToArray();
+            scene["触发地点ID"]="baishitang";dialogue["节点类型"]="Choice";dialogue["选项文本"]="有线索\n离开";
+            dialogue["NextNodeID"]="node_end\nnode_end";dialogue["选项条件类型"]="FlagExists\nNone";
+            dialogue["选项条件键"]="story.hint\n-";dialogue["选项条件值"]="true\ntrue";
+            dialogue["背景"]="丹房";dialogue["分镜"]="教学占位";dialogue["立绘槽"]="Right";WriteAll();
+            using(var plan=Review())ContentSync.Import(plan);
+            Assert.That(content.scenes.Single().locationId,Is.EqualTo("baishitang"));
+            Assert.That(content.nodes.First().choiceConditionKeys,Is.EqualTo(new[]{"story.hint","-"}));
+            Assert.That(content.nodes.First().background,Is.EqualTo("丹房"));
+            dialogue["背景图片"]="Assets/missing.png";WriteAll();
+            using(var plan=ContentSync.Validate(directory,catalog,content))Assert.That(plan.issues.Any(i=>i.field=="背景图片"));
+            dialogue["背景图片"]="";dialogue["选项条件键"]="story.hint";WriteAll();
+            using(var plan=ContentSync.Validate(directory,catalog,content))Assert.That(plan.Valid,Is.False);
+        }
+
+        [Test,Category("DP52")] public void AutomaticBranchCycleIsRejectedEvenWithAnEndExit()
+        {
+            dialogue["节点类型"]="Branch";dialogue["条件类型"]="FlagExists";dialogue["条件键"]="story.loop";
+            dialogue["NextNodeID"]="node_a\nnode_end";WriteAll();
+            using(var plan=ContentSync.Validate(directory,catalog,content))
+                Assert.That(plan.issues.Any(i=>i.reason.Contains("自动节点形成循环")));
+        }
+
         [Test] public void MissingRowsAreRetainedAndExplicitDisableKeepsIdentity()
         {
             using(var p=Review())ContentSync.Import(p);

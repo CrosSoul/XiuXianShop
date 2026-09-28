@@ -48,6 +48,7 @@ namespace XiuXianShop.Tests
             Assert.That(session.BeginBusiness());
             Assert.That(session.GrantAlchemyTestMaterials("recipe_pill_basic"),Is.False);
             Assert.That(session.Items.Count,Is.EqualTo(initial+session.In(ContainerId.CustomerCounter).Count()));
+            if(session.PendingVisitScene!=null)Assert.That(new StoryRunner(session,session.PendingVisitScene).Continue());
             Assert.That(session.EndBusiness());Assert.That(session.BeginCarrying(0));
             int carried=session.Items.Count;
             Assert.That(session.GrantAlchemyTestMaterials("recipe_pill_basic"),Is.False);Assert.That(session.Items.Count,Is.EqualTo(carried));

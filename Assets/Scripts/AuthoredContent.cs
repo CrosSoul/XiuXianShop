@@ -30,6 +30,7 @@ namespace XiuXianShop
         public string requiredFlags, forbiddenFlags, prerequisiteVisitId, queuePhase, buyingCategory;
         public int order;
         public string arrivalSceneId, tradeSceneId, skipSceneId, completion;
+        public string repeatPolicy = "UntilCompleted";
     }
     [Serializable] public sealed class AuthoredVisitItem : AuthoredRecord
     {
@@ -38,7 +39,7 @@ namespace XiuXianShop
     }
     [Serializable] public sealed class AuthoredScene : AuthoredRecord
     {
-        public string title, description, entryNodeId;
+        public string title, description, entryNodeId, locationId;
     }
     [Serializable] public sealed class AuthoredNode : AuthoredRecord
     {
@@ -46,5 +47,10 @@ namespace XiuXianShop
         public string conditionType, conditionKey, conditionValue, actionType, actionTarget, actionValue;
         public string[] choices = Array.Empty<string>();
         public string[] nextNodeIds = Array.Empty<string>();
+        public string background, portraitSlot, portraitVisible, comic;
+        public Sprite backgroundSprite, portraitSprite, comicSprite;
+        public string[] choiceConditionTypes = Array.Empty<string>();
+        public string[] choiceConditionKeys = Array.Empty<string>();
+        public string[] choiceConditionValues = Array.Empty<string>();
     }
 }

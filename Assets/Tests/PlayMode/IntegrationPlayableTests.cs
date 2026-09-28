@@ -19,6 +19,12 @@ namespace XiuXianShop.Tests
             yield return Click("BeginBusiness");
             Assert.That(s.BuyersToday+s.SuppliersToday+s.TradingCustomersToday,Is.EqualTo(count));
             Assert.That(shop.FindButton("CarryOpen").interactable,Is.False);
+            int special=0;
+            while(s.Offer?.VisitId!=null)
+            {
+                while(s.PendingVisitScene!=null)yield return Click("VisitSceneContinue");
+                special++;yield return Click("NextCustomer");
+            }
             for(int n=0;n<count;n++)
             {
                 Assert.That(s.Offer,Is.Not.Null);
@@ -38,7 +44,7 @@ namespace XiuXianShop.Tests
                 }
                 yield return Click("NextCustomer");
             }
-            Assert.That(s.Offer,Is.Null);Assert.That(s.ServedToday,Is.EqualTo(count));
+            Assert.That(s.Offer,Is.Null);Assert.That(s.ServedToday,Is.EqualTo(count+special));
             yield return Click("EndBusiness");
             Assert.That(s.Stamina,Is.EqualTo(stamina));Assert.That(s.ValidateState(),Is.Null);
         }

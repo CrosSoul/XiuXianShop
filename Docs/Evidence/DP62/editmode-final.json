@@ -1,0 +1,118 @@
+{
+  "status": "completed",
+  "duration": 0.77,
+  "summary": {
+    "total": 15,
+    "passed": 15,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.AllMatchingVisitsAppearInExplicitOrderWithoutReplacingOrdinaryCustomers",
+      "Status": "Passed",
+      "Duration": 0.0366992,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.ConditionalWindowAndPrerequisiteCompletionSurviveSave",
+      "Status": "Passed",
+      "Duration": 0.0127856,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.DisplayTeaAndOverflowOnlyModifyOrdinaryVisitors",
+      "Status": "Passed",
+      "Duration": 0.0096151,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.FixedGoodsBudgetAndIdentityComeFromContent",
+      "Status": "Passed",
+      "Duration": 0.0009515,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.GrayboxReadsAuthoredTextAndAppliesHintAndLocationOnlyOnEnd",
+      "Status": "Passed",
+      "Duration": 0.0043672,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.InvalidResultTargetDoesNotApplyEarlierFlag",
+      "Status": "Passed",
+      "Duration": 0.0006626,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.OnceAppearanceProgressRoundTripsWithoutCopyingDefinitions",
+      "Status": "Passed",
+      "Duration": 0.0031257,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.OneTimeTrainingDestinationCannotBeVisitedAgainAfterSave",
+      "Status": "Passed",
+      "Duration": 0.0017669,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.RequiredForbiddenAndFixedTurnConditionsMustAllMatch",
+      "Status": "Passed",
+      "Duration": 0.0013593,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.SameCustomerUsesSeparateFixedVisitsAndNeverAppearsOnNeighbourTurns",
+      "Status": "Passed",
+      "Duration": 0.0010834,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.SceneHandoffRequiresMatchingRequestAndReachedEndForCompletion",
+      "Status": "Passed",
+      "Duration": 0.0010075,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.SkipSceneCannotUnlockBeforeSceneEndCompletion",
+      "Status": "Passed",
+      "Duration": 0.0010044,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.SpecialVisitsDoNotConsumeOrdinaryRandomDrawsAndUnresolvedVisitsReturn",
+      "Status": "Passed",
+      "Duration": 0.0013286,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.TradeResultRequiresSuccessfulAtomicSettlementAndIsNotRepeated",
+      "Status": "Passed",
+      "Duration": 0.0099639,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.ImportedEditsChangeVisitScheduleBudgetGoodsAndDialogueWithoutNewIdentity",
+      "Status": "Passed",
+      "Duration": 0.3684483,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

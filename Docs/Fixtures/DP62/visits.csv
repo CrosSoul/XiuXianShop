@@ -1,0 +1,3 @@
+来访名称,来访ID,顾客ID,显示名,立绘ID,类型,固定回合,最早回合,最晚回合,必须Flag,禁止Flag,前置来访ID,队列阶段,同阶段顺序,求购类别,预算,到店SceneID,交易成功SceneID,跳过SceneID,完成条件,重复策略,数据状态
+炼丹求学线索（隔离）,visit_alchemy_hint_01,npc_alchemy_hint_visitor,消息客（灰盒）,,Story,1,,,,,,BeforeOrdinary,10,,,scene_alchemy_hint_arrival,,,SceneEnd,UntilCompleted,待同步
+固定买卖（隔离）,test_visit_trade,test_trader,买卖客（灰盒）,,Special,1,,,,,,BeforeOrdinary,20,Medicine,40,,,,TradeSuccess,UntilCompleted,待同步

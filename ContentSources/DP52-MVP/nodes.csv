@@ -1,0 +1,19 @@
+节点名称,NodeID,SceneID,节点类型,说话者,文本,立绘ID,表情状态,选项文本,条件类型,条件键,条件值,Action类型,Action目标,Action值,NextNodeID,数据状态,背景,立绘槽,立绘显示,分镜,选项条件类型,选项条件键,选项条件值
+"hint_line","hint_line","scene_alchemy_hint_arrival","Dialogue","来访顾客","听说炼丹房偶尔会指点求学的人。若你有心，不妨营业后去问问。","","","","","","","","","","hint_flag","待同步","","","","","","",""
+"hint_flag","hint_flag","scene_alchemy_hint_arrival","Action","","","","","","","","","SetFlag","story.alchemy_hint_known","true","hint_unlock","待同步","","","","","","",""
+"hint_unlock","hint_unlock","scene_alchemy_hint_arrival","Action","","","","","","","","","UnlockLocation","location_alchemy_training_visit","true","hint_end","待同步","","","","","","",""
+"hint_end","hint_end","scene_alchemy_hint_arrival","End","","","","","","","","","","","","","待同步","","","","","","",""
+"training_background","training_background","scene_alchemy_training","Visual","当值人员","","attendant_placeholder","不耐","","","","","","","","training_attendant","待同步","炼丹房 · 求学","Left","true","","","",""
+"training_attendant","training_attendant","scene_alchemy_training","Dialogue","当值人员","这里不是随便试手的地方。没有师承，也不懂炉程，还是请回吧。","","","","","","","","","","training_elder_enters","待同步","","","","","","",""
+"training_elder_enters","training_elder_enters","scene_alchemy_training","Visual","炼丹长老","","elder_placeholder","温和","","","","","","","","training_elder","待同步","","Right","true","","","",""
+"training_elder","training_elder","scene_alchemy_training","Dialogue","炼丹长老","且慢。我方才路过，看你被劝退仍认真记着炉边的手法，倒想起自己年轻求学的时候。愿意学的话，我亲自教你入门。","","","","","","","","","","training_choice","待同步","","","","","","",""
+"training_choice","training_choice","scene_alchemy_training","Choice","","回应长老","","","愿意用心学习，请您指点。
+我没有基础，也能学吗？","","","","","","","training_resolve
+training_reassure","待同步","","","","","","",""
+"training_reassure","training_reassure","scene_alchemy_training","Dialogue","炼丹长老","谁不是从不会开始的？我看重的是你肯认真学。安心随我来。","","","","","","","","","","training_resolve","待同步","","","","","","",""
+"training_resolve","training_resolve","scene_alchemy_training","Action","","","","","","","","","SetFlag","story.alchemy_learning_accepted","true","training_comic","待同步","","","","","","",""
+"training_comic","training_comic","scene_alchemy_training","Visual","","","","","","","","","","","","training_taught","待同步","","","","灰盒分镜：长老在炉旁示范，玩家认真观摩并练习。","","",""
+"training_taught","training_taught","scene_alchemy_training","Dialogue","炼丹长老","入门的要领已经教给你，余下要靠耐心练习。往后你可以再来炼丹房。","","","","","","","","","","training_profession","待同步","","","","","","",""
+"training_profession","training_profession","scene_alchemy_training","Action","","","","","","","","","UnlockProfession","alchemy","true","training_location","待同步","","","","","","",""
+"training_location","training_location","scene_alchemy_training","Action","","","","","","","","","UnlockLocation","alchemy-room","true","training_end","待同步","","","","","","",""
+"training_end","training_end","scene_alchemy_training","End","","","","","","","","","","","","","待同步","","","","","","",""

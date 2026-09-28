@@ -1,0 +1,5 @@
+节点名称,NodeID,SceneID,节点类型,说话者,文本,立绘ID,表情状态,选项文本,条件类型,条件键,条件值,Action类型,Action目标,Action值,NextNodeID,数据状态
+消息,hint_line,scene_alchemy_hint_arrival,Dialogue,消息客（灰盒）,听说炼丹房有求学的机会。营业结束后，你可以去问问。,,,,,,,,,,hint_flag,待同步
+线索,hint_flag,scene_alchemy_hint_arrival,Action,,,,,,,,,SetFlag,story.alchemy_hint_known,true,hint_unlock,待同步
+目的地,hint_unlock,scene_alchemy_hint_arrival,Action,,,,,,,,,UnlockLocation,location_alchemy_training_visit,true,hint_end,待同步
+结束,hint_end,scene_alchemy_hint_arrival,End,,,,,,,,,,,,,待同步

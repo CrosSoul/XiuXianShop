@@ -10,6 +10,7 @@ namespace XiuXianShop
         public string id;
         public string title;
         public bool initiallyUnlocked;
+        public bool singleVisit;
         [UnityEngine.Tooltip("地点物品区的原型格子尺寸，不代表职业设备容量。")]
         public UnityEngine.Vector2Int itemGridSize = new UnityEngine.Vector2Int(6,4);
         [UnityEngine.Tooltip("长期地点保留物品状态；普通地点离开时清理。不是种植或养殖实现。")]
@@ -23,9 +24,11 @@ namespace XiuXianShop
         public bool HasTravelledThisTurn { get; private set; }
         public bool IsTravelling { get; private set; }
         public string CurrentLocationId { get; private set; }
-        public IEnumerable<TravelLocation> UnlockedLocations => catalog.travelLocations.Where(l=>unlockedLocations.Contains(l.id));
+        public IEnumerable<TravelLocation> UnlockedLocations => catalog.travelLocations.Where(l=>unlockedLocations.Contains(l.id) &&
+            (!l.singleVisit || !HasProgressFlag("location-visited:"+l.id)));
         public int NextLocationStaminaCost => visitedLocations.Count==0 ? catalog.firstLocationStaminaCost : catalog.extraLocationStaminaCost;
         public bool HasVisitedLocation(string id) => visitedLocations.Contains(id);
+        public bool IsLocationUnlocked(string id) => unlockedLocations.Contains(id);
         public bool CanReturnWithoutConfirmation => !UnlockedLocations.Any(l=>CanEnterLocation(l.id,out _));
 
         void InitializeTravel()
@@ -54,8 +57,11 @@ namespace XiuXianShop
 
         public bool CanEnterLocation(string id,out string reason)
         {
+            if(PendingVisitScene!=null){reason="请先结束当前剧情。";return false;}
             if(!IsTravelling || CurrentLocationId!=null){reason="请先返回地点选择界面。";return false;}
             if(!unlockedLocations.Contains(id)){reason="地点尚未解锁。";return false;}
+            if(catalog.travelLocations.Single(l=>l.id==id).singleVisit && HasProgressFlag("location-visited:"+id))
+            {reason="该一次性目的地已经访问。";return false;}
             if(visitedLocations.Contains(id)){reason="本次已访问";return false;}
             return CanSpendStamina(NextLocationStaminaCost,out reason);
         }
@@ -65,6 +71,10 @@ namespace XiuXianShop
             if(!CanEnterLocation(id,out var reason))return Fail(reason);
             Stamina-=NextLocationStaminaCost;
             visitedLocations.Add(id);CurrentLocationId=id;
+            var location=catalog.travelLocations.Single(l=>l.id==id);
+            var story=catalog.authoredContent?.scenes.SingleOrDefault(s=>s.enabled && s.locationId==id);
+            if(location.singleVisit && story==null)SetProgressFlag("location-visited:"+id);
+            if(story!=null && !HasProgressFlag("scene:"+story.id))RequestLocationScene(location,story);
             if(id=="tingfeng-teahouse")ReceiveTeaNews();
             if(id=="baishitang")PrepareCommissions();
             if(id==AlchemyLocationId)Alchemy=null;
@@ -73,6 +83,7 @@ namespace XiuXianShop
 
         public bool LeaveLocation(bool confirmed=false)
         {
+            if(PendingVisitScene!=null)return Fail("请先结束当前剧情。");
             if(!IsTravelling || CurrentLocationId==null)return Fail("当前不在地点内。");
             if(IsAtAlchemy && Alchemy!=null && (Alchemy.Locked || Alchemy.Phase==AlchemyPhase.Running))return Fail("请先完成当前动作并收丹或中止，再离开炼丹房。");
             if(LocationLeaveNeedsConfirmation && !confirmed)return Fail("地点仍有未带走物品，确认离开后将清理这些物品。");
@@ -86,6 +97,7 @@ namespace XiuXianShop
 
         public bool ReturnToShop(bool confirmed=false)
         {
+            if(PendingVisitScene!=null)return Fail("请先结束当前剧情。");
             if(!IsTravelling || CurrentLocationId!=null)return Fail("请先离开地点再回店。");
             if(!confirmed && !CanReturnWithoutConfirmation)return Fail("仍有可前往地点，请确认是否回店。");
             // Return is independent of warehouse space. Unloading uses the existing carry panel.

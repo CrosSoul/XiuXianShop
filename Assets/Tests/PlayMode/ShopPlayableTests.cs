@@ -402,7 +402,8 @@ namespace XiuXianShop.Tests
         }
         IEnumerator RestartWithTestCatalog(System.Action<ShopCatalog> configure,int seed=-1)
         {
-            testCatalog=Object.Instantiate(shop.Catalog);testCatalog.marketEvents=System.Array.Empty<MarketEventDefinition>();configure(testCatalog);
+            // Isolated gameplay scenarios configure their own visitors; the default-session story has its own integration test.
+            testCatalog=Object.Instantiate(shop.Catalog);testCatalog.authoredContent=null;testCatalog.marketEvents=System.Array.Empty<MarketEventDefinition>();configure(testCatalog);
             Object.Destroy(shop.gameObject);yield return null;
             shop=new GameObject("Test Shop Prototype").AddComponent<ShopPrototype>();shop.Catalog=testCatalog;shop.CustomerSeed=seed;
             yield return null;yield return null;Canvas.ForceUpdateCanvases();

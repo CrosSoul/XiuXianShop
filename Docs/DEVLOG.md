@@ -449,6 +449,25 @@ DP-58 最终状态补充：Unity Pipeline CLI 检查 Console Error0/Warning0（�
 - 最终 Console Error 0 / Warning 0，Editor ready/stopped，无编译或 Domain Reload，未清日志。文本 diff --check 通过；Unity 自动序列化的 5 个空 itemId 行有尾随空格，未手改 YAML。未执行 Player 构建或人工窗口操作验收。
 - 使用步骤与未接入目录见 ContentSources/README.md。职业、知识、实例预设未知目标明确阻止；物品/配方沿用 DP14 校验路径，后续域尚未迁入。仅本地未提交，交付到 Ready for Review，不标 Done。
 
+## 2026-09-28 — DP-62 开发中：来访队列与进度
+
+- 已核对 DP62、G15 v2、G04 v21 AC84–89、数据规范 v10、G02/G08、G11 与 DP52 当前 To Do 状态。DP62 已转 In Progress；复用 DP64 内容资产和导入入口。
+- 接入固定回合/Flag/前置完成条件、全部合法来访入队、阶段/顺序/稳定 ID 排序和固定物品；普通顾客独立生成。进度加入现有 ShopSave，不另建存档。重复策略可选列支持 Once / UntilCompleted（空值保留；新记录默认 UntilCompleted）。
+- 加入到店/成交/送别 Scene 请求与结束回调；仅有效请求可写 SceneEnd 完成，成功结算后才触发交易完成。正在接灰盒显示、Action 结果与炼丹求学样例，当前还不是完整交付。
+- 本阶段 Edit Mode DP62 6/6：多来访/排序、固定时点、组合条件、固定货物、出现状态往返存档、Scene 回调与完成存档。Console Error0/Warning0、Editor ready/stopped；尚未执行本任务 Play Mode、完整回归和内容端到端联调。
+- 后续增量：线性 VisitSceneGraybox 与 uGUI 对白接入，正常 End 前统一校验有限 Action，取消不写入结果；Choice/Branch/Visual 明确留给 DP52，不做通用 Runner。隔离 CSV 位于 Docs/Fixtures/DP62，已通过 DP64 导入生成 DP62VerificationContent.asset；正式 AuthoredContent 未改，菜单 Validation/Start DP62 Authored Visits 可重置 Play 会话验证。
+- 最新定向 Edit Mode 9/9，新增结果目标失败不部分写入、成功交易才触发结果、重复回调拒绝。实际 Play Mode 对白继续/取消 2/2（含射线命中检查）；首轮两项按钮点击未生效，加入射线断言后通过，尚需在最终回归复核，不能宣称已定位根因。原始最新结果保存至 Evidence/DP62。
+- 尚未交付：总客数显示、其他来访条件/队列与交易边界、内容修改端到端及完整回归仍需核对；一次性求学目的地与后续 DP52 交接边界也待收尾。Jira 保持 In Progress。
+
+
+## 2026-09-29 — DP-62 完成实现与定向验证
+
+- 完成本轮来访队列、固定货物/预算、Scene 交接、线性灰盒、完成进度与一次性求学目的地。复用 DP64 同步与 G08 交易；普通客流独立。作者操作及隔离试玩入口见 ContentSources/README.md。正式源仍是草稿且有错位行，未擅自导入；DP52 完整 Runner/实际授业留在原任务。
+- 收尾补齐送别 Scene 未达到完成条件时禁止解锁；在应用任何结果前完成检查。定向覆盖窗口与前置完成存档、展示/茶肆/体力溢出不改特殊预算及货物、CSV 修改类别/Scene/文本/排序立即生效。
+- 既有全量 Edit Mode 212/212；最终增量 DP62 Edit Mode 15/15、真实 Play Mode 对白继续/取消 2/2，见 Evidence/DP62/editmode-final.json 与 playmode-final.json。针对性验证覆盖 AC84–89 和 DP62 的内容导入、队列、结算、取消及进度边界。
+- 全量 Play Mode 保留原始 52/55、3 失败结果（playmode.json）：EmptyDisplayStillReceivesFiveAndRealDragsUpdateBudgetTierPreview 仍断言旧预算“18–22”；CalendarRealClicksShowTwelveMonthsOverlapDetailsAndBlockUnderlyingInput 仍期待 Esc 关闭日历，而既有代码先打开系统菜单。这两处与本轮无关，未顺手更改。DefaultSessionKeepsTeaCommissionsAndItemsAcrossContinuousMonths 的奖励卸货断言首次失败，2026-09-29 单独复跑 1/1 通过；根因尚未确定，不宣称整个回归全绿。
+- 用户报告 compiler error 后，当前 MCP recompile_status 为 completed/failed=false/errors=[]；EditorUtility.scriptCompilationFailed=false，Console Error0/Warning0，未清日志。Editor ready/stopped、无编译/Domain Reload；ShopPrototype.unity dirty=false。此次未复现编译错误，不虚构修复原因。
+- 未做 Player 构建或人工手感验收。没有新增 Package/工程设置改动；Unity API 在现有 Catalog 加入锁定的一次性求学地点，单独样例资产未挂入默认正式内容。仅本地未提交；交付到 Ready for Review，不标 Done。
 
 ## 2026-09-27 — 编译错误复查
 

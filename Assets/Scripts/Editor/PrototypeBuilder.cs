@@ -11,6 +11,15 @@ namespace XiuXianShop.Editor
         public const string CatalogPath="Assets/Data/ShopCatalog.asset";
         static ShopCatalog verificationCatalog;
         static bool discountEnabled;
+        [MenuItem("XiuXianShop/Validation/Start DP62 Authored Visits (resets Play session)")]
+        public static void StartAuthoredVisits()
+        {
+            if(!CanStartVerification())return;
+            StartVerificationDay();
+            VisitVerification.Configure(verificationCatalog,AssetDatabase.LoadAssetAtPath<AuthoredContent>("Assets/Data/DP62VerificationContent.asset"));
+            var shop=Object.FindFirstObjectByType<ShopPrototype>();shop.StartVerificationSession(verificationCatalog,62);
+            shop.SavePath=System.IO.Path.Combine(Application.dataPath,"../Temp/DP62VerificationSave.json");
+        }
         [MenuItem("XiuXianShop/Current Play Session/Grant Miniature Alchemy Furnace (no reset)")]
         public static void GrantCurrentShopFurnace()
         {

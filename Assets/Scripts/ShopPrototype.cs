@@ -63,6 +63,8 @@ namespace XiuXianShop
 
         void Update()
         {
+            TickVisitScene();
+            if(Session?.PendingVisitScene!=null)return;
             TickAlchemyPanel();
             // Fuel use changes value continuously. Alchemy updates its own labels; keep grid views
             // stable during the batch so a stationary pointer can retain its hover target.
@@ -248,7 +250,7 @@ namespace XiuXianShop
             var attraction=Session.Phase==TurnPhase.Preparation?Session.PreviewAttraction():null;
             string preferredCategory=attraction==null?"":string.Join("、",attraction.BuyingCategories.Where(c=>c.DisplayedCount>0).Select(c=>ShopCatalog.CategoryName(c.Category)));
             if(preferredCategory=="")preferredCategory="空展示 · 各类别基础权重";
-            displaySummary.text=Session.Phase==TurnPhase.Preparation?$"本回合 {Session.CustomerCountThisTurn} 位 · 只求购 {attraction.BuyingChance:P0} / 只出售 {attraction.SellingChance:P0} / 同时买卖 {attraction.TradingChance:P0}\n展示加权：{preferredCategory}\n预算按求购类别与普通 / 富裕 / 阔绰档配置":$"本月只求购 {Session.BuyersToday} / 只出售 {Session.SuppliersToday} / 同时买卖 {Session.TradingCustomersToday}\n已离场 {Session.ServedToday} · 待到访 {Session.RemainingCustomers}\n开门时的展示效果已锁定";
+            displaySummary.text=Session.Phase==TurnPhase.Preparation?$"普通 {Session.CustomerCountThisTurn} 位 + 特殊 {Session.EligibleSpecialVisitCount} 位 · 只求购 {attraction.BuyingChance:P0} / 只出售 {attraction.SellingChance:P0} / 同时买卖 {attraction.TradingChance:P0}\n展示加权：{preferredCategory}\n预算按求购类别与普通 / 富裕 / 阔绰档配置":$"本月共 {Session.TotalCustomersThisTurn} 位（特殊 {Session.SpecialVisitsThisTurn}） · 只求购 {Session.BuyersToday} / 只出售 {Session.SuppliersToday} / 同时买卖 {Session.TradingCustomersToday}\n已离场 {Session.ServedToday} · 待到访 {Session.RemainingCustomers}\n开门时的展示效果已锁定";
             var offer=Session.Offer;
             bool canAccept=Session.CanAcceptTrade(out int total,out string tradeReason);
             bool closed=Session.Phase==TurnPhase.Closed;
@@ -262,7 +264,7 @@ namespace XiuXianShop
             else if(offer==null)
             {
                 customerTitle.text=Session.Phase==TurnPhase.Open?(Session.RemainingCustomers>0?"等待下一位顾客":"本月顾客已全部离场"):"营业前 · 配置店铺";
-                customerDetails.text=Session.Phase==TurnPhase.Open?$"{Session.LastCustomerResult}\n剩余 {Session.RemainingCustomers} 位，可呼叫下一位或闭店。":$"空展示柜也有客人 · 本回合 {Session.CustomerCountThisTurn} 位\n展示加权：{preferredCategory}\n供货按类别从普通来货池随机";
+                customerDetails.text=Session.Phase==TurnPhase.Open?$"{Session.LastCustomerResult}\n剩余 {Session.RemainingCustomers} 位，可呼叫下一位或闭店。":$"空展示柜也有客人 · 本回合共 {Session.TotalCustomersThisTurn} 位\n展示加权：{preferredCategory}\n供货按类别从普通来货池随机";
                 tradeDetails.text=Session.Phase==TurnPhase.Open?"当前没有顾客。\n自有物品可以继续在三区域搬运。": "可直接开始营业；展示商品可提高对应类别的求购概率。\n\n玩家出售：基础价值 + 零售加价及有效标签。\n玩家收购：按卖家货物的当前报价付款。\n\n逐件报价求和，确认时按同一金额结算。";
             }
             else
@@ -270,7 +272,8 @@ namespace XiuXianShop
                 customerTitle.text=$"{offer.CustomerName} · {(offer.Behavior==CustomerBehavior.Buying?"只求购":offer.Behavior==CustomerBehavior.Selling?"只出售":"同时买卖")}";
                 string demand=offer.Behavior==CustomerBehavior.Selling?"无求购计划":$"想要：{ShopCatalog.CategoryName(offer.RequestedCategory)} · 剩余资金：{offer.RemainingBudget}";
                 var supplyValue=offer.SupplierItems.Where(i=>i.ForSale).Sum(i=>Session.Quote(i).Amount);
-                customerDetails.text=$"{demand}\n来货 {offer.SupplierItems.Count(i=>i.ForSale)} 件 · 总价值：{supplyValue} 灵石\n普通随机顾客 · 开业快照已固定";
+                customerDetails.text=$"{demand}\n来货 {offer.SupplierItems.Count(i=>i.ForSale)} 件 · 总价值：{supplyValue} 灵石\n"+
+                    (string.IsNullOrEmpty(offer.VisitId)?"普通随机顾客 · 开业快照已固定":"特定来访 · 求购与来货已确定");
                 var quote=Session.PreviewTrade();
                 tradeDetails.text=string.Join("\n\n",quote.Lines.Select(l=>l.Description));
                 if(quote.Lines.Count==0)tradeDetails.text="谈判柜台为空。打开谈判可请求全部来货，或手动选入商品。";

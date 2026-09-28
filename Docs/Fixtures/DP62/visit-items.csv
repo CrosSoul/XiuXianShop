@@ -1,0 +1,3 @@
+条目名称,条目ID,来访ID,用途,物品ID,数量,实例预设ID,数据状态
+草药,test_goods_herb,test_visit_trade,Sell,herb,1,,待同步
+露水,test_goods_dew,test_visit_trade,Sell,dew,1,,待同步

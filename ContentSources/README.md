@@ -5,7 +5,7 @@
 3. 同目录创建 `snapshot.json`，例如 `{"formatVersion":1,"snapshotId":"2026-09-28-v1"}`。这是可读版本标识，不是校验和。
 4. Unity 菜单 **XiuXianShop → 内容同步 (Content Sync)**，刷新并选择快照，点击 **Validate**；错误显示表、行、稳定 ID、字段和原因。
 5. 点击 **Preview Diff** 检查新增、修改、停用与遗漏保留；无错误才可 **Import**。预览后修改源文件或目标资产，需要重新预览。
-6. 检查 Git 中 CSV 与 `Assets/Data/AuthoredContent.asset` 的差异，再 Play。当前只生成静态中间数据，尚无特殊顾客或剧情 Runner 驱动这些记录。
+6. 检查 Git 中 CSV 与 `Assets/Data/AuthoredContent.asset` 的差异，再 Play。DP-62 已读取来访数据并提供线性对白灰盒；完整剧情 Runner 由 DP-52 接入。
 
 ## 同步约定
 
@@ -22,3 +22,15 @@
 `Confluence-2026-09-28` 保留原始导出。`nodes.csv` 的 `alchemy_hint_001` 行存在字段错位：`草稿` 位于 NextNodeID，备注文本位于数据状态。因此当前快照会被拒绝；没有静默移动字段，也没有将草稿作为正式内容导入。修正 Confluence 源表并重新导出后再校验。默认运行时资产保持空内容。
 
 首批仅接入 04.4–04.7；原有物品/配方 DP-14 校验脚本保持独立且未修改。后续其他内容域可添加 ContentDomainAdapter，不需要另建菜单或同步框架。
+
+## DP-62 来访运行与试玩
+
+批准内容仍按上述四表流程导入。每条 visit 在开业时检查固定/最早/最晚回合、必须/禁止 Flag 和前置 visit 完成；所有合法记录按阶段、顺序、稳定 ID 入队，额外加入普通客流。Flag 列用逗号或单元格内换行分隔。可选「重复策略」列为 `Once`（出现过不再来）或 `UntilCompleted`（未完成可在后续合法回合再来，新记录默认）；固定回合始终只命中指定月份。完成后均不再出现，多个 visit 可复用同一 customerId。
+
+求购/预算、固定货物、Scene 引用和对白更新只需重新导入。存档保存来访进度、Flag、地点结果，不保存对白定义。旧 DP-61 存档缺少来访进度时视为尚无进度。
+
+当前 DP-52 尚未接入，来访通过 PendingVisitScene / FinishVisitScene 交接。现有灰盒适配器显示线性 Dialogue，并在正常 End 时统一检查及应用 SetFlag、UnlockLocation、已有 UnlockRecipe；取消不应用。Choice / Branch / Visual 提示需要正式 Runner，不伪装执行。交易结果仅成功结算后触发；要求交易完成的来访不能提前执行结果动作。
+
+隔离试玩：打开 ShopPrototype 并 Play，选择 **XiuXianShop → Validation → Start DP62 Authored Visits (resets Play session)**，然后开始营业。先出现消息客，结束对白后获得线索并解锁「炼丹房求学」；取消则不解锁。下一位为预算 40、求购丹药、携带草药与露水的买卖客。闭店后可正常外出查看新目的地；该入口只允许访问一次，结果随现有存档保存。真正授业、职业和长期炼丹房访问由 DP-52 后续实现，本切片不授予。
+
+隔离数据源位于 `Docs/Fixtures/DP62`，生成资产为 `Assets/Data/DP62VerificationContent.asset`；这是专用测试输入，未写入默认 AuthoredContent。若编辑正式内容，请使用 ContentSources 快照入口，不把隔离样例自动当作批准内容。

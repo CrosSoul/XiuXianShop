@@ -1,0 +1,172 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6eb0a38c4f117c4dbcb422cee010f48, type: 3}
+  m_Name: DP62VerificationContent
+  m_EditorClassIdentifier: XiuXianShop.Runtime::XiuXianShop.AuthoredContent
+  lastSnapshotId: DP62-isolated-graybox-v1
+  lastImportedAtUtc: 2026-09-28T11:56:31.0043285Z
+  visits:
+  - id: visit_alchemy_hint_01
+    enabled: 1
+    title: "\u70BC\u4E39\u6C42\u5B66\u7EBF\u7D22\uFF08\u9694\u79BB\uFF09"
+    customerId: npc_alchemy_hint_visitor
+    displayName: "\u6D88\u606F\u5BA2\uFF08\u7070\u76D2\uFF09"
+    portraitId: 
+    type: Story
+    fixedTurn:
+      hasValue: 1
+      value: 1
+    earliestTurn:
+      hasValue: 0
+      value: 0
+    latestTurn:
+      hasValue: 0
+      value: 0
+    budget:
+      hasValue: 0
+      value: 0
+    requiredFlags: 
+    forbiddenFlags: 
+    prerequisiteVisitId: 
+    queuePhase: BeforeOrdinary
+    buyingCategory: 
+    order: 10
+    arrivalSceneId: scene_alchemy_hint_arrival
+    tradeSceneId: 
+    skipSceneId: 
+    completion: SceneEnd
+    repeatPolicy: UntilCompleted
+  - id: test_visit_trade
+    enabled: 1
+    title: "\u56FA\u5B9A\u4E70\u5356\uFF08\u9694\u79BB\uFF09"
+    customerId: test_trader
+    displayName: "\u4E70\u5356\u5BA2\uFF08\u7070\u76D2\uFF09"
+    portraitId: 
+    type: Special
+    fixedTurn:
+      hasValue: 1
+      value: 1
+    earliestTurn:
+      hasValue: 0
+      value: 0
+    latestTurn:
+      hasValue: 0
+      value: 0
+    budget:
+      hasValue: 1
+      value: 40
+    requiredFlags: 
+    forbiddenFlags: 
+    prerequisiteVisitId: 
+    queuePhase: BeforeOrdinary
+    buyingCategory: Medicine
+    order: 20
+    arrivalSceneId: 
+    tradeSceneId: 
+    skipSceneId: 
+    completion: TradeSuccess
+    repeatPolicy: UntilCompleted
+  visitItems:
+  - id: test_goods_herb
+    enabled: 1
+    title: "\u8349\u836F"
+    visitId: test_visit_trade
+    purpose: Sell
+    itemId: herb
+    instancePresetId: 
+    quantity: 1
+  - id: test_goods_dew
+    enabled: 1
+    title: "\u9732\u6C34"
+    visitId: test_visit_trade
+    purpose: Sell
+    itemId: dew
+    instancePresetId: 
+    quantity: 1
+  scenes:
+  - id: scene_alchemy_hint_arrival
+    enabled: 1
+    title: "\u6C42\u5B66\u6D88\u606F\uFF08\u9694\u79BB\u7070\u76D2\uFF09"
+    description: "\u975E\u6B63\u5F0F\u5BF9\u767D\uFF0C\u4E0D\u6388\u4E88\u804C\u4E1A\u6216\u957F\u671F\u8BBF\u95EE\u6743\u3002"
+    entryNodeId: hint_line
+  nodes:
+  - id: hint_line
+    enabled: 1
+    title: "\u6D88\u606F"
+    sceneId: scene_alchemy_hint_arrival
+    type: Dialogue
+    speaker: "\u6D88\u606F\u5BA2\uFF08\u7070\u76D2\uFF09"
+    text: "\u542C\u8BF4\u70BC\u4E39\u623F\u6709\u6C42\u5B66\u7684\u673A\u4F1A\u3002\u8425\u4E1A\u7ED3\u675F\u540E\uFF0C\u4F60\u53EF\u4EE5\u53BB\u95EE\u95EE\u3002"
+    portraitId: 
+    expression: 
+    conditionType: 
+    conditionKey: 
+    conditionValue: 
+    actionType: 
+    actionTarget: 
+    actionValue: 
+    choices: []
+    nextNodeIds:
+    - hint_flag
+  - id: hint_flag
+    enabled: 1
+    title: "\u7EBF\u7D22"
+    sceneId: scene_alchemy_hint_arrival
+    type: Action
+    speaker: 
+    text: 
+    portraitId: 
+    expression: 
+    conditionType: 
+    conditionKey: 
+    conditionValue: 
+    actionType: SetFlag
+    actionTarget: story.alchemy_hint_known
+    actionValue: true
+    choices: []
+    nextNodeIds:
+    - hint_unlock
+  - id: hint_unlock
+    enabled: 1
+    title: "\u76EE\u7684\u5730"
+    sceneId: scene_alchemy_hint_arrival
+    type: Action
+    speaker: 
+    text: 
+    portraitId: 
+    expression: 
+    conditionType: 
+    conditionKey: 
+    conditionValue: 
+    actionType: UnlockLocation
+    actionTarget: location_alchemy_training_visit
+    actionValue: true
+    choices: []
+    nextNodeIds:
+    - hint_end
+  - id: hint_end
+    enabled: 1
+    title: "\u7ED3\u675F"
+    sceneId: scene_alchemy_hint_arrival
+    type: End
+    speaker: 
+    text: 
+    portraitId: 
+    expression: 
+    conditionType: 
+    conditionKey: 
+    conditionValue: 
+    actionType: 
+    actionTarget: 
+    actionValue: 
+    choices: []
+    nextNodeIds: []

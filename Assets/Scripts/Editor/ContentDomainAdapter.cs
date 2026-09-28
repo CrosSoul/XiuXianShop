@@ -65,6 +65,8 @@ namespace XiuXianShop.Editor
                         fixedTurn=r.Number("固定回合",1,previous:old?.fixedTurn??default),earliestTurn=r.Number("最早回合",1,previous:old?.earliestTurn??default),latestTurn=r.Number("最晚回合",1,previous:old?.latestTurn??default),budget=r.Number("预算",0,previous:old?.budget??default),
                         requiredFlags=r.Optional("必须Flag",old?.requiredFlags),forbiddenFlags=r.Optional("禁止Flag",old?.forbiddenFlags),prerequisiteVisitId=r.Optional("前置来访ID",old?.prerequisiteVisitId),queuePhase=r.OneOf("队列阶段","BeforeOrdinary","AfterOrdinary"),
                         order=r.Number("同阶段顺序",0,true).value,buyingCategory=r.Optional("求购类别",old?.buyingCategory),arrivalSceneId=r.Optional("到店SceneID",old?.arrivalSceneId),tradeSceneId=r.Optional("交易成功SceneID",old?.tradeSceneId),skipSceneId=r.Optional("跳过SceneID",old?.skipSceneId),completion=r.OneOf("完成条件","SceneEnd","TradeSuccess")};
+                    v.repeatPolicy=r.Optional("重复策略",old?.repeatPolicy??"UntilCompleted");
+                    if(v.repeatPolicy!="Once" && v.repeatPolicy!="UntilCompleted")r.Error("重复策略","允许值：Once / UntilCompleted。");
                     if(v.earliestTurn.hasValue && v.latestTurn.hasValue && v.earliestTurn.value>v.latestTurn.value)r.Error("最晚回合","不能早于最早回合。");
                     if(v.fixedTurn.hasValue && ((v.earliestTurn.hasValue && v.fixedTurn.value<v.earliestTurn.value) || (v.latestTurn.hasValue && v.fixedTurn.value>v.latestTurn.value)))r.Error("固定回合","不在指定回合范围内。");
                     if(v.buyingCategory!="" && (!Enum.TryParse<ItemCategory>(v.buyingCategory,out var category) || !Enum.IsDefined(typeof(ItemCategory),category) || category==ItemCategory.Unclassified))r.Error("求购类别","须为现有玩家可见类别的枚举名称。");
@@ -103,11 +105,14 @@ namespace XiuXianShop.Editor
         sealed class Scenes : ContentDomainAdapter
         {
             public override string FileName=>"scenes.csv";
-            public override void Stage(ContentSyncPlan p,string csv)=>p.staged.scenes=Merge(p,csv,"SceneID","场景名称|SceneID|说明|数据状态",p.staged.scenes,(r,old)=>new AuthoredScene{title=r.Required("场景名称"),description=r.Optional("说明",old?.description)});
+            public override void Stage(ContentSyncPlan p,string csv)=>p.staged.scenes=Merge(p,csv,"SceneID","场景名称|SceneID|说明|数据状态",p.staged.scenes,(r,old)=>new AuthoredScene{title=r.Required("场景名称"),description=r.Optional("说明",old?.description),locationId=r.Optional("触发地点ID",old?.locationId)});
             public override void Validate(ContentSyncPlan p)
             {
                 foreach(var s in p.staged.scenes.Where(s=>s.enabled))
                 {
+                    Reference(p,s.id,"触发地点ID",s.locationId,p.catalog.travelLocations.Select(l=>l.id),true);
+                    if(!string.IsNullOrEmpty(s.locationId) && p.staged.scenes.Count(x=>x.enabled && x.locationId==s.locationId)>1)
+                        p.Error(FileName,s.id,"触发地点ID","一个地点只能配置一个进入剧情。");
                     var nodes=p.staged.nodes.Where(n=>n.enabled && n.sceneId==s.id).ToArray();
                     string entry=nodes.FirstOrDefault()?.id;
                     if(s.entryNodeId!=entry && !p.changes.Any(c=>c.StartsWith("新增") && c.Contains(s.id)))
@@ -123,6 +128,20 @@ namespace XiuXianShop.Editor
                         foreach(var next in node.nextNodeIds)queue.Enqueue(next);
                     }
                     foreach(var n in nodes.Where(n=>!reached.Contains(n.id)))p.Error("nodes.csv",n.id,"NextNodeID","从本场景首行入口无法到达此节点。");
+                    var canEnd=new HashSet<string>(nodes.Where(n=>n.type=="End").Select(n=>n.id));
+                    bool changed;
+                    do {changed=false;foreach(var n in nodes)if(n.nextNodeIds.Any(canEnd.Contains) && canEnd.Add(n.id))changed=true;}while(changed);
+                    foreach(var n in nodes.Where(n=>!canEnd.Contains(n.id)))p.Error("nodes.csv",n.id,"NextNodeID","此节点没有可达的 End。");
+                    var visiting=new HashSet<string>();var checkedNodes=new HashSet<string>();
+                    bool HasAutomaticCycle(string id)
+                    {
+                        var node=nodes.FirstOrDefault(n=>n.id==id);
+                        if(node==null || node.type=="Dialogue" || node.type=="Choice" || node.type=="End")return false;
+                        if(visiting.Contains(id))return true;
+                        if(!checkedNodes.Add(id))return false;
+                        visiting.Add(id);bool cycle=node.nextNodeIds.Any(HasAutomaticCycle);visiting.Remove(id);return cycle;
+                    }
+                    foreach(var n in nodes)if(HasAutomaticCycle(n.id)){p.Error("nodes.csv",n.id,"NextNodeID","自动节点形成循环；循环须经过可交互节点。");break;}
                 }
             }
         }
@@ -130,11 +149,37 @@ namespace XiuXianShop.Editor
         {
             public override string FileName=>"nodes.csv";
             static string[] Lines(string value)=>value.Replace("\r","").Split('\n').Where(v=>!string.IsNullOrWhiteSpace(v)).Select(v=>v.Trim()).ToArray();
+            static Sprite ReadSprite(ContentRow row,string field,Sprite previous)
+            {
+                string path=row.Get(field);if(path=="")return previous;
+                var sprite=UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(path);
+                if(sprite==null)row.Error(field,"找不到已导入 Sprite 资源："+path);
+                return sprite;
+            }
             public override void Stage(ContentSyncPlan p,string csv)=>p.staged.nodes=Merge(p,csv,"NodeID",
                 "节点名称|NodeID|SceneID|节点类型|说话者|文本|立绘ID|表情状态|选项文本|条件类型|条件键|条件值|Action类型|Action目标|Action值|NextNodeID|数据状态",p.staged.nodes,(r,old)=>{
                     var n=new AuthoredNode{title=r.Required("节点名称"),sceneId=r.Required("SceneID"),type=r.OneOf("节点类型","Dialogue","Visual","Choice","Branch","Action","End"),
                         speaker=r.Optional("说话者",old?.speaker),text=r.Optional("文本",old?.text),portraitId=r.Optional("立绘ID",old?.portraitId),expression=r.Optional("表情状态",old?.expression),choices=Lines(r.Get("选项文本")),nextNodeIds=Lines(r.Get("NextNodeID")),
                         conditionType=r.Optional("条件类型",old?.conditionType),conditionKey=r.Optional("条件键",old?.conditionKey),conditionValue=r.Optional("条件值",old?.conditionValue),actionType=r.Get("Action类型"),actionTarget=r.Get("Action目标"),actionValue=r.Get("Action值")};
+                    n.background=r.Optional("背景",old?.background);n.comic=r.Optional("分镜",old?.comic);
+                    n.backgroundSprite=ReadSprite(r,"背景图片",old?.backgroundSprite);n.portraitSprite=ReadSprite(r,"立绘图片",old?.portraitSprite);n.comicSprite=ReadSprite(r,"分镜图片",old?.comicSprite);
+                    n.portraitSlot=r.Optional("立绘槽",old?.portraitSlot);n.portraitVisible=r.Optional("立绘显示",old?.portraitVisible);
+                    n.choiceConditionTypes=Lines(r.Optional("选项条件类型",old==null?"":string.Join("\n",old.choiceConditionTypes)));
+                    n.choiceConditionKeys=Lines(r.Optional("选项条件键",old==null?"":string.Join("\n",old.choiceConditionKeys)));
+                    n.choiceConditionValues=Lines(r.Optional("选项条件值",old==null?"":string.Join("\n",old.choiceConditionValues)));
+                    if(n.portraitSlot!="" && n.portraitSlot!="Left" && n.portraitSlot!="Right")r.Error("立绘槽","允许 Left / Right。");
+                    if(n.portraitVisible!="" && n.portraitVisible!="true" && n.portraitVisible!="false")r.Error("立绘显示","允许 true / false。");
+                    if(n.type=="Choice" && n.conditionType!="")r.Error("条件类型","Choice 请逐项填写选项条件，不使用整节点条件。");
+                    if(n.choiceConditionTypes.Length>0)
+                    {
+                        if(n.type!="Choice" || n.choiceConditionTypes.Length!=n.choices.Length || n.choiceConditionKeys.Length!=n.choices.Length || n.choiceConditionValues.Length!=n.choices.Length)
+                            r.Error("选项条件类型","三列须与选项逐行对应，无条件项填写 None / - / true。");
+                        foreach(string type in n.choiceConditionTypes)
+                            if(!new[]{"None","FlagExists","FlagAbsent","LocationUnlocked","ProfessionUnlocked","RecipeUnlocked"}.Contains(type))r.Error("选项条件类型","未知条件："+type);
+                        if(n.choiceConditionValues.Any(v=>v!="true" && v!="false"))r.Error("选项条件值","允许 true / false。");
+                    }
+                    else if(n.choiceConditionKeys.Length>0 || n.choiceConditionValues.Length>0)r.Error("选项条件类型","缺少选项条件类型。");
+                    if(n.conditionValue!="" && n.conditionValue!="true" && n.conditionValue!="false")r.Error("条件值","允许 true / false。");
                     if(n.type=="Dialogue")r.Required("文本");
                     int edges=n.type=="End"?0:n.type=="Branch"?2:n.type=="Choice"?n.choices.Length:1;
                     if(n.type=="Choice" && n.choices.Length<2)r.Error("选项文本","Choice 至少两个选项，每行一个。");
@@ -163,14 +208,17 @@ namespace XiuXianShop.Editor
                     foreach(var next in n.nextNodeIds)Reference(p,n.id,"NextNodeID",next,p.staged.nodes.Where(x=>x.enabled && x.sceneId==n.sceneId).Select(x=>x.id));
                     CheckTarget(p,n.id,"Action目标",n.actionType,n.actionTarget);
                     CheckTarget(p,n.id,"条件键",n.conditionType,n.conditionKey);
+                    if(n.choiceConditionTypes.Length==n.choiceConditionKeys.Length)
+                        for(int i=0;i<n.choiceConditionTypes.Length;i++)CheckTarget(p,n.id,"选项条件键",n.choiceConditionTypes[i],n.choiceConditionKeys[i]);
                 }
             }
             void CheckTarget(ContentSyncPlan p,string id,string field,string type,string target)
             {
                 if(type=="UnlockLocation" || type=="LocationUnlocked")Reference(p,id,field,target,p.catalog.travelLocations.Select(l=>l.id));
                 if(type=="UnlockRecipe" || type=="RecipeUnlocked")Reference(p,id,field,target,p.catalog.alchemy.recipes.Select(r=>r.id));
-                if(type=="UnlockProfession" || type=="ProfessionUnlocked" || type=="UnlockKnowledge" || type=="KnowledgeUnlocked")
-                    p.Error(FileName,id,field,"职业 / 知识目标目录尚未实现，不能把未声明 ID 当作合法内容。后续由对应域接入。");
+                if(type=="UnlockProfession" || type=="ProfessionUnlocked")Reference(p,id,field,target,new[]{"alchemy"});
+                if(type=="UnlockKnowledge" || type=="KnowledgeUnlocked")
+                    p.Error(FileName,id,field,"知识目录尚未实现，不能把未声明 ID 当作合法内容。");
             }
         }
     }

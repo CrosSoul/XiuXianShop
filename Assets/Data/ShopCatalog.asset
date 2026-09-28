@@ -602,11 +602,25 @@ MonoBehaviour:
   - id: baishitang
     title: "\u767E\u4E8B\u5802"
     initiallyUnlocked: 1
+    singleVisit: 0
     itemGridSize: {x: 6, y: 4}
     preserveItemsBetweenVisits: 0
   - id: tingfeng-teahouse
     title: "\u542C\u98CE\u8336\u8086"
     initiallyUnlocked: 1
+    singleVisit: 0
+    itemGridSize: {x: 6, y: 4}
+    preserveItemsBetweenVisits: 0
+  - id: location_alchemy_training_visit
+    title: "\u70BC\u4E39\u623F\u6C42\u5B66"
+    initiallyUnlocked: 0
+    singleVisit: 1
+    itemGridSize: {x: 6, y: 4}
+    preserveItemsBetweenVisits: 0
+  - id: alchemy-room
+    title: "\u70BC\u4E39\u623F"
+    initiallyUnlocked: 0
+    singleVisit: 0
     itemGridSize: {x: 6, y: 4}
     preserveItemsBetweenVisits: 0
   retailMarkup: 0.15

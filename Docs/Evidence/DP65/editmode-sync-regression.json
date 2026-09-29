@@ -1,0 +1,153 @@
+{
+  "status": "completed",
+  "duration": 3.54,
+  "summary": {
+    "total": 20,
+    "passed": 20,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.AutomaticBranchCycleIsRejectedEvenWithAnEndExit",
+      "Status": "Passed",
+      "Duration": 0.1200279,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.ChoiceBranchAndActionAreTypedAndCrossSceneEdgesAreRejected",
+      "Status": "Passed",
+      "Duration": 0.1452211,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.DraftsCannotBeReferencedAndEffectiveChangesMustBeMarkedPending",
+      "Status": "Passed",
+      "Duration": 0.1591473,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.EmptyOptionalCellsPreservePreviouslyImportedValues",
+      "Status": "Passed",
+      "Duration": 0.1520007,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.ImportedEditsChangeVisitScheduleBudgetGoodsAndDialogueWithoutNewIdentity",
+      "Status": "Passed",
+      "Duration": 0.3013185,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.InvalidImportReportsRowAndFieldWithoutPartialAssetWrite(\"duplicate\",\"来访ID\")",
+      "Status": "Passed",
+      "Duration": 0.1515721,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.InvalidImportReportsRowAndFieldWithoutPartialAssetWrite(\"item\",\"物品ID\")",
+      "Status": "Passed",
+      "Duration": 0.1388417,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.InvalidImportReportsRowAndFieldWithoutPartialAssetWrite(\"scene\",\"到店SceneID\")",
+      "Status": "Passed",
+      "Duration": 0.1410019,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.InvalidImportReportsRowAndFieldWithoutPartialAssetWrite(\"next\",\"NextNodeID\")",
+      "Status": "Passed",
+      "Duration": 0.146795,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.InvalidImportReportsRowAndFieldWithoutPartialAssetWrite(\"action\",\"Action类型\")",
+      "Status": "Passed",
+      "Duration": 0.1529552,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.InvalidImportReportsRowAndFieldWithoutPartialAssetWrite(\"target\",\"Action目标\")",
+      "Status": "Passed",
+      "Duration": 0.1554275,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.InvalidImportReportsRowAndFieldWithoutPartialAssetWrite(\"number\",\"数量\")",
+      "Status": "Passed",
+      "Duration": 0.1572087,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.InvalidImportReportsRowAndFieldWithoutPartialAssetWrite(\"state\",\"数据状态\")",
+      "Status": "Passed",
+      "Duration": 0.1584384,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.MalformedCsvOrMissingTableBlocksImport",
+      "Status": "Passed",
+      "Duration": 0.1150045,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.MissingRowsAreRetainedAndExplicitDisableKeepsIdentity",
+      "Status": "Passed",
+      "Duration": 0.2175951,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.PreviewDoesNotWriteAndImportUpdatesStableIdentityAndIsIdempotent",
+      "Status": "Passed",
+      "Duration": 0.2675165,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.RealConfluenceExportReportsMisalignedStatusWithoutWriting",
+      "Status": "Passed",
+      "Duration": 0.1199374,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.StaleSourceOrChangedCatalogRequiresNewPreview",
+      "Status": "Passed",
+      "Duration": 0.1090922,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.StoryLocationVisualAndConditionalChoicesUseTheSameImporter",
+      "Status": "Passed",
+      "Duration": 0.1526408,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.ValidAllDraftSnapshotImportsNoRuntimeDefinitions",
+      "Status": "Passed",
+      "Duration": 0.1549759,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

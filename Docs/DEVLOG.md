@@ -469,8 +469,53 @@ DP-58 最终状态补充：Unity Pipeline CLI 检查 Console Error0/Warning0（�
 - 用户报告 compiler error 后，当前 MCP recompile_status 为 completed/failed=false/errors=[]；EditorUtility.scriptCompilationFailed=false，Console Error0/Warning0，未清日志。Editor ready/stopped、无编译/Domain Reload；ShopPrototype.unity dirty=false。此次未复现编译错误，不虚构修复原因。
 - 未做 Player 构建或人工手感验收。没有新增 Package/工程设置改动；Unity API 在现有 Catalog 加入锁定的一次性求学地点，单独样例资产未挂入默认正式内容。仅本地未提交；交付到 Ready for Review，不标 Done。
 
+## 2026-09-29 — DP-52 剧情 Runner 与炼丹求学链路
+
+- 核对 DP52 最新描述、Runner v2、G15 v2、G14 v1、G04 v21 AC90–96；复用 DP62 的 Scene 请求/结果交接和 DP64 四表导入，没有新增剧情存档或同步窗口。
+- StoryRunner 支持 Dialogue / Visual / Choice / Branch / Action / End；条件读取 Session 与本 Scene 暂存结果，正常 End 原子校验并提交 Flag/地点/炼丹职业/已有配方解锁，取消不提交。Scene 完成标记使用既有 progressFlags，地点触发已完成 Scene 不重播。知识没有正式内容，仍拒绝未知目标。
+- ShopPrototype.Visits 使用同一灰盒视图显示背景、左右立绘、表情、静态分镜、可滚动选择。可选 Sprite 引用在 Editor 导入，运行时不联网；无图片时使用占位。剧情中普通输入、保存和炼丹时钟暂停；结束返回原顾客或原外出地点。原线性 VisitSceneGraybox 只保留给既有适配测试，不再驱动实际 UI。
+- ContentSources/DP52-MVP 保存任务明确授权的灰盒内容，未覆盖原 Confluence 草稿。经统一 Validate/Import 写入默认 AuthoredContent：1 visit / 2 Scene / 16 node。通过 Unity API 在 Catalog 增加初始锁定的长期炼丹房；求学 Scene End 才解锁 profession:alchemy 与 alchemy-room，并消耗一次性求学目的地。实际内容没有 UnlockRecipe 节点，不授予具体丹方。
+- 作者维护及新增可选列见 ContentSources/README.md：地点触发、视觉/图片、逐项选择条件；未知 Sprite、非法条件、不可达节点、无 End 路径或自动循环阻止导入。直接 Play → 开始营业 → 结束线索对白 → 闭店/准备携带 → 炼丹房求学 → 完成对白及选择，即可验证完整链路。
+- 最终全量 Edit Mode 222/222；实际 Play Mode 剧情链路 1/1、炼丹相关 11/11、默认会话 4/4（两组有重叠，不相加声称独立用例数）。原始结果保存在 Evidence/DP52。包含继续/选项实际鼠标输入、遮罩阻挡、正常营业与外出、DP58/60炉程、产物存读档与不赠送丹方检查。
+- 过程失败如实保留：早期 Play 测试脚本 Key 枚举与辅助方法重名导致一次 CS0119，已修正；测试配置缺少解锁目标导致一项校验失败，补齐配置后通过；原闭店辅助步骤跳过新增对白，造成五项炼丹测试无法进入窗口，改为实际结束对白后重跑 11/11。切换测试过滤器曾返回 0 用例，不计通过，重新编译后执行了真实目标用例。自动审批额度限制曾中断检查，恢复后完成上述验证。
+- 最终 Validate 无错误，scriptCompilationFailed=false，Console Error0/Warning0、Editor ready/stopped、无编译/Domain Reload，ShopPrototype.unity dirty=false；未清日志。文本 diff --check 通过。本轮未重跑存在已记录旧预算/日历断言问题的全量 Play 集；不宣称其全部通过。未做 Player 构建或人工手感验收。
+- 续接时已有提交 9670851（DP-52 in progress），未改写或推送；本次追加作者说明、日志和测试证据仍未提交。交付停在 Ready for Review，由用户验收；无正式玩法规则冲突，灰盒对白/视觉和选项呈现仍需人工确认。
+
 ## 2026-09-27 — 编译错误复查
 
 - 当前日志中的 CS0200 来自 PersistenceTests 曾直接赋值 GridItem 的 Quality、QualityValueMultiplier、PurchaseValue；检查时源文件已经改为通过存档 DTO 准备数据，本轮未修改脚本或 Unity 资产。
 - 通过 Unity MCP 请求脚本编译，Editor.log 记录 build success；重载后 scriptCompilationFailed=false，Console 捕获 Error 0 / Warning 0，Editor ready/stopped，无编译或 Domain Reload。未清空 Console。
 - 本次仅验证编译状态，未运行玩法测试，不代表尚在开发的存读档功能已经验收。
+
+## 2026-09-29 — DP-63 Esc 系统菜单与设置 v1
+
+- 复用现有系统菜单、DP61 保存/读取接口和 DP58 TooltipHoverDelaySeconds；新增设置入口，仅提供 0 / 0.5 / 1 / 1.5 秒（默认 1 秒），即时生效。PlayerPrefs 独立保存用户偏好，不写入进度槽，不建立通用设置框架。
+- 新增 ShopPrototype.Settings.cs 与 SettingsPlayableTests.cs；ShopPrototype.Start 读取偏好，SaveMenu 增加设置按钮。PersistencePlayableTests 补齐结束当前剧情再闭店的真实操作，未放宽保存门禁。Unity 自动生成新脚本 meta，未修改场景、Package 或 Project Settings。
+- 实际 Play Mode 设置专项 2/2、存读档相关回归 5/5；原始结果见 Evidence/DP63。覆盖四档悬停、移出隐藏、菜单阻挡、恢复拖拽、跨会话偏好、读档不覆盖偏好，以及营业/外出/炼丹/剧情保存限制。另通过 MCP 在正常 Play 设置 0.5 秒，Stop 后重新 Play 确认保留；检查结束已恢复用户原来的偏好键缺省状态。
+- 用户反馈 compiler error 后再次强制请求编译；当前 Logs/Editor.log 为 build success，scriptCompilationFailed=false，Console Error0/Warning0、Editor ready/stopped、无编译/Domain Reload，ShopPrototype.unity dirty=false，未清日志。未复现当前编译错误，未虚构错误原因或额外修改脚本。
+- git diff --check 通过。未做 Player 构建、独立程序重启或人工手感验收；未重复全量玩法测试。人工入口：Play → Esc → 设置，切换四档并返回悬停物品；Stop/Play 后核对保留，读取另一进度槽后核对偏好不变。
+- 无正式规则冲突；四档数值遵循 UI 规格，视觉布局和个人延迟偏好仍由玩家体验判断。保留既有 DP52 文档改动；本地未提交，交付 Ready for Review，不标 Done。
+
+## 2026-09-29 — DP-65 百事堂内容管线
+
+- 统一 Content Sync 增加 commissions 域，原始 Confluence 04.8–04.11 快照与授权迁移快照分别保留。导入 8 个全局配置、16 个模板、7 个池、17 个现有原型成员；通过 Unity API 更新 AuthoredContent 与 ShopCatalog，不手改 YAML。成员仅 herb/dew/cinnabar/sword/pill，未填入新商品或把原型标成最终平衡。
+- 模板/池/成员按稳定ID与状态合并；奖励数量与组合由显式抽取组列表示，成员支持权重和件数。Validate 不写入；Import 同时检查快照和两份目标，失败回滚、重复导入不写入。正常 Play 使用同步后 Catalog，旧常量收拢为仅供显式原型重置的 CommissionVerification。
+- Edit Mode 委托相关 21/21、统一同步回归 20/20、原百事堂 Play Mode 3/3。原始结果见 Evidence/DP65。首次新增 Edit 用例未结束默认开场剧情而失败，修正实际前置操作；Play 初次因非测试鼠标输入干扰未点击成功，沿用现有输入隔离后 3/3。未修改正式输入设置。
+- 实际正常 Play 额外验证：临时快照修改 BSH-001 标题/文案并将候选数设 16，同步后百事堂对应 Text 显示新文字；停止后重新导入基线，还原标题及候选数 3。此项通过 MCP 运行时操作完成，不冒充人工点击验收。
+- Console Error0/Warning0，未清日志。尚未做 Player 构建或人工手感复验；无玩法规则冲突。作者步骤已增补 ContentSources/README.md。未提交/推送，交付 Ready for Review。
+
+## 2026-09-29 — DP-66 市场事件内容管线
+
+- 统一 Content Sync 新增 market 域，导入现有4种原型行情到 AuthoredContent/ShopCatalog；原始空的04.12表保留，不回写正式平衡。快照 DP66-Prototype；方向、修正、权重、持续范围和冷却均可编辑，草稿跳过、非法类别/引用格式/重复ID/倒置范围阻止导入。
+- 普通生成和茶肆共用按类型权重选择及合法时间窗口；持续和冷却来自类型配置。事件记录保存自身冷却，已排定结果/会话定义保持存档固定；移除旧恢复校验中最多3回合限制以支持数据持续范围。隐藏/公开/报价/历史购买价值规则保持。
+- Edit Mode 市场相关45/45（含新适配器及市场、秘闻、价格和存档），茶肆实际 Play Mode2/2，秘闻用同步资产而非硬编码测试池。证据见 Evidence/DP66。未重复完整日历人工验收，未做 Player 构建。
+- 四种事件ID及作者操作见 ContentSources/README.md；每年最多3次仍是既有原型频率，非新增正式值。未提交/推送，交付 Ready for Review。
+
+## 2026-09-30 — DP-67 炼丹内容管线
+
+- 用户确认 DP-60 已人工验收，Jira 已核对 Done。DP-67 继续接入已有统一 Content Sync 的 alchemy 域，不另建同步框架。
+- 从原始 04.2/04.3/04.13–04.15 导出制作授权灰盒迁移快照：3 配方、10 输入输出、9 全局配置、7 材料目标、18 炉程。历史候选及灵石原料不导入；调火保留已有 8/24 秒目标，仅材料改为显式在炉时长。通过 Unity API 导入 AuthoredContent / ShopCatalog，并补入原灰盒已有的相关物品定义，不自动发放物品。
+- 正常 Play 使用同步配置，原配方常量收拢至显式测试夹具。初始火候、完整/研磨、逐材料目标及炉程提示读取数据；没有重做品质分值或 UI。
+- 编译通过。Edit Mode 炼丹相关 41/41；新增用例验证双入口改研磨/在炉/上品倍率及引用、顺序、动作校验。初次失败来自测试准备缺设备/未结束剧情及夹具重置覆盖配置，修正测试准备后通过。证据：Evidence/DP67/editmode-alchemy.json。
+- 实际场景 Play Mode 11/11，包括三张配方、双入口、连续两炉及共享悬停；外出测试同样读取已导入 Catalog 配方。证据：Evidence/DP67/playmode-alchemy.json。最终重复导入不写入，研磨8秒/上品倍率1.5基线保持，Console Error0/Warning0、Editor stopped且未编译/更新、scriptCompilationFailed=false、ShopPrototype 场景无未保存修改。未清日志。
+- 作者操作见 ContentSources/README.md；全部数值仍为原型。04.2/04.3历史候选与当前灰盒存在差异，按DP-67明确范围只迁移现有三张输入输出，不批量批准候选，也未回写远端数据状态。未做 Player 构建或新的人工验收；仅本地未提交/推送，交付 Ready for Review。

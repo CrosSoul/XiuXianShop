@@ -1,0 +1,14 @@
+field_name,type,configuration
+条目ID,text,
+奖励池ID,text,
+物品ID,text,
+权重,number,number_format:number
+最小数量,number,number_format:number
+最大数量,number,number_format:number
+数据状态,tag,
+备注,text,
+
+view_name,layout,filters,sorts,hidden_fields,is_default,is_current
+全部池成员,table,,,,true,true
+
+

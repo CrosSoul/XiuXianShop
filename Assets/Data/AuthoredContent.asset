@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6eb0a38c4f117c4dbcb422cee010f48, type: 3}
   m_Name: AuthoredContent
   m_EditorClassIdentifier: XiuXianShop.Runtime::XiuXianShop.AuthoredContent
-  lastSnapshotId: DP52-MVP-v1
-  lastImportedAtUtc: 2026-09-28T16:32:15.0196014Z
+  lastSnapshotId: dp67-existing-greybox-20260930
+  lastImportedAtUtc: 2026-09-29T19:41:12.5935694Z
   visits:
   - id: visit_alchemy_hint_01
     enabled: 1
@@ -82,6 +82,9 @@ MonoBehaviour:
     portraitSlot: 
     portraitVisible: 
     comic: 
+    backgroundSprite: {fileID: 0}
+    portraitSprite: {fileID: 0}
+    comicSprite: {fileID: 0}
     choiceConditionTypes: []
     choiceConditionKeys: []
     choiceConditionValues: []
@@ -107,6 +110,9 @@ MonoBehaviour:
     portraitSlot: 
     portraitVisible: 
     comic: 
+    backgroundSprite: {fileID: 0}
+    portraitSprite: {fileID: 0}
+    comicSprite: {fileID: 0}
     choiceConditionTypes: []
     choiceConditionKeys: []
     choiceConditionValues: []
@@ -132,6 +138,9 @@ MonoBehaviour:
     portraitSlot: 
     portraitVisible: 
     comic: 
+    backgroundSprite: {fileID: 0}
+    portraitSprite: {fileID: 0}
+    comicSprite: {fileID: 0}
     choiceConditionTypes: []
     choiceConditionKeys: []
     choiceConditionValues: []
@@ -156,6 +165,9 @@ MonoBehaviour:
     portraitSlot: 
     portraitVisible: 
     comic: 
+    backgroundSprite: {fileID: 0}
+    portraitSprite: {fileID: 0}
+    comicSprite: {fileID: 0}
     choiceConditionTypes: []
     choiceConditionKeys: []
     choiceConditionValues: []
@@ -181,6 +193,9 @@ MonoBehaviour:
     portraitSlot: Left
     portraitVisible: true
     comic: 
+    backgroundSprite: {fileID: 0}
+    portraitSprite: {fileID: 0}
+    comicSprite: {fileID: 0}
     choiceConditionTypes: []
     choiceConditionKeys: []
     choiceConditionValues: []
@@ -206,6 +221,9 @@ MonoBehaviour:
     portraitSlot: 
     portraitVisible: 
     comic: 
+    backgroundSprite: {fileID: 0}
+    portraitSprite: {fileID: 0}
+    comicSprite: {fileID: 0}
     choiceConditionTypes: []
     choiceConditionKeys: []
     choiceConditionValues: []
@@ -231,6 +249,9 @@ MonoBehaviour:
     portraitSlot: Right
     portraitVisible: true
     comic: 
+    backgroundSprite: {fileID: 0}
+    portraitSprite: {fileID: 0}
+    comicSprite: {fileID: 0}
     choiceConditionTypes: []
     choiceConditionKeys: []
     choiceConditionValues: []
@@ -256,6 +277,9 @@ MonoBehaviour:
     portraitSlot: 
     portraitVisible: 
     comic: 
+    backgroundSprite: {fileID: 0}
+    portraitSprite: {fileID: 0}
+    comicSprite: {fileID: 0}
     choiceConditionTypes: []
     choiceConditionKeys: []
     choiceConditionValues: []
@@ -284,6 +308,9 @@ MonoBehaviour:
     portraitSlot: 
     portraitVisible: 
     comic: 
+    backgroundSprite: {fileID: 0}
+    portraitSprite: {fileID: 0}
+    comicSprite: {fileID: 0}
     choiceConditionTypes: []
     choiceConditionKeys: []
     choiceConditionValues: []
@@ -309,6 +336,9 @@ MonoBehaviour:
     portraitSlot: 
     portraitVisible: 
     comic: 
+    backgroundSprite: {fileID: 0}
+    portraitSprite: {fileID: 0}
+    comicSprite: {fileID: 0}
     choiceConditionTypes: []
     choiceConditionKeys: []
     choiceConditionValues: []
@@ -334,6 +364,9 @@ MonoBehaviour:
     portraitSlot: 
     portraitVisible: 
     comic: 
+    backgroundSprite: {fileID: 0}
+    portraitSprite: {fileID: 0}
+    comicSprite: {fileID: 0}
     choiceConditionTypes: []
     choiceConditionKeys: []
     choiceConditionValues: []
@@ -359,6 +392,9 @@ MonoBehaviour:
     portraitSlot: 
     portraitVisible: 
     comic: "\u7070\u76D2\u5206\u955C\uFF1A\u957F\u8001\u5728\u7089\u65C1\u793A\u8303\uFF0C\u73A9\u5BB6\u8BA4\u771F\u89C2\u6469\u5E76\u7EC3\u4E60\u3002"
+    backgroundSprite: {fileID: 0}
+    portraitSprite: {fileID: 0}
+    comicSprite: {fileID: 0}
     choiceConditionTypes: []
     choiceConditionKeys: []
     choiceConditionValues: []
@@ -384,6 +420,9 @@ MonoBehaviour:
     portraitSlot: 
     portraitVisible: 
     comic: 
+    backgroundSprite: {fileID: 0}
+    portraitSprite: {fileID: 0}
+    comicSprite: {fileID: 0}
     choiceConditionTypes: []
     choiceConditionKeys: []
     choiceConditionValues: []
@@ -409,6 +448,9 @@ MonoBehaviour:
     portraitSlot: 
     portraitVisible: 
     comic: 
+    backgroundSprite: {fileID: 0}
+    portraitSprite: {fileID: 0}
+    comicSprite: {fileID: 0}
     choiceConditionTypes: []
     choiceConditionKeys: []
     choiceConditionValues: []
@@ -434,6 +476,9 @@ MonoBehaviour:
     portraitSlot: 
     portraitVisible: 
     comic: 
+    backgroundSprite: {fileID: 0}
+    portraitSprite: {fileID: 0}
+    comicSprite: {fileID: 0}
     choiceConditionTypes: []
     choiceConditionKeys: []
     choiceConditionValues: []
@@ -458,6 +503,754 @@ MonoBehaviour:
     portraitSlot: 
     portraitVisible: 
     comic: 
+    backgroundSprite: {fileID: 0}
+    portraitSprite: {fileID: 0}
+    comicSprite: {fileID: 0}
     choiceConditionTypes: []
     choiceConditionKeys: []
     choiceConditionValues: []
+  commissionGlobals:
+  - id: candidateCount
+    enabled: 1
+    value: 3
+  - id: completionLimitPerTurn
+    enabled: 1
+    value: 1
+  - id: refreshCadence
+    enabled: 1
+    value: "\u6BCF\u56DE\u5408"
+  - id: templateDrawMode
+    enabled: 1
+    value: "\u6309\u6743\u91CD\u65E0\u653E\u56DE\u62BD\u53D6"
+  - id: rewardDisclosure
+    enabled: 1
+    value: "\u65B9\u5411\u4E0E\u5927\u81F4\u6863\u4F4D\u516C\u5F00"
+  - id: extraGiftChance
+    enabled: 1
+    value: 8%
+  - id: extraGiftCount
+    enabled: 1
+    value: 1
+  - id: longTermProgression
+    enabled: 1
+    value: "\u5173\u95ED"
+  commissionPools:
+  - id: BSH-R01
+    enabled: 1
+    title: "\u4F4E\u9636\u6750\u6599"
+    description: "\u4ECE\u767E\u4E8B\u5802\u4F4E\u9636\u6750\u6599\u6C60\u968F\u673A\u53D6\u5F972\u20134\u4EF6\uFF1B\u5141\u8BB8\u540C\u7C7B\u7269\u54C1\u91CD\u590D\uFF0C\u5177\u4F53\u6210\u5458\u7528\u7A33\u5B9A\u7269\u54C1ID\u7EF4\u62A4\u3002"
+    hint: "\u4F4E\u9636\u6750\u6599 \xD7 \u82E5\u5E72"
+    groups: group1:2:4
+    minimumMoney: 0
+    maximumMoney: 0
+  - id: BSH-R02
+    enabled: 1
+    title: "\u666E\u901A\u5546\u54C1"
+    description: "\u4ECE\u767E\u4E8B\u5802\u666E\u901A\u5546\u54C1\u6C60\u968F\u673A\u53D6\u5F971\u20133\u4EF6\u53EF\u6B63\u5E38\u4EA4\u6613\u7684\u666E\u901A\u5546\u54C1\u3002"
+    hint: "\u666E\u901A\u5546\u54C1 \xD7 \u82E5\u5E72"
+    groups: group1:1:3
+    minimumMoney: 0
+    maximumMoney: 0
+  - id: BSH-R03
+    enabled: 1
+    title: "\u6DF7\u5408\u5B9E\u7269"
+    description: "\u56FA\u5B9A\u62BD\u53D61\u4EF6\u4F4E\u9636\u6750\u6599\uFF0B1\u4EF6\u666E\u901A\u5546\u54C1\u3002"
+    hint: "\u6750\u6599\u4E0E\u5546\u54C1\u5404\u82E5\u5E72"
+    groups: group1:1:1;group2:1:1
+    minimumMoney: 0
+    maximumMoney: 0
+  - id: BSH-R04
+    enabled: 1
+    title: "\u5C11\u91CF\u7ECF\u8425\u8D27\u5E01"
+    description: "\u968F\u673A6\u201310\u5355\u4F4D\u5F53\u524D\u666E\u901A\u7ECF\u8425\u7ED3\u7B97\u8D27\u5E01\uFF1B\u6570\u503C\u4EC5\u4E3A\u7B2C\u4E00\u7248\u539F\u578B\uFF0C\u53EF\u8C03\u3002"
+    hint: "\u5C11\u91CF\u7ECF\u8425\u8D27\u5E01"
+    groups: 
+    minimumMoney: 6
+    maximumMoney: 10
+  - id: BSH-R05
+    enabled: 1
+    title: "\u8D27\u5E01\uFF0B\u5B9E\u7269"
+    description: "\u968F\u673A4\u20136\u5355\u4F4D\u7ECF\u8425\u8D27\u5E01\uFF0B1\u4EF6\u4F4E\u9636\u6750\u6599\u6216\u666E\u901A\u5546\u54C1\u3002"
+    hint: "\u5C11\u91CF\u7ECF\u8425\u8D27\u5E01\uFF0B\u4E00\u4EF6\u5B9E\u7269"
+    groups: group1:1:1
+    minimumMoney: 4
+    maximumMoney: 6
+  - id: BSH-R06
+    enabled: 1
+    title: "\u6742\u9879\u5B9E\u7269"
+    description: "\u4ECE\u4F4E\u9636\u6750\u6599\u6C60\u4E0E\u666E\u901A\u5546\u54C1\u6C60\u7684\u8054\u5408\u96C6\u5408\u4E2D\u968F\u673A1\u20133\u4EF6\uFF1B\u7C7B\u522B\u4E0D\u9884\u5148\u4FDD\u8BC1\u3002"
+    hint: "\u4F4E\u9636\u6742\u9879 \xD7 \u82E5\u5E72"
+    groups: group1:1:3
+    minimumMoney: 0
+    maximumMoney: 0
+  - id: BSH-R07
+    enabled: 1
+    title: "\u610F\u5916\u8C22\u793C"
+    description: "\u89E6\u53D18%\u8C22\u793C\u5224\u5B9A\u65F6\u4ECE\u767E\u4E8B\u5802\u8C22\u793C\u6C60\u968F\u673A1\u4EF6\uFF1B\u4E0D\u5F97\u5305\u542B\u5267\u60C5\u552F\u4E00\u7269\u3001\u804C\u4E1A\u5173\u952E\u89E3\u9501\u7269\u6216\u660E\u663E\u7834\u574F\u524D\u671F\u7ECF\u6D4E\u7684\u9AD8\u4EF7\u503C\u7269\u3002"
+    hint: "\u4E0D\u63D0\u524D\u663E\u793A"
+    groups: group1:1:1
+    minimumMoney: 0
+    maximumMoney: 0
+  commissionMembers:
+  - id: BSH-R01-group1-herb
+    enabled: 1
+    poolId: BSH-R01
+    groupId: group1
+    itemId: herb
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  - id: BSH-R01-group1-dew
+    enabled: 1
+    poolId: BSH-R01
+    groupId: group1
+    itemId: dew
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  - id: BSH-R01-group1-cinnabar
+    enabled: 1
+    poolId: BSH-R01
+    groupId: group1
+    itemId: cinnabar
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  - id: BSH-R02-group1-sword
+    enabled: 1
+    poolId: BSH-R02
+    groupId: group1
+    itemId: sword
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  - id: BSH-R03-group1-herb
+    enabled: 1
+    poolId: BSH-R03
+    groupId: group1
+    itemId: herb
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  - id: BSH-R03-group1-dew
+    enabled: 1
+    poolId: BSH-R03
+    groupId: group1
+    itemId: dew
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  - id: BSH-R03-group1-cinnabar
+    enabled: 1
+    poolId: BSH-R03
+    groupId: group1
+    itemId: cinnabar
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  - id: BSH-R03-group2-sword
+    enabled: 1
+    poolId: BSH-R03
+    groupId: group2
+    itemId: sword
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  - id: BSH-R05-group1-herb
+    enabled: 1
+    poolId: BSH-R05
+    groupId: group1
+    itemId: herb
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  - id: BSH-R05-group1-dew
+    enabled: 1
+    poolId: BSH-R05
+    groupId: group1
+    itemId: dew
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  - id: BSH-R05-group1-cinnabar
+    enabled: 1
+    poolId: BSH-R05
+    groupId: group1
+    itemId: cinnabar
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  - id: BSH-R05-group1-sword
+    enabled: 1
+    poolId: BSH-R05
+    groupId: group1
+    itemId: sword
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  - id: BSH-R06-group1-herb
+    enabled: 1
+    poolId: BSH-R06
+    groupId: group1
+    itemId: herb
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  - id: BSH-R06-group1-dew
+    enabled: 1
+    poolId: BSH-R06
+    groupId: group1
+    itemId: dew
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  - id: BSH-R06-group1-cinnabar
+    enabled: 1
+    poolId: BSH-R06
+    groupId: group1
+    itemId: cinnabar
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  - id: BSH-R06-group1-sword
+    enabled: 1
+    poolId: BSH-R06
+    groupId: group1
+    itemId: sword
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  - id: BSH-R07-group1-pill
+    enabled: 1
+    poolId: BSH-R07
+    groupId: group1
+    itemId: pill
+    note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+    weight: 1
+    minimumCount: 1
+    maximumCount: 1
+  commissionTemplates:
+  - id: BSH-001
+    enabled: 1
+    title: "\u836F\u94FA\u7406\u5E93"
+    description: "\u574A\u5E02\u836F\u94FA\u521A\u6E05\u8FC7\u540E\u5E93\uFF0C\u5269\u4E0B\u4E0D\u5C11\u8FB9\u89D2\u6750\u6599\u4E0E\u65E7\u5305\u88C5\u9700\u8981\u91CD\u65B0\u5206\u7C7B\uFF0C\u638C\u67DC\u4E34\u65F6\u7F3A\u4EBA\u624B\u3002"
+    rewardPoolId: BSH-R01
+    rewardHint: "\u4F4E\u9636\u6750\u6599 \xD7 \u82E5\u5E72"
+    weight: 10
+  - id: BSH-002
+    enabled: 1
+    title: "\u5546\u961F\u70B9\u8D27"
+    description: "\u4E00\u652F\u77ED\u9014\u5546\u961F\u521A\u8FDB\u574A\u5E02\uFF0C\u9700\u8981\u5728\u5F00\u5E02\u524D\u6838\u5BF9\u8D27\u7BB1\u6570\u91CF\u548C\u6807\u7B7E\uFF0C\u907F\u514D\u5378\u8D27\u65F6\u62FF\u9519\u3002"
+    rewardPoolId: BSH-R02
+    rewardHint: "\u666E\u901A\u5546\u54C1 \xD7 \u82E5\u5E72"
+    weight: 10
+  - id: BSH-003
+    enabled: 1
+    title: "\u94FA\u9762\u5E2E\u5DE5"
+    description: "\u4E34\u8857\u6742\u8D27\u94FA\u6362\u4E86\u4E00\u6279\u8D27\u67B6\uFF0C\u9700\u8981\u6709\u4EBA\u628A\u6563\u8D27\u91CD\u65B0\u5F52\u4F4D\uFF0C\u5E76\u628A\u5269\u4F59\u5305\u88C5\u6750\u6599\u6E05\u51FA\u6765\u3002"
+    rewardPoolId: BSH-R03
+    rewardHint: "\u6750\u6599\u4E0E\u5546\u54C1\u5404\u82E5\u5E72"
+    weight: 10
+  - id: BSH-004
+    enabled: 1
+    title: "\u9001\u5951\u8DD1\u817F"
+    description: "\u4E24\u5BB6\u5546\u94FA\u9700\u8981\u5728\u95ED\u5E02\u524D\u4E92\u9001\u4E00\u4EFD\u76D6\u5370\u5951\u4E66\uFF0C\u8DEF\u4E0D\u8FDC\uFF0C\u4F46\u53CC\u65B9\u90FD\u62BD\u4E0D\u5F00\u8EAB\u3002"
+    rewardPoolId: BSH-R04
+    rewardHint: "\u5C11\u91CF\u7ECF\u8425\u8D27\u5E01"
+    weight: 8
+  - id: BSH-005
+    enabled: 1
+    title: "\u5E93\u623F\u6E05\u8D26"
+    description: "\u4E00\u95F4\u516C\u7528\u8D27\u6808\u7684\u8D26\u9762\u4E0E\u5B9E\u7269\u5BF9\u4E0D\u4E0A\uFF0C\u9700\u8981\u6309\u8D27\u7B7E\u91CD\u65B0\u6E05\u70B9\u4E00\u904D\u6563\u843D\u6742\u9879\u3002"
+    rewardPoolId: BSH-R06
+    rewardHint: "\u4F4E\u9636\u6742\u9879 \xD7 \u82E5\u5E72"
+    weight: 8
+  - id: BSH-006
+    enabled: 1
+    title: "\u4E34\u65F6\u770B\u644A"
+    description: "\u644A\u4E3B\u4E34\u65F6\u8981\u53BB\u529E\u4E8B\uFF0C\u8BF7\u4EBA\u66FF\u4ED6\u7167\u770B\u7247\u523B\u644A\u4F4D\u5E76\u6309\u5DF2\u7ECF\u5199\u597D\u7684\u4EF7\u7B7E\u4EA4\u63A5\u8D27\u7269\u3002"
+    rewardPoolId: BSH-R02
+    rewardHint: "\u666E\u901A\u5546\u54C1 \xD7 \u82E5\u5E72"
+    weight: 10
+  - id: BSH-007
+    enabled: 1
+    title: "\u8D27\u6808\u642C\u8FD0"
+    description: "\u8D27\u6808\u91CC\u6709\u4E00\u6279\u4E0D\u503C\u5F53\u96C7\u4E13\u95E8\u529B\u58EB\u7684\u5C0F\u7BB1\u5B50\uFF0C\u9700\u8981\u4ECE\u540E\u95E8\u632A\u5230\u5206\u62E3\u533A\u3002"
+    rewardPoolId: BSH-R01
+    rewardHint: "\u4F4E\u9636\u6750\u6599 \xD7 \u82E5\u5E72"
+    weight: 10
+  - id: BSH-008
+    enabled: 1
+    title: "\u9A7F\u7AD9\u9001\u4EF6"
+    description: "\u574A\u5E02\u9A7F\u7AD9\u79EF\u7740\u51E0\u4EFD\u77ED\u9014\u5305\u4EF6\uFF0C\u6B63\u597D\u9700\u8981\u6709\u4EBA\u987A\u8DEF\u9001\u5230\u9644\u8FD1\u51E0\u5BB6\u5546\u94FA\u3002"
+    rewardPoolId: BSH-R05
+    rewardHint: "\u5C11\u91CF\u7ECF\u8425\u8D27\u5E01\uFF0B\u4E00\u4EF6\u5B9E\u7269"
+    weight: 8
+  - id: BSH-009
+    enabled: 1
+    title: "\u4FEE\u7F2E\u6742\u5F79"
+    description: "\u4E00\u95F4\u65E7\u94FA\u5B50\u6362\u4E86\u95E8\u677F\u548C\u8D27\u67B6\uFF0C\u5B8C\u5DE5\u540E\u8FD8\u6709\u9489\u4EF6\u3001\u6728\u6599\u548C\u6742\u6750\u8981\u6574\u7406\u6536\u62E2\u3002"
+    rewardPoolId: BSH-R01
+    rewardHint: "\u4F4E\u9636\u6750\u6599 \xD7 \u82E5\u5E72"
+    weight: 9
+  - id: BSH-010
+    enabled: 1
+    title: "\u96C6\u5E02\u76D8\u8D27"
+    description: "\u96C6\u5E02\u51C6\u5907\u6536\u644A\uFF0C\u51E0\u5BB6\u644A\u4F4D\u9700\u8981\u5408\u5E76\u6E05\u70B9\u5269\u4F59\u8D27\u7269\uFF0C\u6309\u5404\u81EA\u540D\u518C\u91CD\u65B0\u88C5\u7BB1\u3002"
+    rewardPoolId: BSH-R02
+    rewardHint: "\u666E\u901A\u5546\u54C1 \xD7 \u82E5\u5E72"
+    weight: 9
+  - id: BSH-011
+    enabled: 1
+    title: "\u884C\u5546\u5378\u8D27"
+    description: "\u4E00\u540D\u884C\u5546\u5E26\u56DE\u96F6\u6563\u8D27\u7269\uFF0C\u6570\u91CF\u4E0D\u591A\u4F46\u79CD\u7C7B\u6742\uFF0C\u9700\u8981\u5E2E\u5FD9\u5378\u4E0B\u5E76\u6309\u7528\u9014\u5206\u5F00\u3002"
+    rewardPoolId: BSH-R03
+    rewardHint: "\u6750\u6599\u4E0E\u5546\u54C1\u5404\u82E5\u5E72"
+    weight: 9
+  - id: BSH-012
+    enabled: 1
+    title: "\u836F\u6750\u5206\u62E3"
+    description: "\u836F\u519C\u9001\u6765\u4E00\u6279\u54C1\u8D28\u666E\u901A\u7684\u6742\u6750\uFF0C\u9700\u8981\u628A\u53EF\u7528\u90E8\u5206\u3001\u5305\u88C5\u548C\u5E9F\u8FB9\u5206\u5F00\uFF0C\u65B9\u4FBF\u836F\u94FA\u5165\u5E93\u3002"
+    rewardPoolId: BSH-R01
+    rewardHint: "\u4F4E\u9636\u6750\u6599 \xD7 \u82E5\u5E72"
+    weight: 10
+  - id: BSH-013
+    enabled: 1
+    title: "\u8D26\u623F\u6284\u5F55"
+    description: "\u767E\u4E8B\u5802\u4EE3\u5546\u6237\u5F52\u6863\u4E00\u6279\u65E7\u8D26\uFF0C\u9700\u8981\u628A\u51E0\u9875\u5DF2\u6838\u5BF9\u7684\u6D41\u6C34\u8A8A\u5199\u5230\u7EDF\u4E00\u683C\u5F0F\u4E2D\u3002"
+    rewardPoolId: BSH-R04
+    rewardHint: "\u5C11\u91CF\u7ECF\u8425\u8D27\u5E01"
+    weight: 7
+  - id: BSH-014
+    enabled: 1
+    title: "\u5668\u94FA\u642C\u7BB1"
+    description: "\u5668\u7269\u94FA\u521A\u6536\u5230\u4E00\u6279\u666E\u901A\u96F6\u4EF6\u548C\u6742\u8D27\uFF0C\u9700\u8981\u628A\u6CA1\u6709\u6280\u672F\u8981\u6C42\u7684\u7BB1\u4EF6\u642C\u5230\u5BF9\u5E94\u8D27\u4F4D\u3002"
+    rewardPoolId: BSH-R06
+    rewardHint: "\u4F4E\u9636\u6742\u9879 \xD7 \u82E5\u5E72"
+    weight: 9
+  - id: BSH-015
+    enabled: 1
+    title: "\u5BA2\u6808\u642C\u67F4"
+    description: "\u5BA2\u6808\u540E\u9662\u65B0\u5230\u4E00\u6279\u65E5\u5E38\u8017\u6750\uFF0C\u9700\u8981\u5728\u665A\u5E02\u524D\u642C\u5165\u5E93\u623F\u5E76\u6309\u7528\u9014\u5806\u653E\u3002"
+    rewardPoolId: BSH-R05
+    rewardHint: "\u5C11\u91CF\u7ECF\u8425\u8D27\u5E01\uFF0B\u4E00\u4EF6\u5B9E\u7269"
+    weight: 8
+  - id: BSH-016
+    enabled: 1
+    title: "\u7075\u821F\u6CCA\u4F4D\u5378\u8D27"
+    description: "\u5C0F\u578B\u7075\u821F\u4E34\u65F6\u9760\u6CCA\uFF0C\u51E0\u7BB1\u666E\u901A\u8D27\u7269\u6025\u7740\u8FDB\u574A\u5E02\uFF0C\u642C\u8FD0\u4E0E\u5206\u62E3\u90FD\u4E0D\u9700\u8981\u4E13\u4E1A\u8D44\u683C\u3002"
+    rewardPoolId: BSH-R03
+    rewardHint: "\u6750\u6599\u4E0E\u5546\u54C1\u5404\u82E5\u5E72"
+    weight: 8
+  marketEvents:
+  - id: medicine-demand
+    enabled: 1
+    title: "\u4E39\u836F\u6C42\u8D2D\u6F6E"
+    description: "\u836F\u574A\u6C42\u8D2D\u589E\u591A\uFF0C\u4E39\u836F\u51FA\u552E\u62A5\u4EF7\u6682\u65F6\u4E0A\u6DA8\u3002"
+    note: "\u8FC1\u79FB\u73B0\u6709Unity\u539F\u578B\u6D4B\u8BD5\u503C\uFF1B\u975E\u6700\u7EC8\u5E73\u8861"
+    category: 1
+    direction: PlayerSells
+    percent: 0.2
+    weight: 1
+    minimumDuration: 1
+    maximumDuration: 2
+    cooldownTurns: 2
+  - id: medicine-supply
+    enabled: 1
+    title: "\u4E39\u836F\u96C6\u4E2D\u5230\u8D27"
+    description: "\u5546\u961F\u96C6\u4E2D\u4F9B\u8D27\uFF0C\u4E39\u836F\u4E70\u5356\u62A5\u4EF7\u6682\u65F6\u4E0B\u964D\u3002"
+    note: "\u8FC1\u79FB\u73B0\u6709Unity\u539F\u578B\u6D4B\u8BD5\u503C\uFF1B\u975E\u6700\u7EC8\u5E73\u8861"
+    category: 1
+    direction: Both
+    percent: -0.1
+    weight: 1
+    minimumDuration: 1
+    maximumDuration: 2
+    cooldownTurns: 2
+  - id: materials-supply
+    enabled: 1
+    title: "\u7075\u6750\u4E30\u6536"
+    description: "\u7075\u6750\u8D27\u6E90\u589E\u52A0\uFF0C\u6536\u8D2D\u6750\u6599\u62A5\u4EF7\u6682\u65F6\u4E0B\u964D\u3002"
+    note: "\u8FC1\u79FB\u73B0\u6709Unity\u539F\u578B\u6D4B\u8BD5\u503C\uFF1B\u975E\u6700\u7EC8\u5E73\u8861"
+    category: 2
+    direction: PlayerBuys
+    percent: -0.2
+    weight: 1
+    minimumDuration: 1
+    maximumDuration: 2
+    cooldownTurns: 2
+  - id: equipment-demand
+    enabled: 1
+    title: "\u6CD5\u5668\u884C\u60C5\u5347\u6E29"
+    description: "\u88C5\u5907\u4EA4\u6613\u9700\u6C42\u589E\u52A0\uFF0C\u88C5\u5907\u4E70\u5356\u62A5\u4EF7\u6682\u65F6\u4E0A\u6DA8\u3002"
+    note: "\u8FC1\u79FB\u73B0\u6709Unity\u539F\u578B\u6D4B\u8BD5\u503C\uFF1B\u975E\u6700\u7EC8\u5E73\u8861"
+    category: 3
+    direction: Both
+    percent: 0.2
+    weight: 1
+    minimumDuration: 1
+    maximumDuration: 2
+    cooldownTurns: 2
+  recipes:
+  - id: recipe_pill_basic
+    enabled: 1
+    title: "\u56DE\u6C14\u4E39\uFF5C\u57FA\u7840\u6F14\u793A\u914D\u65B9"
+    description: "DP-67 \u8FC1\u79FB\u73B0\u6709\u7070\u76D2\u914D\u7F6E\uFF0C\u975E\u6700\u7EC8\u5E73\u8861\uFF1B\u9759\u6001\u539F\u6599\u4EA7\u51FA\u4EE5\u672C\u5FEB\u7167\u660E\u7EC6\u4E3A\u51C6\u3002"
+  - id: recipe_pill_fire_yang
+    enabled: 1
+    title: "\u8D64\u9633\u4E39\uFF5C\u5019\u9009\u914D\u65B9"
+    description: "DP-67 \u8FC1\u79FB\u73B0\u6709\u7070\u76D2\u914D\u7F6E\uFF0C\u975E\u6700\u7EC8\u5E73\u8861\uFF1B\u9759\u6001\u539F\u6599\u4EA7\u51FA\u4EE5\u672C\u5FEB\u7167\u660E\u7EC6\u4E3A\u51C6\u3002"
+  - id: recipe_pill_metal_water
+    enabled: 1
+    title: "\u91D1\u6C34\u51DD\u5143\u4E39\uFF5C\u5019\u9009\u914D\u65B9"
+    description: "DP-67 \u8FC1\u79FB\u73B0\u6709\u7070\u76D2\u914D\u7F6E\uFF0C\u975E\u6700\u7EC8\u5E73\u8861\uFF1B\u9759\u6001\u539F\u6599\u4EA7\u51FA\u4EE5\u672C\u5FEB\u7167\u660E\u7EC6\u4E3A\u51C6\u3002"
+  recipeLines:
+  - id: recipe_pill_basic:input:herb
+    enabled: 1
+    recipeId: recipe_pill_basic
+    itemId: herb
+    purpose: "\u539F\u6599"
+    quantity: 1
+  - id: recipe_pill_basic:input:dew
+    enabled: 1
+    recipeId: recipe_pill_basic
+    itemId: dew
+    purpose: "\u539F\u6599"
+    quantity: 1
+  - id: recipe_pill_basic:output:pill
+    enabled: 1
+    recipeId: recipe_pill_basic
+    itemId: pill
+    purpose: "\u4EA7\u7269"
+    quantity: 1
+  - id: recipe_pill_fire_yang:input:mat_fire_herb
+    enabled: 1
+    recipeId: recipe_pill_fire_yang
+    itemId: mat_fire_herb
+    purpose: "\u539F\u6599"
+    quantity: 1
+  - id: recipe_pill_fire_yang:input:mat_fire_fruit
+    enabled: 1
+    recipeId: recipe_pill_fire_yang
+    itemId: mat_fire_fruit
+    purpose: "\u539F\u6599"
+    quantity: 1
+  - id: recipe_pill_fire_yang:output:pill_fire_yang
+    enabled: 1
+    recipeId: recipe_pill_fire_yang
+    itemId: pill_fire_yang
+    purpose: "\u4EA7\u7269"
+    quantity: 1
+  - id: recipe_pill_metal_water:input:mat_metal_herb
+    enabled: 1
+    recipeId: recipe_pill_metal_water
+    itemId: mat_metal_herb
+    purpose: "\u539F\u6599"
+    quantity: 1
+  - id: recipe_pill_metal_water:input:mat_metal_fruit
+    enabled: 1
+    recipeId: recipe_pill_metal_water
+    itemId: mat_metal_fruit
+    purpose: "\u539F\u6599"
+    quantity: 1
+  - id: recipe_pill_metal_water:input:mat_water_fruit
+    enabled: 1
+    recipeId: recipe_pill_metal_water
+    itemId: mat_water_fruit
+    purpose: "\u539F\u6599"
+    quantity: 1
+  - id: recipe_pill_metal_water:output:pill_metal_water
+    enabled: 1
+    recipeId: recipe_pill_metal_water
+    itemId: pill_metal_water
+    purpose: "\u4EA7\u7269"
+    quantity: 1
+  alchemyGlobals:
+  - id: grindDuration
+    enabled: 1
+    value: 8
+  - id: perfectTolerance
+    enabled: 1
+    value: 0.5
+  - id: acceptableTolerance
+    enabled: 1
+    value: 2
+  - id: heatLowEnergyMultiplier
+    enabled: 1
+    value: 1
+  - id: heatMediumEnergyMultiplier
+    enabled: 1
+    value: 1.5
+  - id: heatHighEnergyMultiplier
+    enabled: 1
+    value: 2
+  - id: qualityNormalValueMultiplier
+    enabled: 1
+    value: 1
+  - id: qualityGoodValueMultiplier
+    enabled: 1
+    value: 1.2
+  - id: qualityTopValueMultiplier
+    enabled: 1
+    value: 1.5
+  alchemyMaterials:
+  - id: alchemy_basic_herb
+    enabled: 1
+    recipeId: recipe_pill_basic
+    itemId: herb
+    quantity: 1
+    order: 1
+    preloaded: 1
+    ground: 0
+    residenceSeconds: 16
+  - id: alchemy_basic_dew
+    enabled: 1
+    recipeId: recipe_pill_basic
+    itemId: dew
+    quantity: 1
+    order: 2
+    preloaded: 0
+    ground: 0
+    residenceSeconds: 8
+  - id: alchemy_fire_herb
+    enabled: 1
+    recipeId: recipe_pill_fire_yang
+    itemId: mat_fire_herb
+    quantity: 1
+    order: 1
+    preloaded: 1
+    ground: 0
+    residenceSeconds: 16
+  - id: alchemy_fire_fruit
+    enabled: 1
+    recipeId: recipe_pill_fire_yang
+    itemId: mat_fire_fruit
+    quantity: 1
+    order: 2
+    preloaded: 0
+    ground: 1
+    residenceSeconds: 8
+  - id: alchemy_mw_herb
+    enabled: 1
+    recipeId: recipe_pill_metal_water
+    itemId: mat_metal_herb
+    quantity: 1
+    order: 1
+    preloaded: 1
+    ground: 0
+    residenceSeconds: 32
+  - id: alchemy_mw_water_fruit
+    enabled: 1
+    recipeId: recipe_pill_metal_water
+    itemId: mat_water_fruit
+    quantity: 1
+    order: 2
+    preloaded: 0
+    ground: 1
+    residenceSeconds: 24
+  - id: alchemy_mw_metal_fruit
+    enabled: 1
+    recipeId: recipe_pill_metal_water
+    itemId: mat_metal_fruit
+    quantity: 1
+    order: 3
+    preloaded: 0
+    ground: 1
+    residenceSeconds: 16
+  alchemySteps:
+  - id: basic_01
+    enabled: 1
+    recipeId: recipe_pill_basic
+    action: "\u9884\u7F6E"
+    itemId: herb
+    state: "\u5B8C\u6574"
+    hint: "\u5F00\u7089\u524D\u5C06\u51DD\u6C14\u8349\u9884\u7F6E\u5165\u7089\u3002"
+    order: 1
+    heat: 1
+    furnaceSeconds: 0
+  - id: basic_02
+    enabled: 1
+    recipeId: recipe_pill_basic
+    action: "\u5F00\u7089"
+    itemId: 
+    state: 
+    hint: "\u4EE5\u4E2D\u706B\u5F00\u7089\u3002"
+    order: 2
+    heat: 1
+    furnaceSeconds: 0
+  - id: basic_03
+    enabled: 1
+    recipeId: recipe_pill_basic
+    action: "\u6295\u6599"
+    itemId: dew
+    state: "\u5B8C\u6574"
+    hint: "\u6295\u5165\u7075\u9732\u3002"
+    order: 3
+    heat: 1
+    furnaceSeconds: 0
+  - id: basic_04
+    enabled: 1
+    recipeId: recipe_pill_basic
+    action: "\u6536\u4E39"
+    itemId: 
+    state: 
+    hint: "\u5728\u4E24\u5473\u6750\u6599\u8FBE\u5230\u76EE\u6807\u5728\u7089\u65F6\u957F\u540E\u6536\u4E39\u3002"
+    order: 4
+    heat: 1
+    furnaceSeconds: 0
+  - id: fire_01
+    enabled: 1
+    recipeId: recipe_pill_fire_yang
+    action: "\u9884\u7F6E"
+    itemId: mat_fire_herb
+    state: "\u5B8C\u6574"
+    hint: "\u5F00\u7089\u524D\u9884\u7F6E\u8D64\u708E\u8349\u3002"
+    order: 1
+    heat: 1
+    furnaceSeconds: 0
+  - id: fire_02
+    enabled: 1
+    recipeId: recipe_pill_fire_yang
+    action: "\u5F00\u7089"
+    itemId: 
+    state: 
+    hint: "\u4EE5\u4E2D\u706B\u5F00\u7089\u3002"
+    order: 2
+    heat: 1
+    furnaceSeconds: 0
+  - id: fire_03
+    enabled: 1
+    recipeId: recipe_pill_fire_yang
+    action: "\u7814\u78E8"
+    itemId: mat_fire_fruit
+    state: "\u7814\u78E8"
+    hint: "\u5F00\u7089\u540E\u7ACB\u5373\u7814\u78E8\u706B\u7075\u679C\u3002"
+    order: 3
+    heat: 1
+    furnaceSeconds: 0
+  - id: fire_04
+    enabled: 1
+    recipeId: recipe_pill_fire_yang
+    action: "\u6295\u6599"
+    itemId: mat_fire_fruit
+    state: "\u7814\u78E8"
+    hint: "\u6295\u5165\u7814\u78E8\u540E\u7684\u706B\u7075\u679C\u3002"
+    order: 4
+    heat: 1
+    furnaceSeconds: 0
+  - id: fire_05
+    enabled: 1
+    recipeId: recipe_pill_fire_yang
+    action: "\u6536\u4E39"
+    itemId: 
+    state: 
+    hint: "\u6309\u6750\u6599\u76EE\u6807\u5728\u7089\u65F6\u957F\u6536\u4E39\u3002"
+    order: 5
+    heat: 1
+    furnaceSeconds: 0
+  - id: mw_01
+    enabled: 1
+    recipeId: recipe_pill_metal_water
+    action: "\u9884\u7F6E"
+    itemId: mat_metal_herb
+    state: "\u5B8C\u6574"
+    hint: "\u5F00\u7089\u524D\u9884\u7F6E\u91D1\u51DD\u8349\u3002"
+    order: 1
+    heat: 1
+    furnaceSeconds: 0
+  - id: mw_02
+    enabled: 1
+    recipeId: recipe_pill_metal_water
+    action: "\u5F00\u7089"
+    itemId: 
+    state: 
+    hint: "\u4EE5\u4E2D\u706B\u5F00\u7089\u3002"
+    order: 2
+    heat: 1
+    furnaceSeconds: 0
+  - id: mw_03
+    enabled: 1
+    recipeId: recipe_pill_metal_water
+    action: "\u7814\u78E8"
+    itemId: mat_water_fruit
+    state: "\u7814\u78E8"
+    hint: "\u5148\u7814\u78E8\u6C34\u7075\u679C\u3002"
+    order: 3
+    heat: 1
+    furnaceSeconds: 0
+  - id: mw_04
+    enabled: 1
+    recipeId: recipe_pill_metal_water
+    action: "\u6295\u6599"
+    itemId: mat_water_fruit
+    state: "\u7814\u78E8"
+    hint: "\u6295\u5165\u7814\u78E8\u540E\u7684\u6C34\u7075\u679C\u3002"
+    order: 4
+    heat: 1
+    furnaceSeconds: 0
+  - id: mw_05
+    enabled: 1
+    recipeId: recipe_pill_metal_water
+    action: "\u8C03\u706B"
+    itemId: 
+    state: 
+    hint: "\u5207\u6362\u9AD8\u706B\u3002"
+    order: 5
+    heat: 2
+    furnaceSeconds: 8
+  - id: mw_06
+    enabled: 1
+    recipeId: recipe_pill_metal_water
+    action: "\u7814\u78E8"
+    itemId: mat_metal_fruit
+    state: "\u7814\u78E8"
+    hint: "\u9AD8\u706B\u9636\u6BB5\u7814\u78E8\u91D1\u7075\u679C\u3002"
+    order: 6
+    heat: 1
+    furnaceSeconds: 0
+  - id: mw_07
+    enabled: 1
+    recipeId: recipe_pill_metal_water
+    action: "\u6295\u6599"
+    itemId: mat_metal_fruit
+    state: "\u7814\u78E8"
+    hint: "\u6295\u5165\u7814\u78E8\u540E\u7684\u91D1\u7075\u679C\u3002"
+    order: 7
+    heat: 1
+    furnaceSeconds: 0
+  - id: mw_08
+    enabled: 1
+    recipeId: recipe_pill_metal_water
+    action: "\u8C03\u706B"
+    itemId: 
+    state: 
+    hint: "\u5207\u6362\u4F4E\u706B\u3002"
+    order: 8
+    heat: 0
+    furnaceSeconds: 24
+  - id: mw_09
+    enabled: 1
+    recipeId: recipe_pill_metal_water
+    action: "\u6536\u4E39"
+    itemId: 
+    state: 
+    hint: "\u6309\u4E09\u5473\u6750\u6599\u76EE\u6807\u5728\u7089\u65F6\u957F\u6536\u4E39\u3002"
+    order: 9
+    heat: 1
+    furnaceSeconds: 0

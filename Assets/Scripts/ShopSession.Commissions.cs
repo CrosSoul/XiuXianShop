@@ -50,10 +50,11 @@ namespace XiuXianShop
                 throw new ArgumentException("百事堂奖励范围无效："+id);
             foreach(var group in pool.items)
             {
-                if(group.minimumCount<1 || group.maximumCount<group.minimumCount || group.maximumCount==int.MaxValue || group.itemIds.Length==0)
+                if(group.minimumCount<1 || group.maximumCount<group.minimumCount || group.maximumCount==int.MaxValue || group.members.Length==0)
                     throw new ArgumentException("百事堂实物数量无效："+id);
-                foreach(var itemId in group.itemIds)
+                foreach(var member in group.members)
                 {
+                    string itemId=member.itemId;
                     var definition=catalog.Find(itemId);
                     if(!IsSaleItem(definition) || definition.IsStorage || definition.category==ItemCategory.ProductionEquipment ||
                         definition.Shape(0,false).Max(p=>p.x)>=CurrentLocation.itemGridSize.x)
@@ -76,13 +77,13 @@ namespace XiuXianShop
             foreach(var group in pool.items)
             {
                 int count=DrawCustomerNumber(group.minimumCount,group.maximumCount+1);
-                for(int i=0;i<count;i++)rewards.Add(group.itemIds[DrawCustomerNumber(0,group.itemIds.Length)]);
+                for(int i=0;i<count;i++)DrawCommissionMember(group.members,rewards);
             }
             bool gift=DrawCustomerChance()<catalog.commissions.extraGiftChance;
             if(gift)
             {
-                var members=CommissionPool(catalog.commissions.extraGiftPoolId).items[0].itemIds;
-                for(int i=0;i<catalog.commissions.extraGiftCount;i++)rewards.Add(members[DrawCustomerNumber(0,members.Length)]);
+                var members=CommissionPool(catalog.commissions.extraGiftPoolId).items[0].members;
+                for(int i=0;i<catalog.commissions.extraGiftCount;i++)DrawCommissionMember(members,rewards);
             }
             // The receiving area can grow downward; carried storage stays finite.
             // This guarantees all earned goods exist even when the player filled the floor.
@@ -101,6 +102,14 @@ namespace XiuXianShop
             CommissionResult=template.title+"已完成 · 经营货币 +"+money+" · 实物 "+rewards.Count+" 件"+
                 (gift?"（含意外谢礼 "+catalog.commissions.extraGiftCount+" 件）":"")+"。请手动带走领取区物品。";
             return Success(CommissionResult);
+        }
+        void DrawCommissionMember(CommissionMemberRow[] members,List<string> rewards)
+        {
+            double roll=DrawCustomerChance()*members.Sum(m=>(double)m.weight);
+            var selected=members[members.Length-1];
+            foreach(var member in members){roll-=member.weight;if(roll<0){selected=member;break;}}
+            int count=DrawCustomerNumber(selected.minimumCount,selected.maximumCount+1);
+            for(int i=0;i<count;i++)rewards.Add(selected.itemId);
         }
     }
 }

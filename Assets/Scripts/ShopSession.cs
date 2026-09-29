@@ -386,7 +386,7 @@ namespace XiuXianShop
         { item.Container=target; item.StorageItemId=0; item.LocationId=null; item.X=x; item.Y=y; item.Rotation=((rotation%4)+4)%4; item.Flipped=flipped; }
 
         public DisplayAttraction PreviewAttraction() => BuildCustomerAttraction();
-        static bool IsSaleItem(ItemDefinition definition) => !definition.IsStorage && definition.category!=ItemCategory.ProductionEquipment && !definition.procurementSign && definition.FullBaseValue>0
+        public static bool IsSaleItem(ItemDefinition definition) => !definition.IsStorage && definition.category!=ItemCategory.ProductionEquipment && !definition.procurementSign && definition.FullBaseValue>0
             && definition.category!=ItemCategory.Unclassified && definition.category!=ItemCategory.BusinessSign;
 
         public bool BeginBusiness()

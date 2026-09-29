@@ -15,6 +15,8 @@ namespace XiuXianShop
         public float breaths;
         public string itemId;
         public bool ground;
+        public bool preloaded;
+        public float residenceSeconds;
         public AlchemyHeat heat = AlchemyHeat.Medium;
     }
 
@@ -23,6 +25,8 @@ namespace XiuXianShop
     {
         public string id, title, productId;
         public bool allowGrinding, allowHeatChange;
+        public AlchemyHeat initialHeat=AlchemyHeat.Medium;
+        public AlchemyStepRow[] steps=Array.Empty<AlchemyStepRow>();
         public AlchemyTarget[] targets;
     }
 
@@ -42,19 +46,7 @@ namespace XiuXianShop
         public Vector2Int preparationSize=new Vector2Int(6,4), fuelSize=new Vector2Int(2,2), outputSize=new Vector2Int(2,2);
         public bool showDebug=true;
         [Min(.1f)] public float debugTimeScale=1;
-        public AlchemyRecipe[] recipes =
-        {
-            new AlchemyRecipe {id="recipe_pill_basic",title="回气丹",productId="pill",targets=new[]{
-                Ingredient("herb",0),Ingredient("dew",1),Collect(2)}},
-            new AlchemyRecipe {id="recipe_pill_fire_yang",title="赤阳丹",productId="pill_fire_yang",allowGrinding=true,targets=new[]{
-                Ingredient("mat_fire_herb",0),Ingredient("mat_fire_fruit",1,true),Collect(2)}},
-            new AlchemyRecipe {id="recipe_pill_metal_water",title="金水凝元丹",productId="pill_metal_water",allowGrinding=true,allowHeatChange=true,targets=new[]{
-                Ingredient("mat_metal_herb",0),Ingredient("mat_water_fruit",1,true),Heat(1,AlchemyHeat.High),
-                Ingredient("mat_metal_fruit",2,true),Heat(3,AlchemyHeat.Low),Collect(4)}}
-        };
-        static AlchemyTarget Ingredient(string id,float breaths,bool ground=false) => new AlchemyTarget {kind=AlchemyEventKind.Ingredient,itemId=id,breaths=breaths,ground=ground};
-        static AlchemyTarget Heat(float breaths,AlchemyHeat heat) => new AlchemyTarget {kind=AlchemyEventKind.Heat,breaths=breaths,heat=heat};
-        static AlchemyTarget Collect(float breaths) => new AlchemyTarget {kind=AlchemyEventKind.Collect,breaths=breaths};
+        public AlchemyRecipe[] recipes = Array.Empty<AlchemyRecipe>();
         public float HeatMultiplier(AlchemyHeat heat) => heat==AlchemyHeat.Low?lowHeatMultiplier:heat==AlchemyHeat.High?highHeatMultiplier:mediumHeatMultiplier;
         public float ValueMultiplier(PillQuality quality) => quality==PillQuality.Superior?superiorValue:quality==PillQuality.Good?goodValue:ordinaryValue;
         public static string QualityName(PillQuality quality) => quality==PillQuality.Superior?"上品":quality==PillQuality.Good?"良品":quality==PillQuality.Ordinary?"普通":"废丹";

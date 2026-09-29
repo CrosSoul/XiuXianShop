@@ -55,6 +55,20 @@ namespace XiuXianShop.Editor
             if(!allowed.Contains(target))plan.Error(FileName,id,field,$"未知、草稿、停用或尚未接入的引用：{target}");
         }
         public static ContentDomainAdapter[] CreateDefaults() => new ContentDomainAdapter[]{new Visits(),new VisitItems(),new Scenes(),new Nodes()};
+        public static ContentDomainAdapter[] CreateFor(string[] domains,ContentSyncPlan plan)
+        {
+            if(domains==null || domains.Length==0)return CreateDefaults();
+            var result=new List<ContentDomainAdapter>();
+            foreach(string domain in domains.Distinct())
+            {
+                if(domain=="visits")result.AddRange(CreateDefaults());
+                else if(domain=="commissions")result.AddRange(CommissionContentAdapter.Create());
+                else if(domain=="market")result.Add(new MarketContentAdapter());
+                else if(domain=="alchemy")result.AddRange(AlchemyContentAdapter.Create());
+                else plan.Error("snapshot.json",domain,"domains","未知内容域。");
+            }
+            return result.ToArray();
+        }
 
         sealed class Visits : ContentDomainAdapter
         {

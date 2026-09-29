@@ -1,0 +1,1679 @@
+{
+  "status": "completed",
+  "duration": 9.99,
+  "summary": {
+    "total": 238,
+    "passed": 238,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.CollectionScoresEachResidenceOnceAndPreloadingDoesNotEarnPerfectScore",
+      "Status": "Passed",
+      "Duration": 0.016959,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.FirstIngredientMustPrecedeIgnitionAndMissingIngredientIsReported",
+      "Status": "Passed",
+      "Duration": 0.0019663,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.GrindingLocksRecipeAndMovesAndUnpreparedMaterialCannotBeAdded",
+      "Status": "Passed",
+      "Duration": 0.002167,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.HighHeatDelayConsumesMoreAndAbortKeepsUnspentMaterials",
+      "Status": "Passed",
+      "Duration": 0.0021173,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.PendingStoryPausesFurnaceClockAndFuelUntilReturn",
+      "Status": "Passed",
+      "Duration": 0.0076985,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.QualityIsInstanceValueBeforeMarketTags(8,16,Superior,1.5d)",
+      "Status": "Passed",
+      "Duration": 0.0079448,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.QualityIsInstanceValueBeforeMarketTags(9,16,Good,1.2d)",
+      "Status": "Passed",
+      "Duration": 0.0056643,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.QualityIsInstanceValueBeforeMarketTags(11,17,Ordinary,1)",
+      "Status": "Passed",
+      "Duration": 0.0015561,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.QualityIsInstanceValueBeforeMarketTags(11,20,Ruined,0)",
+      "Status": "Passed",
+      "Duration": 0.0020103,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ResidenceWindowBoundariesAreInclusive(7.5d,1.0f)",
+      "Status": "Passed",
+      "Duration": 0.0024014,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ResidenceWindowBoundariesAreInclusive(8.5d,1.0f)",
+      "Status": "Passed",
+      "Duration": 0.001393,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ResidenceWindowBoundariesAreInclusive(6,0.6f)",
+      "Status": "Passed",
+      "Duration": 0.0014719,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ResidenceWindowBoundariesAreInclusive(10,0.6f)",
+      "Status": "Passed",
+      "Duration": 0.0013579,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ResidenceWindowBoundariesAreInclusive(5.9d,0.0f)",
+      "Status": "Passed",
+      "Duration": 0.0013054,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ResidenceWindowBoundariesAreInclusive(10.1d,0.0f)",
+      "Status": "Passed",
+      "Duration": 0.0019525,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.StructureErrorsCannotBeCancelledByPerfectTiming",
+      "Status": "Passed",
+      "Duration": 0.0051004,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.SupplyExhaustionStopsAtAvailableEnergyAndPreservesReusableShell",
+      "Status": "Passed",
+      "Duration": 0.0073808,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ThreeRecipesFinishWithOriginalInstancesAndNoSecondStaminaCost(\"recipe_pill_basic\",48)",
+      "Status": "Passed",
+      "Duration": 0.0032382,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ThreeRecipesFinishWithOriginalInstancesAndNoSecondStaminaCost(\"recipe_pill_fire_yang\",48)",
+      "Status": "Passed",
+      "Duration": 0.0015245,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ThreeRecipesFinishWithOriginalInstancesAndNoSecondStaminaCost(\"recipe_pill_metal_water\",104)",
+      "Status": "Passed",
+      "Duration": 0.0016994,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.TooLittleEnergyAndBlockedOutputDoNotStartOrConsume",
+      "Status": "Passed",
+      "Duration": 0.0017335,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.TwoStructureErrorsRuin",
+      "Status": "Passed",
+      "Duration": 0.0014919,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.AllMatchingVisitsAppearInExplicitOrderWithoutReplacingOrdinaryCustomers",
+      "Status": "Passed",
+      "Duration": 0.0017314,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.ConditionalWindowAndPrerequisiteCompletionSurviveSave",
+      "Status": "Passed",
+      "Duration": 0.0052333,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.DisplayTeaAndOverflowOnlyModifyOrdinaryVisitors",
+      "Status": "Passed",
+      "Duration": 0.0024409,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.FixedGoodsBudgetAndIdentityComeFromContent",
+      "Status": "Passed",
+      "Duration": 0.0009271,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.GrayboxReadsAuthoredTextAndAppliesHintAndLocationOnlyOnEnd",
+      "Status": "Passed",
+      "Duration": 0.0028453,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.InvalidResultTargetDoesNotApplyEarlierFlag",
+      "Status": "Passed",
+      "Duration": 0.0007044,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.OnceAppearanceProgressRoundTripsWithoutCopyingDefinitions",
+      "Status": "Passed",
+      "Duration": 0.0010292,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.OneTimeTrainingDestinationCannotBeVisitedAgainAfterSave",
+      "Status": "Passed",
+      "Duration": 0.0014533,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.RequiredForbiddenAndFixedTurnConditionsMustAllMatch",
+      "Status": "Passed",
+      "Duration": 0.0047653,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.SameCustomerUsesSeparateFixedVisitsAndNeverAppearsOnNeighbourTurns",
+      "Status": "Passed",
+      "Duration": 0.0013088,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.SceneHandoffRequiresMatchingRequestAndReachedEndForCompletion",
+      "Status": "Passed",
+      "Duration": 0.0069994,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.SkipSceneCannotUnlockBeforeSceneEndCompletion",
+      "Status": "Passed",
+      "Duration": 0.0009727,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.SpecialVisitsDoNotConsumeOrdinaryRandomDrawsAndUnresolvedVisitsReturn",
+      "Status": "Passed",
+      "Duration": 0.0017061,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AuthoredVisitTests.TradeResultRequiresSuccessfulAtomicSettlementAndIsNotRepeated",
+      "Status": "Passed",
+      "Duration": 0.003813,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CarryTests.FailedReturnPreservesEveryCarryItemUntilWarehouseIsRearranged",
+      "Status": "Passed",
+      "Duration": 0.1126646,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CarryTests.HandHoldingLoadedContainerPreservesItsContentsAndValidState",
+      "Status": "Passed",
+      "Duration": 0.0011011,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CarryTests.NoPackHasTwoIndependentSlotsWithoutGeometryOrExtraInventory",
+      "Status": "Passed",
+      "Duration": 0.0010354,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CarryTests.SelectedPackKeepsItsPreloadedContentsAndCannotBeSwappedOrNested",
+      "Status": "Passed",
+      "Duration": 0.0026927,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.ChangesTextWeightNewTemplatePoolAndGiftThroughImportWithoutCode",
+      "Status": "Passed",
+      "Duration": 0.3702018,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.DuplicateIdsBlockImport(\"templates\")",
+      "Status": "Passed",
+      "Duration": 0.1737475,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.DuplicateIdsBlockImport(\"pools\")",
+      "Status": "Passed",
+      "Duration": 0.1677902,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.DuplicateIdsBlockImport(\"members\")",
+      "Status": "Passed",
+      "Duration": 0.16793,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.InvalidReferencesAndRangesBlockImport(\"templates\",\"奖励池ID\",\"unknown\")",
+      "Status": "Passed",
+      "Duration": 0.1686979,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.InvalidReferencesAndRangesBlockImport(\"members\",\"物品ID\",\"unknown\")",
+      "Status": "Passed",
+      "Duration": 0.1690649,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.InvalidReferencesAndRangesBlockImport(\"members\",\"权重\",\"NaN\")",
+      "Status": "Passed",
+      "Duration": 0.221646,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.InvalidReferencesAndRangesBlockImport(\"pools\",\"实物抽取组\",\"bad:4:2\")",
+      "Status": "Passed",
+      "Duration": 0.1604927,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.PreviewIsReadOnlyAndImportIdempotentWithFixedSavedCandidates",
+      "Status": "Passed",
+      "Duration": 0.2070559,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.CandidatesAreDistinctFixedWeightedAndRefreshAfterMonth",
+      "Status": "Passed",
+      "Duration": 0.0022193,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.DataControlsNewTemplatesWeightsAndCandidateCount",
+      "Status": "Passed",
+      "Duration": 0.0003605,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.FilledFloorDoesNotLoseRewardsAndLeavingRequiresConfirmation",
+      "Status": "Passed",
+      "Duration": 0.0053582,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.GiftChanceCountMembershipAndCurrencyRangesAreConfigurable",
+      "Status": "Passed",
+      "Duration": 0.0005609,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.InvalidCurrencyCapacityDoesNotPartiallyReward",
+      "Status": "Passed",
+      "Duration": 0.0003745,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.NormalPoolsSettleOnceIntoLocationOrBalance(\"BSH-R01\",2,4,0,0)",
+      "Status": "Passed",
+      "Duration": 0.0034929,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.NormalPoolsSettleOnceIntoLocationOrBalance(\"BSH-R02\",1,3,0,0)",
+      "Status": "Passed",
+      "Duration": 0.0017577,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.NormalPoolsSettleOnceIntoLocationOrBalance(\"BSH-R03\",2,2,0,0)",
+      "Status": "Passed",
+      "Duration": 0.0027383,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.NormalPoolsSettleOnceIntoLocationOrBalance(\"BSH-R04\",0,0,6,10)",
+      "Status": "Passed",
+      "Duration": 0.0045372,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.NormalPoolsSettleOnceIntoLocationOrBalance(\"BSH-R05\",1,1,4,6)",
+      "Status": "Passed",
+      "Duration": 0.0092889,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.NormalPoolsSettleOnceIntoLocationOrBalance(\"BSH-R06\",1,3,0,0)",
+      "Status": "Passed",
+      "Duration": 0.002928,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.AutomaticBranchCycleIsRejectedEvenWithAnEndExit",
+      "Status": "Passed",
+      "Duration": 0.1036684,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.ChoiceBranchAndActionAreTypedAndCrossSceneEdgesAreRejected",
+      "Status": "Passed",
+      "Duration": 0.1272435,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.DraftsCannotBeReferencedAndEffectiveChangesMustBeMarkedPending",
+      "Status": "Passed",
+      "Duration": 0.1340325,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.EmptyOptionalCellsPreservePreviouslyImportedValues",
+      "Status": "Passed",
+      "Duration": 0.1524032,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.ImportedEditsChangeVisitScheduleBudgetGoodsAndDialogueWithoutNewIdentity",
+      "Status": "Passed",
+      "Duration": 0.2984376,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.InvalidImportReportsRowAndFieldWithoutPartialAssetWrite(\"duplicate\",\"来访ID\")",
+      "Status": "Passed",
+      "Duration": 0.1663311,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.InvalidImportReportsRowAndFieldWithoutPartialAssetWrite(\"item\",\"物品ID\")",
+      "Status": "Passed",
+      "Duration": 0.1471095,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.InvalidImportReportsRowAndFieldWithoutPartialAssetWrite(\"scene\",\"到店SceneID\")",
+      "Status": "Passed",
+      "Duration": 0.1425745,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.InvalidImportReportsRowAndFieldWithoutPartialAssetWrite(\"next\",\"NextNodeID\")",
+      "Status": "Passed",
+      "Duration": 0.1565243,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.InvalidImportReportsRowAndFieldWithoutPartialAssetWrite(\"action\",\"Action类型\")",
+      "Status": "Passed",
+      "Duration": 0.1567963,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.InvalidImportReportsRowAndFieldWithoutPartialAssetWrite(\"target\",\"Action目标\")",
+      "Status": "Passed",
+      "Duration": 0.1296552,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.InvalidImportReportsRowAndFieldWithoutPartialAssetWrite(\"number\",\"数量\")",
+      "Status": "Passed",
+      "Duration": 0.1241414,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.InvalidImportReportsRowAndFieldWithoutPartialAssetWrite(\"state\",\"数据状态\")",
+      "Status": "Passed",
+      "Duration": 0.1501143,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.MalformedCsvOrMissingTableBlocksImport",
+      "Status": "Passed",
+      "Duration": 0.09123,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.MissingRowsAreRetainedAndExplicitDisableKeepsIdentity",
+      "Status": "Passed",
+      "Duration": 0.2005195,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.PreviewDoesNotWriteAndImportUpdatesStableIdentityAndIsIdempotent",
+      "Status": "Passed",
+      "Duration": 0.2488604,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.RealConfluenceExportReportsMisalignedStatusWithoutWriting",
+      "Status": "Passed",
+      "Duration": 0.1314262,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.StaleSourceOrChangedCatalogRequiresNewPreview",
+      "Status": "Passed",
+      "Duration": 0.094984,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.StoryLocationVisualAndConditionalChoicesUseTheSameImporter",
+      "Status": "Passed",
+      "Duration": 0.1485584,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ContentSyncTests.ValidAllDraftSnapshotImportsNoRuntimeDefinitions",
+      "Status": "Passed",
+      "Duration": 0.141244,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CustomerGenerationTests.AllDisplayCategoriesContributeByCountAndPreviewDoesNotRerollQueue",
+      "Status": "Passed",
+      "Duration": 0.0028087,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CustomerGenerationTests.CategoryBudgetTableAndTierDistributionAreUsed",
+      "Status": "Passed",
+      "Duration": 0.0879138,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CustomerGenerationTests.EmptyDisplaySupportsAllThreeBehaviorsAndConfiguredSupplyCounts",
+      "Status": "Passed",
+      "Duration": 0.1039332,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CustomerGenerationTests.EmptySupplyPoolsAreExcludedAndPurchaseDoesNotRefillDemandBudget",
+      "Status": "Passed",
+      "Duration": 0.0019694,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CustomerGenerationTests.OverflowAndPromotionAddToConfiguredBaseExactlyOnce",
+      "Status": "Passed",
+      "Duration": 0.0042145,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CustomerGenerationTests.TravellersRedistributeOnlyRemainingSingleDirectionProbability",
+      "Status": "Passed",
+      "Duration": 0.0008397,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CustomerGenerationTests.WealthyPromotionMarksOneOrdinaryCustomerAndCapsTier(0)",
+      "Status": "Passed",
+      "Duration": 0.0014728,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CustomerGenerationTests.WealthyPromotionMarksOneOrdinaryCustomerAndCapsTier(2)",
+      "Status": "Passed",
+      "Duration": 0.0072465,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CustomerGenerationTests.WindsMultiplyCategoryWeightWithoutGuaranteeingSelection(BuyerTrend)",
+      "Status": "Passed",
+      "Duration": 0.0788975,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CustomerGenerationTests.WindsMultiplyCategoryWeightWithoutGuaranteeingSelection(SupplierTrend)",
+      "Status": "Passed",
+      "Duration": 0.0870552,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.IntegrationTests.DevelopmentKitExtendsCurrentInventoryWithoutReconfiguringExistingData(\"recipe_pill_basic\")",
+      "Status": "Passed",
+      "Duration": 0.0041648,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.IntegrationTests.DevelopmentKitExtendsCurrentInventoryWithoutReconfiguringExistingData(\"recipe_pill_fire_yang\")",
+      "Status": "Passed",
+      "Duration": 0.0019295,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.IntegrationTests.DevelopmentKitExtendsCurrentInventoryWithoutReconfiguringExistingData(\"recipe_pill_metal_water\")",
+      "Status": "Passed",
+      "Duration": 0.0018926,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.IntegrationTests.DevelopmentKitRejectsActiveBusinessCarryingAndFullWarehouseWithoutPartialInventory",
+      "Status": "Passed",
+      "Duration": 0.0033247,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.LocationItemTests.CollectingEverythingLeavesWithoutConfirmationAndPreservesOriginalState",
+      "Status": "Passed",
+      "Duration": 0.0017438,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.LocationItemTests.FailedPlacementAndFullLocationDoNotMoveOrGenerateItems",
+      "Status": "Passed",
+      "Duration": 0.0012173,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.LocationItemTests.OrdinaryLeaveCancelsWithoutChangesThenDeletesOnlyUncollectedItems",
+      "Status": "Passed",
+      "Duration": 0.0014544,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.LocationItemTests.PersistentItemsSurviveOtherLocationCleanupNextTurnAndSaveRestore",
+      "Status": "Passed",
+      "Duration": 0.0016906,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.AnnualWindowFollowsTwelveMonthYears(1,1)",
+      "Status": "Passed",
+      "Duration": 0.001113,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.AnnualWindowFollowsTwelveMonthYears(12,1)",
+      "Status": "Passed",
+      "Duration": 0.0001642,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.AnnualWindowFollowsTwelveMonthYears(13,13)",
+      "Status": "Passed",
+      "Duration": 6.38E-05,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.AnnualWindowFollowsTwelveMonthYears(24,13)",
+      "Status": "Passed",
+      "Duration": 6.15E-05,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.AnnualWindowFollowsTwelveMonthYears(25,25)",
+      "Status": "Passed",
+      "Duration": 5.18E-05,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.BrowsingAndSaveRestoreDoNotChargeRentAndUseActualPeriod",
+      "Status": "Passed",
+      "Duration": 0.0015476,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.DateControlsFutureActiveExpiredTagsAndBothTradeDirections(1,23,20)",
+      "Status": "Passed",
+      "Duration": 0.000525,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.DateControlsFutureActiveExpiredTagsAndBothTradeDirections(6,23,24)",
+      "Status": "Passed",
+      "Duration": 0.0004485,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.DateControlsFutureActiveExpiredTagsAndBothTradeDirections(7,27,20)",
+      "Status": "Passed",
+      "Duration": 0.0002797,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.DateControlsFutureActiveExpiredTagsAndBothTradeDirections(8,25,18)",
+      "Status": "Passed",
+      "Duration": 0.00028,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.DateControlsFutureActiveExpiredTagsAndBothTradeDirections(9,25,18)",
+      "Status": "Passed",
+      "Duration": 0.0002772,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.DateControlsFutureActiveExpiredTagsAndBothTradeDirections(10,23,20)",
+      "Status": "Passed",
+      "Duration": 0.0002928,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.DateControlsFutureActiveExpiredTagsAndBothTradeDirections(11,19,20)",
+      "Status": "Passed",
+      "Duration": 0.0003007,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.DateControlsFutureActiveExpiredTagsAndBothTradeDirections(12,23,20)",
+      "Status": "Passed",
+      "Duration": 0.0003076,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.DisclosedMarketContinuesAcrossYearAndRestoreWithoutReroll",
+      "Status": "Passed",
+      "Duration": 0.0011345,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.HalfYearOverlapAndClippingNeverShareOccupiedLane",
+      "Status": "Passed",
+      "Duration": 0.0042067,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.IncompatibleSchemaIsRejectedWithoutChangingSession",
+      "Status": "Passed",
+      "Duration": 0.0019387,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.InvalidSaveAndMiddaySaveAreRejectedRatherThanLosingInventory",
+      "Status": "Passed",
+      "Duration": 0.0007848,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.IsolatedMonthlyGenerationUsesTestConfigurationWithoutRerolls",
+      "Status": "Passed",
+      "Duration": 0.1352335,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.MarketsRevealOnlyOnStartTurnWithTheirWholeDurationAndStayVisibleInHistory",
+      "Status": "Passed",
+      "Duration": 0.0020947,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.MixedTradeUsesOnlyActiveMarketEffectsAndPreservesHistory(5,10,20,-10)",
+      "Status": "Passed",
+      "Duration": 0.0021536,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.MixedTradeUsesOnlyActiveMarketEffectsAndPreservesHistory(6,10,24,-14)",
+      "Status": "Passed",
+      "Duration": 0.0006172,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.MixedTradeUsesOnlyActiveMarketEffectsAndPreservesHistory(7,12,20,-8)",
+      "Status": "Passed",
+      "Duration": 0.0007049,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.MixedTradeUsesOnlyActiveMarketEffectsAndPreservesHistory(8,11,18,-7)",
+      "Status": "Passed",
+      "Duration": 0.0005867,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.MixedTradeUsesOnlyActiveMarketEffectsAndPreservesHistory(10,10,20,-10)",
+      "Status": "Passed",
+      "Duration": 0.0006135,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.MonthlyBoundaryAndRentAreSettledOnceAndRestored",
+      "Status": "Passed",
+      "Duration": 0.0010166,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.OverlapBasketUsesSameFiftyForBudgetIncomeAndActualSale",
+      "Status": "Passed",
+      "Duration": 0.001163,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.PurchaseHistoryCalendarAndRentSurviveJsonRestoreWithoutDuplicateEffects",
+      "Status": "Passed",
+      "Duration": 0.0022572,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.RestoredCustomerRandomSequenceIsUnaffectedByCalendarBrowsing",
+      "Status": "Passed",
+      "Duration": 0.0085384,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketCalendarTests.SameMarketTypeLeavesTwoFullTurnsAndBrowsingOrderDoesNotReroll",
+      "Status": "Passed",
+      "Duration": 0.1708752,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketContentTests.DraftsDoNotGenerateAndImportCannotRerollExistingSession",
+      "Status": "Passed",
+      "Duration": 0.2417096,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketContentTests.DuplicateIdAndReversedDurationAreRejected",
+      "Status": "Passed",
+      "Duration": 0.1630211,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketContentTests.InvalidDataBlocksImportWithoutAssetChanges(\"目标类别\",\"Unknown\")",
+      "Status": "Passed",
+      "Duration": 0.152182,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketContentTests.InvalidDataBlocksImportWithoutAssetChanges(\"最长持续回合\",\"0\")",
+      "Status": "Passed",
+      "Duration": 0.1568015,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketContentTests.InvalidDataBlocksImportWithoutAssetChanges(\"生成权重\",\"NaN\")",
+      "Status": "Passed",
+      "Duration": 0.1719234,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketContentTests.InvalidDataBlocksImportWithoutAssetChanges(\"交易方向\",\"Script\")",
+      "Status": "Passed",
+      "Duration": 0.1761351,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketContentTests.NewTypeControlsQuotesDurationsCooldownWeightAndSecretFromOnePool",
+      "Status": "Passed",
+      "Duration": 0.2646797,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketSecretTests.EmptyWindowGeneratesLegalEventAndLaterScheduleGenerationRespectsIt",
+      "Status": "Passed",
+      "Duration": 0.0008888,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketSecretTests.ExistingFutureEventIsRevealedWithFullDurationAcrossYearAndOnlyActsWhenActive",
+      "Status": "Passed",
+      "Duration": 0.000428,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.MarketSecretTests.NoLegalCombinationReturnsNothingAndLeavesScheduleUnchanged",
+      "Status": "Passed",
+      "Duration": 0.0002153,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NegotiationTests.AllPurchaseUsesCombinedSpaceAndFailureDoesNotBuyTheFirstItem",
+      "Status": "Passed",
+      "Duration": 0.3617759,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NegotiationTests.ConcessionNeedsCurrentExplicitApprovalAndRecordsOnlyActualIncome(18,7)",
+      "Status": "Passed",
+      "Duration": 0.0013964,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NegotiationTests.ConcessionNeedsCurrentExplicitApprovalAndRecordsOnlyActualIncome(0,25)",
+      "Status": "Passed",
+      "Duration": 0.0004911,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NegotiationTests.FinalNetRatherThanSaleSubtotalConsumesCustomerBudget",
+      "Status": "Passed",
+      "Duration": 0.0006479,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NegotiationTests.ManualSelectionOverridesAllAndOnlyTheSelectedCopyIsBought",
+      "Status": "Passed",
+      "Duration": 0.0008307,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NegotiationTests.MixedPositiveNegativeAndZeroNetSettleAtomically(10,25,-25,0)",
+      "Status": "Passed",
+      "Duration": 0.0012006,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NegotiationTests.MixedPositiveNegativeAndZeroNetSettleAtomically(35,0,0,0)",
+      "Status": "Passed",
+      "Duration": 0.0005415,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NegotiationTests.MixedPositiveNegativeAndZeroNetSettleAtomically(45,0,10,10)",
+      "Status": "Passed",
+      "Duration": 0.000465,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NegotiationTests.MovingBackCancellingAndNextCustomerNeverTransferUnboughtGoods",
+      "Status": "Passed",
+      "Duration": 0.0006541,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NegotiationTests.NetPlayerFundsGateTheWholeTrade(24,10,\"灵石不足\")",
+      "Status": "Passed",
+      "Duration": 0.0009064,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NegotiationTests.PriceChangesRefreshBothDirectionsAndConfirmedPurchaseHistoryIsStable",
+      "Status": "Passed",
+      "Duration": 0.0020737,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NegotiationTests.PriceOrBasketChangesInvalidateConcessionApproval",
+      "Status": "Passed",
+      "Duration": 0.0006038,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NegotiationTests.PureSaleDoesNotRequireBuyingCustomerGoods",
+      "Status": "Passed",
+      "Duration": 0.0004754,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NegotiationTests.WrongCategoryAndSignArePlacedButBlockMixedSettlement",
+      "Status": "Passed",
+      "Duration": 0.0005271,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.ClosedSnapshotKeepsItemRelationshipsQualityResourceAndProgress",
+      "Status": "Passed",
+      "Duration": 0.0026281,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.FailedSlotWritePreservesPreviouslySavedFile",
+      "Status": "Passed",
+      "Duration": 0.0196169,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.GeneratedTeaCommissionAndCalendarRestoreWithoutDrawingAgain",
+      "Status": "Passed",
+      "Duration": 0.0013491,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.InvalidSnapshotCannotChangeSourceSession(\"schema\")",
+      "Status": "Passed",
+      "Duration": 0.0010545,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.InvalidSnapshotCannotChangeSourceSession(\"duplicate\")",
+      "Status": "Passed",
+      "Duration": 0.0004591,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.InvalidSnapshotCannotChangeSourceSession(\"unknown\")",
+      "Status": "Passed",
+      "Duration": 0.0004631,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.InvalidSnapshotCannotChangeSourceSession(\"capacity\")",
+      "Status": "Passed",
+      "Duration": 0.000556,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.InvalidSnapshotCannotChangeSourceSession(\"quality\")",
+      "Status": "Passed",
+      "Duration": 0.0004274,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.RestoringNextMonthDoesNotReapplyRecoveryOrOverflow",
+      "Status": "Passed",
+      "Duration": 0.0009169,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.SaveGateRejectsBusinessCarryAndOpenFurnace",
+      "Status": "Passed",
+      "Duration": 0.0007145,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopAlchemyTests.ExactStaminaStartsOnceAndFailureChangesNoResource(20,True)",
+      "Status": "Passed",
+      "Duration": 0.0022911,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopAlchemyTests.ExactStaminaStartsOnceAndFailureChangesNoResource(19,False)",
+      "Status": "Passed",
+      "Duration": 0.0005849,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopAlchemyTests.ProductionEquipmentRejectsOrdinaryAndPortableStorageButKeepsEquipmentCompatibility",
+      "Status": "Passed",
+      "Duration": 0.0051078,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopAlchemyTests.StageAndDeviceGuardsKeepIdentityAndDisallowCrossMonthWork",
+      "Status": "Passed",
+      "Duration": 0.0015574,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopAlchemyTests.ThreeRecipesUseSameResidenceQualityAndEnergyWithOneShopCharge(\"recipe_pill_basic\",48)",
+      "Status": "Passed",
+      "Duration": 0.0058793,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopAlchemyTests.ThreeRecipesUseSameResidenceQualityAndEnergyWithOneShopCharge(\"recipe_pill_fire_yang\",48)",
+      "Status": "Passed",
+      "Duration": 0.0065799,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopAlchemyTests.ThreeRecipesUseSameResidenceQualityAndEnergyWithOneShopCharge(\"recipe_pill_metal_water\",104)",
+      "Status": "Passed",
+      "Duration": 0.000877,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopAlchemyTests.TwoManualBatchesChargeSeparatelyAndOutputMustBeRemoved",
+      "Status": "Passed",
+      "Duration": 0.0020133,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPricingTests.ActualPurchaseValueIsSixteenAndDoesNotChangeWithTagsOrLocation",
+      "Status": "Passed",
+      "Duration": 0.0015056,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPricingTests.DisplaySnapshotUsesBaseValuesAndDoesNotRecalculateFromQuotes",
+      "Status": "Passed",
+      "Duration": 0.0006897,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPricingTests.EveryBasketLineUsesLatestQuoteForValidationAndMoney",
+      "Status": "Passed",
+      "Duration": 0.0007778,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPricingTests.FullCounterSupplierCanBeSkippedWithoutFreeItemsOrStuckQueue",
+      "Status": "Passed",
+      "Duration": 0.0039924,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPricingTests.LowerBoundRoundingAndDirectionalTagsAreExplicit",
+      "Status": "Passed",
+      "Duration": 0.0008776,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPricingTests.ModifiersAddAndReplaceRatherThanMultiplyOrStackDuplicateIds",
+      "Status": "Passed",
+      "Duration": 0.0006304,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPricingTests.SettlementIncludesIncomeExpensesAndResetsOnlyOnNextDay",
+      "Status": "Passed",
+      "Duration": 0.0008309,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPricingTests.WarehouseBaseAndSaleMarkupUseDifferentContexts",
+      "Status": "Passed",
+      "Duration": 0.0005512,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.BudgetSixtyBuysThreePillsAsOneAtomicBasket",
+      "Status": "Passed",
+      "Duration": 0.0023463,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.BuyerCanBuyRepeatedlyUntilRemainingBudgetIsInsufficient(20,1,2)",
+      "Status": "Passed",
+      "Duration": 0.0015474,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.BuyerCanBuyRepeatedlyUntilRemainingBudgetIsInsufficient(40,2,4)",
+      "Status": "Passed",
+      "Duration": 0.000379,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.CategoryAttractionIsDeduplicatedAndSnapshotSurvivesDisplayChanges",
+      "Status": "Passed",
+      "Duration": 0.000613,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.CounterAcceptsPlayerGoodsButPreventsCustomerTheft",
+      "Status": "Passed",
+      "Duration": 0.0007646,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.CraftCanUseSpaceFreedByItsOwnIngredients",
+      "Status": "Passed",
+      "Duration": 0.119579,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.CraftFailsAtomicallyInFragmentedFullStorage",
+      "Status": "Passed",
+      "Duration": 0.1315663,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.DisplayActuallyDeterminesTradeDirection",
+      "Status": "Passed",
+      "Duration": 0.0009063,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.EmptyDisplayCanOpenButMissingIngredientsAndPrematureSleepFail",
+      "Status": "Passed",
+      "Duration": 0.0003685,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.FlippedLCanEnterPocketThatOriginalCannot",
+      "Status": "Passed",
+      "Duration": 0.0004277,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.FullStoragePreventsPurchaseAndKeepsCustomerOwnership",
+      "Status": "Passed",
+      "Duration": 0.1250759,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.InsufficientMoneyCannotConsumeSupplyOrChargeAnything",
+      "Status": "Passed",
+      "Duration": 0.0007331,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.InvalidDropAndRotationLeaveEveryItemUnchanged",
+      "Status": "Passed",
+      "Duration": 0.0004618,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.LongItemMustRotateAtBottomEdge",
+      "Status": "Passed",
+      "Duration": 0.0002937,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.MixedCategoryAndNonSaleBasketsDisableTheWholeSale",
+      "Status": "Passed",
+      "Duration": 0.0007864,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.PlayerGoodsMoveInEveryPhaseAndStayPlacedOnCustomerDeparture",
+      "Status": "Passed",
+      "Duration": 0.0005887,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.PreviewDoesNotConsumeRandomnessAndOpeningFreezesTheWholeQueue",
+      "Status": "Passed",
+      "Duration": 0.0021729,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.RemovingSignAfterOpeningKeepsSuppliersAndFullCounterCanBeCleared",
+      "Status": "Passed",
+      "Duration": 0.0148474,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.RotationAndReflectionHaveExpectedOccupiedCells",
+      "Status": "Passed",
+      "Duration": 0.0017695,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.SellingRequiresStagingAndCannotSettleTwice",
+      "Status": "Passed",
+      "Duration": 0.0005372,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.SleepChargesPeriodicRentAndNeverMakesNegativeMoney",
+      "Status": "Passed",
+      "Duration": 0.0006936,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.ThousandsOfRandomRearrangementsNeverLoseOrDuplicateItems",
+      "Status": "Passed",
+      "Duration": 0.1837135,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopSessionTests.TwoProcureCraftSellLoopsAndTwoDaysAreProfitable",
+      "Status": "Passed",
+      "Duration": 0.0024466,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.SpiritStoneTests.DynamicQuoteAndDisplayUseRemainingValueAndOpeningSnapshotStaysFixed",
+      "Status": "Passed",
+      "Duration": 0.0011708,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.SpiritStoneTests.ExhaustionShattersOnlyLowAndRefillKeepsReusableIdentity",
+      "Status": "Passed",
+      "Duration": 0.0008032,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.SpiritStoneTests.GradesCapacityAndIndependentAmountsAreNotWalletOrItemCount",
+      "Status": "Passed",
+      "Duration": 0.0014548,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.SpiritStoneTests.InvalidMutationsAndCustomerOwnershipLeaveStateUntouched",
+      "Status": "Passed",
+      "Duration": 0.0008233,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.SpiritStoneTests.PurchasedResourceRetainsHistoryThroughStorageCarryAndSave",
+      "Status": "Passed",
+      "Duration": 0.0011199,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.SpiritStoneTests.SaveRejectsInvalidResourceCountsAndPreservesEmptyShell",
+      "Status": "Passed",
+      "Duration": 0.0009745,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.StaminaTests.ConfigurableLimitsAndRecoveryDoNotStackMonthlyBonus",
+      "Status": "Passed",
+      "Duration": 0.0008961,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.StaminaTests.ExactCostReachesZeroInsufficientFailsAndBusinessRemainsAvailable",
+      "Status": "Passed",
+      "Duration": 0.0007811,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.StaminaTests.MonthlyRecoveryStrictOverflowAndOneExtraCustomer(0,30,False)",
+      "Status": "Passed",
+      "Duration": 0.0012473,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.StaminaTests.MonthlyRecoveryStrictOverflowAndOneExtraCustomer(70,100,False)",
+      "Status": "Passed",
+      "Duration": 0.0005511,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.StaminaTests.MonthlyRecoveryStrictOverflowAndOneExtraCustomer(71,100,True)",
+      "Status": "Passed",
+      "Duration": 0.0004925,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.StaminaTests.MonthlyRecoveryStrictOverflowAndOneExtraCustomer(90,100,True)",
+      "Status": "Passed",
+      "Duration": 0.0004814,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.StaminaTests.MonthlyRecoveryStrictOverflowAndOneExtraCustomer(100,100,True)",
+      "Status": "Passed",
+      "Duration": 0.0004782,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.StaminaTests.SaveRestoreRetainsRecoveryAndOneBonusWithoutRerollingQueue",
+      "Status": "Passed",
+      "Duration": 0.0024384,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.StorageTests.OccupiedOutOfBoundsNestingAndEquipmentRulesRejectWithoutMoving",
+      "Status": "Passed",
+      "Duration": 0.0014809,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.StorageTests.PurchasedContentsKeepHistoryWhenWarehouseIsFullAndAfterRestore",
+      "Status": "Passed",
+      "Duration": 0.1429881,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.StorageTests.TwoShapesRemainSameInstancesAfterBoxMovesAndSaveRestoresContents",
+      "Status": "Passed",
+      "Duration": 0.0016353,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.StoryRunnerTests.ChoiceBranchUsesPendingFlagsAndCommitsOnlyAtEnd(0,\"left\")",
+      "Status": "Passed",
+      "Duration": 0.0016826,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.StoryRunnerTests.ChoiceBranchUsesPendingFlagsAndCommitsOnlyAtEnd(1,\"right\")",
+      "Status": "Passed",
+      "Duration": 0.000487,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.StoryRunnerTests.LocationReturnsToSameContextAndCompletedSceneDoesNotReplayAfterLoad",
+      "Status": "Passed",
+      "Duration": 0.0016944,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.StoryRunnerTests.VisualAndConditionalChoicesCancelWithoutResults",
+      "Status": "Passed",
+      "Duration": 0.0008742,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.TeaHouseTests.InvalidSavedTeaTurnIsRejected",
+      "Status": "Passed",
+      "Duration": 0.0017545,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.TeaHouseTests.NewVisitDoesNotOverwriteTheCurrentMonthsPromotion",
+      "Status": "Passed",
+      "Duration": 0.0007664,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.TeaHouseTests.PromotionStacksWithStaminaOverflowAndDoesNotAppendOnPreview",
+      "Status": "Passed",
+      "Duration": 0.0007638,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.TeaHouseTests.SecretFailureRedrawsOtherEffectWithoutCreatingIllegalMarket",
+      "Status": "Passed",
+      "Duration": 0.0007714,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.TeaHouseTests.SecretResultAndScheduleAreStableAndDoNotAffectPricesEarly",
+      "Status": "Passed",
+      "Duration": 0.0014117,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.TeaHouseTests.WeightedResultAppliesOnlyNextTurnAndDoesNotChangeOnReadOrSave(BuyerTrend)",
+      "Status": "Passed",
+      "Duration": 0.0011977,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.TeaHouseTests.WeightedResultAppliesOnlyNextTurnAndDoesNotChangeOnReadOrSave(SupplierTrend)",
+      "Status": "Passed",
+      "Duration": 0.0008366,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.TeaHouseTests.WeightedResultAppliesOnlyNextTurnAndDoesNotChangeOnReadOrSave(Travellers)",
+      "Status": "Passed",
+      "Duration": 0.000827,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.TeaHouseTests.WeightedResultAppliesOnlyNextTurnAndDoesNotChangeOnReadOrSave(Promotion)",
+      "Status": "Passed",
+      "Duration": 0.0007491,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.TeaHouseTests.WeightedResultAppliesOnlyNextTurnAndDoesNotChangeOnReadOrSave(WealthyVisitor)",
+      "Status": "Passed",
+      "Duration": 0.0007362,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.TravelTests.CarryInstancesStayContinuousAndShopActionsAreBlockedWhileAway",
+      "Status": "Passed",
+      "Duration": 0.0022146,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.TravelTests.ConfirmedReturnConsumesOutingAndNextPreparationSaveCannotBypassPhaseGate",
+      "Status": "Passed",
+      "Duration": 0.0014997,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.TravelTests.DepartureRequiresThisTurnsBusinessToBeClosedAndDoesNotSpendOnFailure",
+      "Status": "Passed",
+      "Duration": 0.0012681,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.TravelTests.EntryPaysOnceAndVisitedOrUnaffordableLocationsCannotBeEntered",
+      "Status": "Passed",
+      "Duration": 0.0012565,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.TravelTests.NoAffordableOrUnlockedLocationsReturnsDirectlyWithoutSpending",
+      "Status": "Passed",
+      "Duration": 0.0015786,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.TravelTests.UnlockingDoesNotGrantStaminaAndCostsReadConfiguration",
+      "Status": "Passed",
+      "Duration": 0.0047148,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "status": "completed",
+  "duration": 59.74,
+  "summary": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.DefaultSessionAlchemyDevelopmentMenusPreserveProgressAndContinueBusiness",
+      "Status": "Passed",
+      "Duration": 21.5291763,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.DefaultSessionKeepsTeaCommissionsAndItemsAcrossContinuousMonths",
+      "Status": "Passed",
+      "Duration": 9.3276131,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.DefaultSessionOverflowDoesNotAccumulateExtraVisitors",
+      "Status": "Passed",
+      "Duration": 3.6694764,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.SavedAlchemyItemsLoadIntoFreshDefaultSessionWithStableIds",
+      "Status": "Passed",
+      "Duration": 25.1916712,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

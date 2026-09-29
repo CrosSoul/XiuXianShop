@@ -15,7 +15,7 @@ namespace XiuXianShop.Tests
         {
             yield return RestartWithTestCatalog(c=>
             {foreach(var e in c.teaHouse.effects)e.weight=e.effect==TeaEffect.Promotion?1:0;},48);
-            var s=shop.Session;
+            IsolateAlchemyTestMouse();var s=shop.Session;
             yield return CloseBusinessForOuting();yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");
             yield return Click("TravelLocation_tingfeng-teahouse");var result=s.LatestTeaVisit;
             Assert.That(result.effect,Is.EqualTo(TeaEffect.Promotion));Assert.That(s.Stamina,Is.EqualTo(40));
@@ -35,15 +35,15 @@ namespace XiuXianShop.Tests
             Assert.That(s.ValidateState(),Is.Null);LogAssert.NoUnexpectedReceived();
         }
 
-        [UnityTest,Category("DP48"),Category("DP27")]
+        [UnityTest,Category("DP48"),Category("DP27"),Category("DP66")]
         public IEnumerator SecretIsVisibleInCalendarBeforeStartWithoutApplyingItsPrice()
         {
             yield return RestartWithTestCatalog(c=>
             {
                 foreach(var e in c.teaHouse.effects)e.weight=e.effect==TeaEffect.MarketSecret?1000000:e.effect==TeaEffect.Promotion?1:0;
-                c.marketEvents=MarketCalendar.PrototypeDefinitions();
+                c.marketEvents=UnityEditor.AssetDatabase.LoadAssetAtPath<ShopCatalog>("Assets/Data/ShopCatalog.asset").marketEvents.Select(e=>e.Copy()).ToArray();
             },48);
-            var s=shop.Session;var before=s.Calendar.ActiveTags(1).Select(t=>t.id).ToArray();
+            IsolateAlchemyTestMouse();var s=shop.Session;var before=s.Calendar.ActiveTags(1).Select(t=>t.id).ToArray();
             yield return CloseBusinessForOuting();yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");yield return Click("TravelLocation_tingfeng-teahouse");
             Assert.That(s.LatestTeaVisit.effect,Is.EqualTo(TeaEffect.MarketSecret));var secret=s.Calendar.DisclosedEvents.Single();
             Assert.That(secret.startTurn,Is.InRange(3,13));Assert.That(s.Calendar.ActiveTags(1).Select(t=>t.id),Is.EqualTo(before));

@@ -1,0 +1,27 @@
+{
+  "status": "completed",
+  "duration": 5.0,
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.SecretIsVisibleInCalendarBeforeStartWithoutApplyingItsPrice",
+      "Status": "Passed",
+      "Duration": 2.1368056,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.TeaVisitReopensSameNewsAndPromotionChangesOnlyNextBusiness",
+      "Status": "Passed",
+      "Duration": 2.8299508,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

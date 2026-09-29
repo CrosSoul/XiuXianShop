@@ -1,0 +1,34 @@
+{
+  "status": "completed",
+  "duration": 6.95,
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.CommissionIsFixedAndPhysicalRewardsMustBeCarriedOrAbandoned",
+      "Status": "Passed",
+      "Duration": 2.707725,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.CurrencyCommissionPaysOnceAndNextMonthOffersNewCommission",
+      "Status": "Passed",
+      "Duration": 2.3730607,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.ExpandedReceivingAreaScrollsAndRewardsFitCarriedStorage",
+      "Status": "Passed",
+      "Duration": 1.8455968,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

@@ -54,6 +54,7 @@ namespace XiuXianShop
             previousFrameRate=Application.targetFrameRate;
             Application.runInBackground=true;
             Application.targetFrameRate=60;
+            LoadTooltipPreference();
             // Development unlocks extend only this Play session, never the saved catalog asset.
             runtimeCatalog=Instantiate(catalog);catalog=runtimeCatalog;
             Session=new ShopSession(catalog, customerSeed: CustomerSeed < 0 ? (int?)null : CustomerSeed);

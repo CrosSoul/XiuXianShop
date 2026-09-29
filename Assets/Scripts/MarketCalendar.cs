@@ -12,7 +12,10 @@ namespace XiuXianShop
         public string title;
         [TextArea] public string description;
         public PriceTag effect;
-        public MarketEventDefinition Copy() => new MarketEventDefinition { id=id, title=title, description=description, effect=effect.Copy() };
+        public bool enabled=true;
+        public float weight=1;
+        public int minimumDuration=1,maximumDuration=2,cooldownTurns=2;
+        public MarketEventDefinition Copy() => new MarketEventDefinition { id=id, title=title, description=description, effect=effect.Copy(),enabled=enabled,weight=weight,minimumDuration=minimumDuration,maximumDuration=maximumDuration,cooldownTurns=cooldownTurns };
     }
 
     [Serializable]
@@ -26,9 +29,10 @@ namespace XiuXianShop
         public PriceTag effect;
         public int Duration => endTurn-startTurn+1;
         public bool knownInAdvance;
+        public int cooldownTurns=2;
         public bool ActiveOn(int turn) => startTurn<=turn && turn<=endTurn;
         public string StatusOn(int turn) => turn<startTurn ? "未开始" : turn>endTurn ? "已结束" : "生效中";
-        public MarketEvent Copy() => new MarketEvent {id=id,title=title,description=description,startTurn=startTurn,endTurn=endTurn,effect=effect.Copy(),knownInAdvance=knownInAdvance};
+        public MarketEvent Copy() => new MarketEvent {id=id,title=title,description=description,startTurn=startTurn,endTurn=endTurn,effect=effect.Copy(),knownInAdvance=knownInAdvance,cooldownTurns=cooldownTurns};
     }
 
     [Serializable]
@@ -67,7 +71,7 @@ namespace XiuXianShop
         public MarketCalendar(MarketEventDefinition[] definitions, int seed)
         {
             this.seed=seed;
-            this.definitions=(definitions??Array.Empty<MarketEventDefinition>()).Select(d=>d.Copy()).ToArray();
+            this.definitions=(definitions??Array.Empty<MarketEventDefinition>()).Where(d=>d.enabled && d.weight>0).Select(d=>d.Copy()).ToArray();
         }
         public MarketCalendar(MarketCalendarState state)
         {
@@ -78,7 +82,7 @@ namespace XiuXianShop
             foreach(var year in state.generatedYears) {if(year<1 || !generatedYears.Add(year))throw new ArgumentException("市场年度记录重复或无效。");}
             foreach(var e in state.events)
             {
-                if(e==null || string.IsNullOrWhiteSpace(e.id) || e.startTurn<1 || e.Duration<1 || e.Duration>3 || e.effect==null ||
+                if(e==null || string.IsNullOrWhiteSpace(e.id) || e.startTurn<1 || e.Duration<1 || e.cooldownTurns<0 || e.effect==null ||
                     float.IsNaN(e.effect.percent) || float.IsInfinity(e.effect.percent) || Math.Abs(e.effect.percent)>100 || events.Any(x=>x.id==e.id))
                     throw new ArgumentException("市场事件记录无效或重复。");
                 events.Add(e.Copy());
@@ -102,19 +106,19 @@ namespace XiuXianShop
                 var candidates=new List<MarketEvent>();
                 foreach(var d in definitions)
                 for(int offset=0;offset<12;offset++)
-                for(int duration=1;duration<=TestMaximumDuration;duration++)
+                for(int duration=d.minimumDuration;duration<=d.maximumDuration;duration++)
                 {
                     int start=(year-1)*12+1+offset,end=start+duration-1;
                     // Stable effect IDs identify the market type, including saved events.
                     // Ending on turn 4 blocks turns 5 and 6; the earliest repeat is turn 7.
-                    if(!CanSchedule(d.id,start,end))continue;
+                    if(!CanSchedule(d,start,end))continue;
                     var effect=d.effect.Copy();effect.id=d.id;
                     candidates.Add(new MarketEvent {id=$"market:{year}:{i}",title=d.title,description=d.description,
-                        startTurn=start,endTurn=end,effect=effect});
+                        startTurn=start,endTurn=end,effect=effect,cooldownTurns=d.cooldownTurns});
                 }
                 // A small custom event pool may run out: never violate the cooldown to fill a quota.
                 if(candidates.Count==0)break;
-                events.Add(candidates[random.Next(candidates.Count)]);
+                events.Add(ChooseCandidate(candidates,random));
             }
         }
         public MarketEvent[] Between(int first,int last)

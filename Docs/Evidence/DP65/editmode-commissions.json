@@ -1,0 +1,160 @@
+{
+  "status": "completed",
+  "duration": 3.0,
+  "summary": {
+    "total": 21,
+    "passed": 21,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.ChangesTextWeightNewTemplatePoolAndGiftThroughImportWithoutCode",
+      "Status": "Passed",
+      "Duration": 0.5415808,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.DuplicateIdsBlockImport(\"templates\")",
+      "Status": "Passed",
+      "Duration": 0.2641491,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.DuplicateIdsBlockImport(\"pools\")",
+      "Status": "Passed",
+      "Duration": 0.2222759,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.DuplicateIdsBlockImport(\"members\")",
+      "Status": "Passed",
+      "Duration": 0.2222077,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.InvalidReferencesAndRangesBlockImport(\"templates\",\"奖励池ID\",\"unknown\")",
+      "Status": "Passed",
+      "Duration": 0.2543398,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.InvalidReferencesAndRangesBlockImport(\"members\",\"物品ID\",\"unknown\")",
+      "Status": "Passed",
+      "Duration": 0.2431107,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.InvalidReferencesAndRangesBlockImport(\"members\",\"权重\",\"NaN\")",
+      "Status": "Passed",
+      "Duration": 0.2372023,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.InvalidReferencesAndRangesBlockImport(\"pools\",\"实物抽取组\",\"bad:4:2\")",
+      "Status": "Passed",
+      "Duration": 0.2340825,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionContentTests.PreviewIsReadOnlyAndImportIdempotentWithFixedSavedCandidates",
+      "Status": "Passed",
+      "Duration": 0.280574,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.CandidatesAreDistinctFixedWeightedAndRefreshAfterMonth",
+      "Status": "Passed",
+      "Duration": 0.0073333,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.DataControlsNewTemplatesWeightsAndCandidateCount",
+      "Status": "Passed",
+      "Duration": 0.00087,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.FilledFloorDoesNotLoseRewardsAndLeavingRequiresConfirmation",
+      "Status": "Passed",
+      "Duration": 0.0142318,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.GiftChanceCountMembershipAndCurrencyRangesAreConfigurable",
+      "Status": "Passed",
+      "Duration": 0.0015538,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.InvalidCurrencyCapacityDoesNotPartiallyReward",
+      "Status": "Passed",
+      "Duration": 0.000448,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.NormalPoolsSettleOnceIntoLocationOrBalance(\"BSH-R01\",2,4,0,0)",
+      "Status": "Passed",
+      "Duration": 0.0051999,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.NormalPoolsSettleOnceIntoLocationOrBalance(\"BSH-R02\",1,3,0,0)",
+      "Status": "Passed",
+      "Duration": 0.0062509,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.NormalPoolsSettleOnceIntoLocationOrBalance(\"BSH-R03\",2,2,0,0)",
+      "Status": "Passed",
+      "Duration": 0.0124374,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.NormalPoolsSettleOnceIntoLocationOrBalance(\"BSH-R04\",0,0,6,10)",
+      "Status": "Passed",
+      "Duration": 0.0012639,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.NormalPoolsSettleOnceIntoLocationOrBalance(\"BSH-R05\",1,1,4,6)",
+      "Status": "Passed",
+      "Duration": 0.0026393,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.CommissionTests.NormalPoolsSettleOnceIntoLocationOrBalance(\"BSH-R06\",1,3,0,0)",
+      "Status": "Passed",
+      "Duration": 0.0029519,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.GeneratedTeaCommissionAndCalendarRestoreWithoutDrawingAgain",
+      "Status": "Passed",
+      "Duration": 0.0078162,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

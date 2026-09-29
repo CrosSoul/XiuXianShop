@@ -11,6 +11,16 @@ namespace XiuXianShop
         public AuthoredVisitItem[] visitItems = Array.Empty<AuthoredVisitItem>();
         public AuthoredScene[] scenes = Array.Empty<AuthoredScene>();
         public AuthoredNode[] nodes = Array.Empty<AuthoredNode>();
+        public CommissionConfigRow[] commissionGlobals = Array.Empty<CommissionConfigRow>();
+        public CommissionPoolRow[] commissionPools = Array.Empty<CommissionPoolRow>();
+        public CommissionMemberRow[] commissionMembers = Array.Empty<CommissionMemberRow>();
+        public CommissionTemplateRow[] commissionTemplates = Array.Empty<CommissionTemplateRow>();
+        public MarketContent[] marketEvents = Array.Empty<MarketContent>();
+        public RecipeMasterRow[] recipes = Array.Empty<RecipeMasterRow>();
+        public RecipeLineRow[] recipeLines = Array.Empty<RecipeLineRow>();
+        public AlchemyGlobalRow[] alchemyGlobals = Array.Empty<AlchemyGlobalRow>();
+        public AlchemyMaterialRow[] alchemyMaterials = Array.Empty<AlchemyMaterialRow>();
+        public AlchemyStepRow[] alchemySteps = Array.Empty<AlchemyStepRow>();
     }
 
     [Serializable] public abstract class AuthoredRecord

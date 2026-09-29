@@ -1,0 +1,5 @@
+行情名称,行情ID,说明,目标类别,交易方向,价格修正百分比,生成权重,最短持续回合,最长持续回合,冷却回合,数据状态,修改说明
+丹药求购潮,medicine-demand,药坊求购增多，丹药出售报价暂时上涨。,Medicine,PlayerSells,20%,1,1,2,2,待同步,迁移现有Unity原型测试值；非最终平衡
+丹药集中到货,medicine-supply,商队集中供货，丹药买卖报价暂时下降。,Medicine,Both,-10%,1,1,2,2,待同步,迁移现有Unity原型测试值；非最终平衡
+灵材丰收,materials-supply,灵材货源增加，收购材料报价暂时下降。,Material,PlayerBuys,-20%,1,1,2,2,待同步,迁移现有Unity原型测试值；非最终平衡
+法器行情升温,equipment-demand,装备交易需求增加，装备买卖报价暂时上涨。,Equipment,Both,20%,1,1,2,2,待同步,迁移现有Unity原型测试值；非最终平衡

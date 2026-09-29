@@ -131,7 +131,8 @@ namespace XiuXianShop.Tests
                         item=ingredients.First(i=>i.Definition.id==target.itemId);yield return ClickGridItem(item);
                         if(target.ground){yield return Click("AlchemyGrind");Assert.That(s.Alchemy.Locked);yield return new WaitUntil(()=>!s.Alchemy.Locked);}
                     }
-                    yield return new WaitUntil(()=>s.Alchemy.Time>=target.breaths*s.Catalog.alchemy.breathSeconds);
+                    double actionTime=target.kind==AlchemyEventKind.Ingredient?recipe.targets.First(t=>t.preloaded).residenceSeconds-target.residenceSeconds:target.breaths*s.Catalog.alchemy.breathSeconds;
+                yield return new WaitUntil(()=>s.Alchemy.Time>=actionTime);
                     if(item!=null)yield return Click("AlchemyAdd");
                     else if(target.kind==AlchemyEventKind.Heat)yield return Click("AlchemyHeat_"+target.heat);
                     else yield return Click("AlchemyCollect");

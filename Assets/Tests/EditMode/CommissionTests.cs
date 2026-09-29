@@ -69,7 +69,7 @@ namespace XiuXianShop.Tests
         {
             OnlyPool("BSH-R04");var settings=catalog.commissions;settings.extraGiftChance=1;settings.extraGiftCount=2;
             var moneyPool=settings.rewardPools.Single(p=>p.id=="BSH-R04");moneyPool.minimumMoney=13;moneyPool.maximumMoney=13;
-            settings.rewardPools.Single(p=>p.id=="BSH-R07").items[0].itemIds=new[]{"dew"};
+            settings.rewardPools.Single(p=>p.id=="BSH-R07").items[0].members=new[]{new CommissionMemberRow{itemId="dew"}};
             var s=Visit();Assert.That(s.CompleteCommission(s.CommissionCandidates.First().id));
             Assert.That(s.Money,Is.EqualTo(catalog.startingMoney+13));Assert.That(s.In(ContainerId.Location).Count(i=>i.Definition.id=="dew"),Is.EqualTo(2));
             Assert.That(s.CommissionResult,Does.Contain("意外谢礼 2 件"));

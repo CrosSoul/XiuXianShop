@@ -197,6 +197,138 @@ MonoBehaviour:
     salePrice: 0
     procurementSign: 0
     advertisedCategory: 2
+  - id: mat_fire_herb
+    title: "\u8D64\u708E\u8349"
+    category: 2
+    description: "DP58\u7070\u76D2\u5019\u9009\uFF0C\u5F62\u72B6\u4E0E\u4EF7\u683C\u4E3A\u53C2\u8003\u503C\uFF0C\u4E0D\u662F\u6B63\u5F0F\u6570\u636E\u540C\u6B65\u3002"
+    color: {r: 0.65, g: 0.65, b: 0.35, a: 1}
+    cells:
+    - {x: 0, y: 0}
+    - {x: 0, y: 1}
+    - {x: 1, y: 1}
+    baseValue: 5
+    spiritResource:
+      rid: -2
+    supplierAvailable: 0
+    storageSize: {x: 0, y: 0}
+    compatibleEquipmentIds: []
+    purchasePrice: 0
+    salePrice: 0
+    procurementSign: 0
+    advertisedCategory: 2
+  - id: mat_fire_fruit
+    title: "\u706B\u7075\u679C"
+    category: 2
+    description: "DP58\u7070\u76D2\u5019\u9009\uFF0C\u5F62\u72B6\u4E0E\u4EF7\u683C\u4E3A\u53C2\u8003\u503C\uFF0C\u4E0D\u662F\u6B63\u5F0F\u6570\u636E\u540C\u6B65\u3002"
+    color: {r: 0.65, g: 0.65, b: 0.35, a: 1}
+    cells:
+    - {x: 0, y: 0}
+    - {x: 1, y: 0}
+    baseValue: 9
+    spiritResource:
+      rid: -2
+    supplierAvailable: 0
+    storageSize: {x: 0, y: 0}
+    compatibleEquipmentIds: []
+    purchasePrice: 0
+    salePrice: 0
+    procurementSign: 0
+    advertisedCategory: 2
+  - id: mat_metal_herb
+    title: "\u91D1\u51DD\u8349"
+    category: 2
+    description: "DP58\u7070\u76D2\u5019\u9009\uFF0C\u5F62\u72B6\u4E0E\u4EF7\u683C\u4E3A\u53C2\u8003\u503C\uFF0C\u4E0D\u662F\u6B63\u5F0F\u6570\u636E\u540C\u6B65\u3002"
+    color: {r: 0.65, g: 0.65, b: 0.35, a: 1}
+    cells:
+    - {x: 0, y: 0}
+    - {x: 0, y: 1}
+    - {x: 1, y: 1}
+    baseValue: 5
+    spiritResource:
+      rid: -2
+    supplierAvailable: 0
+    storageSize: {x: 0, y: 0}
+    compatibleEquipmentIds: []
+    purchasePrice: 0
+    salePrice: 0
+    procurementSign: 0
+    advertisedCategory: 2
+  - id: mat_metal_fruit
+    title: "\u91D1\u7075\u679C"
+    category: 2
+    description: "DP58\u7070\u76D2\u5019\u9009\uFF0C\u5F62\u72B6\u4E0E\u4EF7\u683C\u4E3A\u53C2\u8003\u503C\uFF0C\u4E0D\u662F\u6B63\u5F0F\u6570\u636E\u540C\u6B65\u3002"
+    color: {r: 0.65, g: 0.65, b: 0.35, a: 1}
+    cells:
+    - {x: 0, y: 0}
+    - {x: 1, y: 0}
+    baseValue: 9
+    spiritResource:
+      rid: -2
+    supplierAvailable: 0
+    storageSize: {x: 0, y: 0}
+    compatibleEquipmentIds: []
+    purchasePrice: 0
+    salePrice: 0
+    procurementSign: 0
+    advertisedCategory: 2
+  - id: mat_water_fruit
+    title: "\u6C34\u7075\u679C"
+    category: 2
+    description: "DP58\u7070\u76D2\u5019\u9009\uFF0C\u5F62\u72B6\u4E0E\u4EF7\u683C\u4E3A\u53C2\u8003\u503C\uFF0C\u4E0D\u662F\u6B63\u5F0F\u6570\u636E\u540C\u6B65\u3002"
+    color: {r: 0.65, g: 0.65, b: 0.35, a: 1}
+    cells:
+    - {x: 0, y: 0}
+    - {x: 1, y: 0}
+    baseValue: 9
+    spiritResource:
+      rid: -2
+    supplierAvailable: 0
+    storageSize: {x: 0, y: 0}
+    compatibleEquipmentIds: []
+    purchasePrice: 0
+    salePrice: 0
+    procurementSign: 0
+    advertisedCategory: 2
+  - id: pill_fire_yang
+    title: "\u8D64\u9633\u4E39"
+    category: 1
+    description: "DP58\u7070\u76D2\u4EA7\u7269\uFF0C\u54C1\u76F8\u4FDD\u5B58\u5728\u5B9E\u4F8B\u4E0A\u3002"
+    color: {r: 0.9, g: 0.65, b: 0.3, a: 1}
+    cells:
+    - {x: 0, y: 0}
+    - {x: 1, y: 0}
+    - {x: 0, y: 1}
+    - {x: 1, y: 1}
+    baseValue: 48
+    spiritResource:
+      rid: -2
+    supplierAvailable: 0
+    storageSize: {x: 0, y: 0}
+    compatibleEquipmentIds: []
+    purchasePrice: 0
+    salePrice: 0
+    procurementSign: 0
+    advertisedCategory: 2
+  - id: pill_metal_water
+    title: "\u91D1\u6C34\u51DD\u5143\u4E39"
+    category: 1
+    description: "DP58\u7070\u76D2\u4EA7\u7269\uFF0C\u54C1\u76F8\u4FDD\u5B58\u5728\u5B9E\u4F8B\u4E0A\u3002"
+    color: {r: 0.9, g: 0.65, b: 0.3, a: 1}
+    cells:
+    - {x: 0, y: 0}
+    - {x: 1, y: 0}
+    - {x: 0, y: 1}
+    - {x: 1, y: 1}
+    baseValue: 72
+    spiritResource:
+      rid: -2
+    supplierAvailable: 0
+    storageSize: {x: 0, y: 0}
+    compatibleEquipmentIds: []
+    purchasePrice: 0
+    salePrice: 0
+    procurementSign: 0
+    advertisedCategory: 2
   startingItems:
   - sign
   - herb
@@ -427,10 +559,34 @@ MonoBehaviour:
       minimumMoney: 0
       maximumMoney: 0
       items:
-      - itemIds:
-        - herb
-        - dew
-        - cinnabar
+      - members:
+        - id: BSH-R01-group1-herb
+          enabled: 1
+          poolId: BSH-R01
+          groupId: group1
+          itemId: herb
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
+        - id: BSH-R01-group1-dew
+          enabled: 1
+          poolId: BSH-R01
+          groupId: group1
+          itemId: dew
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
+        - id: BSH-R01-group1-cinnabar
+          enabled: 1
+          poolId: BSH-R01
+          groupId: group1
+          itemId: cinnabar
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
         minimumCount: 2
         maximumCount: 4
     - id: BSH-R02
@@ -438,8 +594,16 @@ MonoBehaviour:
       minimumMoney: 0
       maximumMoney: 0
       items:
-      - itemIds:
-        - sword
+      - members:
+        - id: BSH-R02-group1-sword
+          enabled: 1
+          poolId: BSH-R02
+          groupId: group1
+          itemId: sword
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
         minimumCount: 1
         maximumCount: 3
     - id: BSH-R03
@@ -447,14 +611,46 @@ MonoBehaviour:
       minimumMoney: 0
       maximumMoney: 0
       items:
-      - itemIds:
-        - herb
-        - dew
-        - cinnabar
+      - members:
+        - id: BSH-R03-group1-herb
+          enabled: 1
+          poolId: BSH-R03
+          groupId: group1
+          itemId: herb
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
+        - id: BSH-R03-group1-dew
+          enabled: 1
+          poolId: BSH-R03
+          groupId: group1
+          itemId: dew
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
+        - id: BSH-R03-group1-cinnabar
+          enabled: 1
+          poolId: BSH-R03
+          groupId: group1
+          itemId: cinnabar
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
         minimumCount: 1
         maximumCount: 1
-      - itemIds:
-        - sword
+      - members:
+        - id: BSH-R03-group2-sword
+          enabled: 1
+          poolId: BSH-R03
+          groupId: group2
+          itemId: sword
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
         minimumCount: 1
         maximumCount: 1
     - id: BSH-R04
@@ -467,11 +663,43 @@ MonoBehaviour:
       minimumMoney: 4
       maximumMoney: 6
       items:
-      - itemIds:
-        - herb
-        - dew
-        - cinnabar
-        - sword
+      - members:
+        - id: BSH-R05-group1-herb
+          enabled: 1
+          poolId: BSH-R05
+          groupId: group1
+          itemId: herb
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
+        - id: BSH-R05-group1-dew
+          enabled: 1
+          poolId: BSH-R05
+          groupId: group1
+          itemId: dew
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
+        - id: BSH-R05-group1-cinnabar
+          enabled: 1
+          poolId: BSH-R05
+          groupId: group1
+          itemId: cinnabar
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
+        - id: BSH-R05-group1-sword
+          enabled: 1
+          poolId: BSH-R05
+          groupId: group1
+          itemId: sword
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
         minimumCount: 1
         maximumCount: 1
     - id: BSH-R06
@@ -479,11 +707,43 @@ MonoBehaviour:
       minimumMoney: 0
       maximumMoney: 0
       items:
-      - itemIds:
-        - herb
-        - dew
-        - cinnabar
-        - sword
+      - members:
+        - id: BSH-R06-group1-herb
+          enabled: 1
+          poolId: BSH-R06
+          groupId: group1
+          itemId: herb
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
+        - id: BSH-R06-group1-dew
+          enabled: 1
+          poolId: BSH-R06
+          groupId: group1
+          itemId: dew
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
+        - id: BSH-R06-group1-cinnabar
+          enabled: 1
+          poolId: BSH-R06
+          groupId: group1
+          itemId: cinnabar
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
+        - id: BSH-R06-group1-sword
+          enabled: 1
+          poolId: BSH-R06
+          groupId: group1
+          itemId: sword
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
         minimumCount: 1
         maximumCount: 3
     - id: BSH-R07
@@ -491,8 +751,16 @@ MonoBehaviour:
       minimumMoney: 0
       maximumMoney: 0
       items:
-      - itemIds:
-        - pill
+      - members:
+        - id: BSH-R07-group1-pill
+          enabled: 1
+          poolId: BSH-R07
+          groupId: group1
+          itemId: pill
+          note: "DP65\u8FC1\u79FB\uFF1A\u73B0\u6709Unity\u539F\u578B\u6210\u5458\uFF0C\u975E\u6700\u7EC8\u6279\u51C6\u5E73\u8861"
+          weight: 1
+          minimumCount: 1
+          maximumCount: 1
         minimumCount: 1
         maximumCount: 1
   alchemy:
@@ -521,82 +789,292 @@ MonoBehaviour:
     debugTimeScale: 1
     recipes:
     - id: recipe_pill_basic
-      title: "\u56DE\u6C14\u4E39"
+      title: "\u56DE\u6C14\u4E39\uFF5C\u57FA\u7840\u6F14\u793A\u914D\u65B9"
       productId: pill
       allowGrinding: 0
       allowHeatChange: 0
+      initialHeat: 1
+      steps:
+      - id: basic_01
+        enabled: 1
+        recipeId: recipe_pill_basic
+        action: "\u9884\u7F6E"
+        itemId: herb
+        state: "\u5B8C\u6574"
+        hint: "\u5F00\u7089\u524D\u5C06\u51DD\u6C14\u8349\u9884\u7F6E\u5165\u7089\u3002"
+        order: 1
+        heat: 1
+        furnaceSeconds: 0
+      - id: basic_02
+        enabled: 1
+        recipeId: recipe_pill_basic
+        action: "\u5F00\u7089"
+        itemId: 
+        state: 
+        hint: "\u4EE5\u4E2D\u706B\u5F00\u7089\u3002"
+        order: 2
+        heat: 1
+        furnaceSeconds: 0
+      - id: basic_03
+        enabled: 1
+        recipeId: recipe_pill_basic
+        action: "\u6295\u6599"
+        itemId: dew
+        state: "\u5B8C\u6574"
+        hint: "\u6295\u5165\u7075\u9732\u3002"
+        order: 3
+        heat: 1
+        furnaceSeconds: 0
+      - id: basic_04
+        enabled: 1
+        recipeId: recipe_pill_basic
+        action: "\u6536\u4E39"
+        itemId: 
+        state: 
+        hint: "\u5728\u4E24\u5473\u6750\u6599\u8FBE\u5230\u76EE\u6807\u5728\u7089\u65F6\u957F\u540E\u6536\u4E39\u3002"
+        order: 4
+        heat: 1
+        furnaceSeconds: 0
       targets:
       - kind: 0
         breaths: 0
         itemId: herb
         ground: 0
+        preloaded: 1
+        residenceSeconds: 16
         heat: 1
       - kind: 0
-        breaths: 1
+        breaths: 0
         itemId: dew
         ground: 0
+        preloaded: 0
+        residenceSeconds: 8
         heat: 1
       - kind: 2
         breaths: 2
         itemId: 
         ground: 0
+        preloaded: 0
+        residenceSeconds: 0
         heat: 1
     - id: recipe_pill_fire_yang
-      title: "\u8D64\u9633\u4E39"
+      title: "\u8D64\u9633\u4E39\uFF5C\u5019\u9009\u914D\u65B9"
       productId: pill_fire_yang
       allowGrinding: 1
       allowHeatChange: 0
+      initialHeat: 1
+      steps:
+      - id: fire_01
+        enabled: 1
+        recipeId: recipe_pill_fire_yang
+        action: "\u9884\u7F6E"
+        itemId: mat_fire_herb
+        state: "\u5B8C\u6574"
+        hint: "\u5F00\u7089\u524D\u9884\u7F6E\u8D64\u708E\u8349\u3002"
+        order: 1
+        heat: 1
+        furnaceSeconds: 0
+      - id: fire_02
+        enabled: 1
+        recipeId: recipe_pill_fire_yang
+        action: "\u5F00\u7089"
+        itemId: 
+        state: 
+        hint: "\u4EE5\u4E2D\u706B\u5F00\u7089\u3002"
+        order: 2
+        heat: 1
+        furnaceSeconds: 0
+      - id: fire_03
+        enabled: 1
+        recipeId: recipe_pill_fire_yang
+        action: "\u7814\u78E8"
+        itemId: mat_fire_fruit
+        state: "\u7814\u78E8"
+        hint: "\u5F00\u7089\u540E\u7ACB\u5373\u7814\u78E8\u706B\u7075\u679C\u3002"
+        order: 3
+        heat: 1
+        furnaceSeconds: 0
+      - id: fire_04
+        enabled: 1
+        recipeId: recipe_pill_fire_yang
+        action: "\u6295\u6599"
+        itemId: mat_fire_fruit
+        state: "\u7814\u78E8"
+        hint: "\u6295\u5165\u7814\u78E8\u540E\u7684\u706B\u7075\u679C\u3002"
+        order: 4
+        heat: 1
+        furnaceSeconds: 0
+      - id: fire_05
+        enabled: 1
+        recipeId: recipe_pill_fire_yang
+        action: "\u6536\u4E39"
+        itemId: 
+        state: 
+        hint: "\u6309\u6750\u6599\u76EE\u6807\u5728\u7089\u65F6\u957F\u6536\u4E39\u3002"
+        order: 5
+        heat: 1
+        furnaceSeconds: 0
       targets:
       - kind: 0
         breaths: 0
         itemId: mat_fire_herb
         ground: 0
+        preloaded: 1
+        residenceSeconds: 16
         heat: 1
       - kind: 0
-        breaths: 1
+        breaths: 0
         itemId: mat_fire_fruit
         ground: 1
+        preloaded: 0
+        residenceSeconds: 8
         heat: 1
       - kind: 2
         breaths: 2
         itemId: 
         ground: 0
+        preloaded: 0
+        residenceSeconds: 0
         heat: 1
     - id: recipe_pill_metal_water
-      title: "\u91D1\u6C34\u51DD\u5143\u4E39"
+      title: "\u91D1\u6C34\u51DD\u5143\u4E39\uFF5C\u5019\u9009\u914D\u65B9"
       productId: pill_metal_water
       allowGrinding: 1
       allowHeatChange: 1
+      initialHeat: 1
+      steps:
+      - id: mw_01
+        enabled: 1
+        recipeId: recipe_pill_metal_water
+        action: "\u9884\u7F6E"
+        itemId: mat_metal_herb
+        state: "\u5B8C\u6574"
+        hint: "\u5F00\u7089\u524D\u9884\u7F6E\u91D1\u51DD\u8349\u3002"
+        order: 1
+        heat: 1
+        furnaceSeconds: 0
+      - id: mw_02
+        enabled: 1
+        recipeId: recipe_pill_metal_water
+        action: "\u5F00\u7089"
+        itemId: 
+        state: 
+        hint: "\u4EE5\u4E2D\u706B\u5F00\u7089\u3002"
+        order: 2
+        heat: 1
+        furnaceSeconds: 0
+      - id: mw_03
+        enabled: 1
+        recipeId: recipe_pill_metal_water
+        action: "\u7814\u78E8"
+        itemId: mat_water_fruit
+        state: "\u7814\u78E8"
+        hint: "\u5148\u7814\u78E8\u6C34\u7075\u679C\u3002"
+        order: 3
+        heat: 1
+        furnaceSeconds: 0
+      - id: mw_04
+        enabled: 1
+        recipeId: recipe_pill_metal_water
+        action: "\u6295\u6599"
+        itemId: mat_water_fruit
+        state: "\u7814\u78E8"
+        hint: "\u6295\u5165\u7814\u78E8\u540E\u7684\u6C34\u7075\u679C\u3002"
+        order: 4
+        heat: 1
+        furnaceSeconds: 0
+      - id: mw_05
+        enabled: 1
+        recipeId: recipe_pill_metal_water
+        action: "\u8C03\u706B"
+        itemId: 
+        state: 
+        hint: "\u5207\u6362\u9AD8\u706B\u3002"
+        order: 5
+        heat: 2
+        furnaceSeconds: 8
+      - id: mw_06
+        enabled: 1
+        recipeId: recipe_pill_metal_water
+        action: "\u7814\u78E8"
+        itemId: mat_metal_fruit
+        state: "\u7814\u78E8"
+        hint: "\u9AD8\u706B\u9636\u6BB5\u7814\u78E8\u91D1\u7075\u679C\u3002"
+        order: 6
+        heat: 1
+        furnaceSeconds: 0
+      - id: mw_07
+        enabled: 1
+        recipeId: recipe_pill_metal_water
+        action: "\u6295\u6599"
+        itemId: mat_metal_fruit
+        state: "\u7814\u78E8"
+        hint: "\u6295\u5165\u7814\u78E8\u540E\u7684\u91D1\u7075\u679C\u3002"
+        order: 7
+        heat: 1
+        furnaceSeconds: 0
+      - id: mw_08
+        enabled: 1
+        recipeId: recipe_pill_metal_water
+        action: "\u8C03\u706B"
+        itemId: 
+        state: 
+        hint: "\u5207\u6362\u4F4E\u706B\u3002"
+        order: 8
+        heat: 0
+        furnaceSeconds: 24
+      - id: mw_09
+        enabled: 1
+        recipeId: recipe_pill_metal_water
+        action: "\u6536\u4E39"
+        itemId: 
+        state: 
+        hint: "\u6309\u4E09\u5473\u6750\u6599\u76EE\u6807\u5728\u7089\u65F6\u957F\u6536\u4E39\u3002"
+        order: 9
+        heat: 1
+        furnaceSeconds: 0
       targets:
       - kind: 0
         breaths: 0
         itemId: mat_metal_herb
         ground: 0
+        preloaded: 1
+        residenceSeconds: 32
         heat: 1
       - kind: 0
-        breaths: 1
+        breaths: 0
         itemId: mat_water_fruit
         ground: 1
+        preloaded: 0
+        residenceSeconds: 24
         heat: 1
       - kind: 1
         breaths: 1
         itemId: 
         ground: 0
+        preloaded: 0
+        residenceSeconds: 0
         heat: 2
       - kind: 0
-        breaths: 2
+        breaths: 0
         itemId: mat_metal_fruit
         ground: 1
+        preloaded: 0
+        residenceSeconds: 16
         heat: 1
       - kind: 1
         breaths: 3
         itemId: 
         ground: 0
+        preloaded: 0
+        residenceSeconds: 0
         heat: 0
       - kind: 2
         breaths: 4
         itemId: 
         ground: 0
+        preloaded: 0
+        residenceSeconds: 0
         heat: 1
   travelLocations:
   - id: baishitang
@@ -636,6 +1114,11 @@ MonoBehaviour:
       category: 1
       playerSells: 1
       playerBuys: 0
+    enabled: 1
+    weight: 1
+    minimumDuration: 1
+    maximumDuration: 2
+    cooldownTurns: 2
   - id: medicine-supply
     title: "\u4E39\u836F\u96C6\u4E2D\u5230\u8D27"
     description: "\u5546\u961F\u96C6\u4E2D\u4F9B\u8D27\uFF0C\u4E39\u836F\u4E70\u5356\u62A5\u4EF7\u6682\u65F6\u4E0B\u964D\u3002"
@@ -646,6 +1129,11 @@ MonoBehaviour:
       category: 1
       playerSells: 1
       playerBuys: 1
+    enabled: 1
+    weight: 1
+    minimumDuration: 1
+    maximumDuration: 2
+    cooldownTurns: 2
   - id: materials-supply
     title: "\u7075\u6750\u4E30\u6536"
     description: "\u7075\u6750\u8D27\u6E90\u589E\u52A0\uFF0C\u6536\u8D2D\u6750\u6599\u62A5\u4EF7\u6682\u65F6\u4E0B\u964D\u3002"
@@ -656,6 +1144,11 @@ MonoBehaviour:
       category: 2
       playerSells: 0
       playerBuys: 1
+    enabled: 1
+    weight: 1
+    minimumDuration: 1
+    maximumDuration: 2
+    cooldownTurns: 2
   - id: equipment-demand
     title: "\u6CD5\u5668\u884C\u60C5\u5347\u6E29"
     description: "\u88C5\u5907\u4EA4\u6613\u9700\u6C42\u589E\u52A0\uFF0C\u88C5\u5907\u4E70\u5356\u62A5\u4EF7\u6682\u65F6\u4E0A\u6DA8\u3002"
@@ -666,6 +1159,11 @@ MonoBehaviour:
       category: 3
       playerSells: 1
       playerBuys: 1
+    enabled: 1
+    weight: 1
+    minimumDuration: 1
+    maximumDuration: 2
+    cooldownTurns: 2
   rentPeriod: 6
   firstRent: 20
   references:

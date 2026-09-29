@@ -136,6 +136,9 @@ namespace XiuXianShop
         // Used once by the scene builder. The resulting asset is editable in Inspector.
         public void SetPrototypeDefaults()
         {
+            commissions.templates=CommissionVerification.Templates();
+            commissions.rewardPools=CommissionVerification.Pools();
+            alchemy.recipes=AlchemyRecipeVerification.Recipes();
             priceModelVersion=1;
             items = new[]
             {

@@ -116,7 +116,8 @@ namespace XiuXianShop
             if(a==null){alchemyStatus.text="未开炉 · 中火\n"+Session.Message;return;}
             var cfg=Session.Catalog.alchemy;
             string Title(AlchemyTarget t)=>t.kind==AlchemyEventKind.Ingredient?Session.Catalog.Find(t.itemId).title+(t.ground?"（研磨）":""):t.kind==AlchemyEventKind.Heat?"换"+AlchemySettings.HeatName(t.heat):"收丹";
-            alchemyRecipeText.text=string.Join(" → ",a.Recipe.targets.Select(t=>$"{t.breaths:0.#}炉息 {Title(t)}"));
+            alchemyRecipeText.text=a.Recipe.steps.Length>0?string.Join(" → ",a.Recipe.steps.Select(t=>t.hint)):
+                string.Join(" → ",a.Recipe.targets.Select(t=>t.kind==AlchemyEventKind.Ingredient?$"{Title(t)} 在炉{t.residenceSeconds:0.#}s":$"{t.breaths:0.#}炉息 {Title(t)}"));
             var fuel=Session.In(ContainerId.AlchemyFuel).FirstOrDefault();
             var selected=Session.Find(selectedId);
             alchemyGrinding.text=a.Locked?$"研磨中 · 剩余 {a.GrindingRemaining:0.0}s":Session.IsAlchemyGround(selectedId)?"已研磨":"";

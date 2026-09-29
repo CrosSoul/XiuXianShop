@@ -20,7 +20,7 @@ namespace XiuXianShop.Tests
                 foreach(var t in c.commissions.templates)t.rewardPoolId="BSH-R04";
                 c.commissions.extraGiftChance=1;
             },51);
-            var s=shop.Session;var pack=s.PortableStorage.Single();
+            IsolateAlchemyTestMouse();var s=shop.Session;var pack=s.PortableStorage.Single();
             yield return CloseBusinessForOuting();yield return Click("CarryOpen");yield return Click("CarryOption_"+pack.Id);yield return Click("CarryConfirm");
             yield return Click("TravelBegin");yield return Click("TravelLocation_baishitang");
             for(int i=0;i<24;i++)Assert.That(s.AddLocationItem("dew"));
@@ -48,10 +48,10 @@ namespace XiuXianShop.Tests
             yield return RestartWithTestCatalog(c=>{
                 foreach(var t in c.commissions.templates)t.rewardPoolId="BSH-R01";
                 var group=c.commissions.rewardPools.Single(p=>p.id=="BSH-R01").items[0];
-                group.minimumCount=3;group.maximumCount=3;group.itemIds=new[]{"dew"};
+                group.minimumCount=3;group.maximumCount=3;group.members=new[]{new CommissionMemberRow{itemId="dew"}};
                 c.commissions.extraGiftChance=1;
             },49);
-            var s=shop.Session;int initial=s.Items.Count;
+            IsolateAlchemyTestMouse();var s=shop.Session;int initial=s.Items.Count;
             yield return CloseBusinessForOuting();yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");yield return Click("TravelLocation_baishitang");
             var candidates=s.CommissionCandidates.Select(t=>t.id).ToArray();Assert.That(candidates.Length,Is.EqualTo(3));
             for(int i=0;i<2;i++)
@@ -81,7 +81,7 @@ namespace XiuXianShop.Tests
                 foreach(var t in c.commissions.templates){t.rewardPoolId="BSH-R04";t.title="抄录测试";t.description="配置文案";t.rewardHint="少量经营货币";}
                 c.commissions.extraGiftChance=0;
             },50);
-            var s=shop.Session;int money=s.Money,count=s.Items.Count;
+            IsolateAlchemyTestMouse();var s=shop.Session;int money=s.Money,count=s.Items.Count;
             yield return CloseBusinessForOuting();yield return Click("CarryOpen");yield return Click("CarryConfirm");yield return Click("TravelBegin");yield return Click("TravelLocation_baishitang");
             yield return Click("CommissionOpen");
             Assert.That(shop.GetComponentsInChildren<Text>().Any(t=>t.text=="配置文案"));

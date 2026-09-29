@@ -1,0 +1,300 @@
+{
+  "status": "completed",
+  "duration": 4.4,
+  "summary": {
+    "total": 41,
+    "passed": 41,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyContentTests.BaselineHasOnlyThreeRecipesAndNoSpiritStoneIngredient",
+      "Status": "Passed",
+      "Duration": 0.3580207,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyContentTests.ImportedGrindDurationAffectsBothEntrances(False)",
+      "Status": "Passed",
+      "Duration": 0.4913902,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyContentTests.ImportedGrindDurationAffectsBothEntrances(True)",
+      "Status": "Passed",
+      "Duration": 0.358222,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyContentTests.InvalidReferencesOrdersAndActionsDoNotMutateAssets(\"recipe-lines\",\"条目ID\",\"物品ID\",\"unknown\")",
+      "Status": "Passed",
+      "Duration": 0.2476258,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyContentTests.InvalidReferencesOrdersAndActionsDoNotMutateAssets(\"alchemy-materials\",\"条目ID\",\"配方ID\",\"unknown\")",
+      "Status": "Passed",
+      "Duration": 0.249052,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyContentTests.InvalidReferencesOrdersAndActionsDoNotMutateAssets(\"alchemy-materials\",\"条目ID\",\"投料顺序\",\"2\")",
+      "Status": "Passed",
+      "Duration": 0.2529377,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyContentTests.InvalidReferencesOrdersAndActionsDoNotMutateAssets(\"alchemy-steps\",\"步骤ID\",\"步骤ID\",\"basic_02\")",
+      "Status": "Passed",
+      "Duration": 0.2559975,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyContentTests.InvalidReferencesOrdersAndActionsDoNotMutateAssets(\"alchemy-steps\",\"步骤ID\",\"动作类型\",\"Script\")",
+      "Status": "Passed",
+      "Duration": 0.2516845,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyContentTests.ResidenceAndQualityValueChangesReachBothEntrances(False)",
+      "Status": "Passed",
+      "Duration": 0.3842117,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyContentTests.ResidenceAndQualityValueChangesReachBothEntrances(True)",
+      "Status": "Passed",
+      "Duration": 0.3737858,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyContentTests.StateRequirementAndHeatStepsAreImported",
+      "Status": "Passed",
+      "Duration": 0.3844746,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.CollectionScoresEachResidenceOnceAndPreloadingDoesNotEarnPerfectScore",
+      "Status": "Passed",
+      "Duration": 0.00642,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.FirstIngredientMustPrecedeIgnitionAndMissingIngredientIsReported",
+      "Status": "Passed",
+      "Duration": 0.0028831,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.GrindingLocksRecipeAndMovesAndUnpreparedMaterialCannotBeAdded",
+      "Status": "Passed",
+      "Duration": 0.0029029,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.HighHeatDelayConsumesMoreAndAbortKeepsUnspentMaterials",
+      "Status": "Passed",
+      "Duration": 0.0064376,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.PendingStoryPausesFurnaceClockAndFuelUntilReturn",
+      "Status": "Passed",
+      "Duration": 0.0177754,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.QualityIsInstanceValueBeforeMarketTags(8,16,Superior,1.5d)",
+      "Status": "Passed",
+      "Duration": 0.0071894,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.QualityIsInstanceValueBeforeMarketTags(9,16,Good,1.2d)",
+      "Status": "Passed",
+      "Duration": 0.0019525,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.QualityIsInstanceValueBeforeMarketTags(11,17,Ordinary,1)",
+      "Status": "Passed",
+      "Duration": 0.0020984,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.QualityIsInstanceValueBeforeMarketTags(11,20,Ruined,0)",
+      "Status": "Passed",
+      "Duration": 0.0022978,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ResidenceWindowBoundariesAreInclusive(7.5d,1.0f)",
+      "Status": "Passed",
+      "Duration": 0.0018813,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ResidenceWindowBoundariesAreInclusive(8.5d,1.0f)",
+      "Status": "Passed",
+      "Duration": 0.0014218,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ResidenceWindowBoundariesAreInclusive(6,0.6f)",
+      "Status": "Passed",
+      "Duration": 0.0013204,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ResidenceWindowBoundariesAreInclusive(10,0.6f)",
+      "Status": "Passed",
+      "Duration": 0.00146,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ResidenceWindowBoundariesAreInclusive(5.9d,0.0f)",
+      "Status": "Passed",
+      "Duration": 0.0055193,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ResidenceWindowBoundariesAreInclusive(10.1d,0.0f)",
+      "Status": "Passed",
+      "Duration": 0.0127231,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.StructureErrorsCannotBeCancelledByPerfectTiming",
+      "Status": "Passed",
+      "Duration": 0.0018312,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.SupplyExhaustionStopsAtAvailableEnergyAndPreservesReusableShell",
+      "Status": "Passed",
+      "Duration": 0.0033607,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ThreeRecipesFinishWithOriginalInstancesAndNoSecondStaminaCost(\"recipe_pill_basic\",48)",
+      "Status": "Passed",
+      "Duration": 0.0066127,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ThreeRecipesFinishWithOriginalInstancesAndNoSecondStaminaCost(\"recipe_pill_fire_yang\",48)",
+      "Status": "Passed",
+      "Duration": 0.0021715,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.ThreeRecipesFinishWithOriginalInstancesAndNoSecondStaminaCost(\"recipe_pill_metal_water\",104)",
+      "Status": "Passed",
+      "Duration": 0.0027359,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.TooLittleEnergyAndBlockedOutputDoNotStartOrConsume",
+      "Status": "Passed",
+      "Duration": 0.0025969,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.AlchemyTests.TwoStructureErrorsRuin",
+      "Status": "Passed",
+      "Duration": 0.0027501,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopAlchemyTests.ExactStaminaStartsOnceAndFailureChangesNoResource(20,True)",
+      "Status": "Passed",
+      "Duration": 0.0045859,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopAlchemyTests.ExactStaminaStartsOnceAndFailureChangesNoResource(19,False)",
+      "Status": "Passed",
+      "Duration": 0.0005689,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopAlchemyTests.ProductionEquipmentRejectsOrdinaryAndPortableStorageButKeepsEquipmentCompatibility",
+      "Status": "Passed",
+      "Duration": 0.0015572,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopAlchemyTests.StageAndDeviceGuardsKeepIdentityAndDisallowCrossMonthWork",
+      "Status": "Passed",
+      "Duration": 0.0040601,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopAlchemyTests.ThreeRecipesUseSameResidenceQualityAndEnergyWithOneShopCharge(\"recipe_pill_basic\",48)",
+      "Status": "Passed",
+      "Duration": 0.0034872,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopAlchemyTests.ThreeRecipesUseSameResidenceQualityAndEnergyWithOneShopCharge(\"recipe_pill_fire_yang\",48)",
+      "Status": "Passed",
+      "Duration": 0.0011865,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopAlchemyTests.ThreeRecipesUseSameResidenceQualityAndEnergyWithOneShopCharge(\"recipe_pill_metal_water\",104)",
+      "Status": "Passed",
+      "Duration": 0.0011947,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopAlchemyTests.TwoManualBatchesChargeSeparatelyAndOutputMustBeRemoved",
+      "Status": "Passed",
+      "Duration": 0.0138679,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

@@ -31,7 +31,10 @@ namespace XiuXianShop.Tests
             var slotLabel=shop.GetComponentsInChildren<UnityEngine.UI.Text>().Single(t=>t.name=="SaveSlotInfo_1").text;
             Assert.That(slotLabel,Does.Contain("1 年 1 月").And.Contain("营业准备").And.Not.Contain("保存时间缺失"));
             yield return Click("SystemResume");yield return Click("BeginBusiness");shop.OpenSystemMenu();Assert.That(shop.FindButton("SaveSlot_2").interactable,Is.False);
-            yield return Click("SystemResume");yield return Click("EndBusiness");shop.OpenSystemMenu();Assert.That(shop.FindButton("SaveSlot_2").interactable);
+            yield return Click("SystemResume");
+            if(shop.Session.PendingVisitScene!=null)Assert.That(shop.CanSaveGame(out _),Is.False);
+            while(shop.Session.PendingVisitScene!=null)yield return Click("VisitSceneContinue");
+            yield return Click("EndBusiness");shop.OpenSystemMenu();Assert.That(shop.FindButton("SaveSlot_2").interactable);
             yield return Click("SaveSlot_2");Assert.That(JsonUtility.FromJson<ShopSave>(shop.SaveSlots.Read(2)).phase,Is.EqualTo(TurnPhase.Closed));
             yield return Click("SystemResume");yield return Click("AdvanceTurn");int stamina=shop.Session.Stamina,count=shop.Session.CustomerCountThisTurn;
             var auto=JsonUtility.FromJson<ShopSave>(shop.SaveSlots.Read(0));Assert.That(auto.turn,Is.EqualTo(2));Assert.That(auto.phase,Is.EqualTo(TurnPhase.Preparation));

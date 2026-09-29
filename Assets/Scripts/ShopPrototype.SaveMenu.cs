@@ -28,7 +28,7 @@ namespace XiuXianShop
         {
             CloseSystemMenu();
             systemMenu=Rect(content,"SystemMenu",0,0,1600,1000);Image(systemMenu,new Color(.02f,.035f,.04f),true);
-            Label(systemMenu,"SystemTitle",210,120,1180,50,"系统菜单 · 保存 / 读取",30,gold);
+            Label(systemMenu,"SystemTitle",210,120,1180,50,"系统菜单",30,gold);
             bool canSave=CanSaveGame(out string reason);
             Label(systemMenu,"SaveAvailability",210,190,1180,65,canSave?"当前为安全存档点。读取会替换当前未保存进度。":reason,21,textColor);
             for(int slot=0;slot<=manualSaveSlotCount;slot++)
@@ -53,6 +53,7 @@ namespace XiuXianShop
             }
             Label(systemMenu,"SaveMenuMessage",210,710,1150,65,saveMenuMessage??"",20,gold);
             CarryButton(systemMenu,"SystemResume",210,825,280,"继续游戏 / Esc",CloseSystemMenu);
+            CarryButton(systemMenu,"SystemSettings",610,825,280,"设置",OpenSettings);
             CarryButton(systemMenu,"SystemQuit",1010,825,280,"退出",()=>ShowSaveConfirmation("退出将丢失未保存进度。",()=>{
 #if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying=false;

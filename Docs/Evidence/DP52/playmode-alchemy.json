@@ -1,0 +1,90 @@
+{
+  "status": "completed",
+  "duration": 213.37,
+  "summary": {
+    "total": 11,
+    "passed": 11,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.AlchemySharedHoverCoversCarryPreparationFuelAndGroundState",
+      "Status": "Passed",
+      "Duration": 15.0609361,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.AlchemyTooltipAcceptsRuntimeDelayOptions",
+      "Status": "Passed",
+      "Duration": 3.8171181,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.BasicAlchemyWithActualGridAndButtons",
+      "Status": "Passed",
+      "Duration": 11.0600169,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.ComplexAlchemyWithActualGridAndButtons",
+      "Status": "Passed",
+      "Duration": 18.0307209,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.DefaultSessionAlchemyDevelopmentMenusPreserveProgressAndContinueBusiness",
+      "Status": "Passed",
+      "Duration": 20.9214297,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.GroundAlchemyWithActualGridAndButtons",
+      "Status": "Passed",
+      "Duration": 9.9219011,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.SavedAlchemyItemsLoadIntoFreshDefaultSessionWithStableIds",
+      "Status": "Passed",
+      "Duration": 25.1372903,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.ShopAlchemyWindowKeepsMainGridAndLoadedInstancesOnReopenAndFailedDrops",
+      "Status": "Passed",
+      "Duration": 3.8158749,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.ShopBasicAlchemyTwoBatchesAndNextMonth",
+      "Status": "Passed",
+      "Duration": 42.2902642,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.ShopComplexAlchemyUsesSameKernel",
+      "Status": "Passed",
+      "Duration": 39.7814102,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.ShopGroundAlchemyUsesSameKernel",
+      "Status": "Passed",
+      "Duration": 23.5208264,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

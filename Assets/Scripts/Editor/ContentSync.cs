@@ -11,6 +11,7 @@ namespace XiuXianShop.Editor
     {
         public int formatVersion;
         public string snapshotId, description;
+        public string[] domains;
     }
     public sealed class ContentSyncPlan : IDisposable
     {
@@ -19,6 +20,7 @@ namespace XiuXianShop.Editor
         internal readonly Dictionary<string,ContentRow> rows=new Dictionary<string,ContentRow>();
         internal readonly Dictionary<string,string> inputs=new Dictionary<string,string>();
         internal ShopCatalog catalog;
+        internal ShopCatalog stagedCatalog;
         internal AuthoredContent target,staged;
         internal string previousJson,catalogJson;
         public ContentSnapshotInfo Snapshot {get;internal set;}
@@ -29,7 +31,7 @@ namespace XiuXianShop.Editor
             rows.TryGetValue(table+"/"+id,out var row);
             issues.Add(new ContentIssue{table=table,id=id,field=field,reason=reason,line=row?.line??0,error=true});
         }
-        public void Dispose(){if(staged!=null)UnityEngine.Object.DestroyImmediate(staged);}
+        public void Dispose(){if(staged!=null)UnityEngine.Object.DestroyImmediate(staged);if(stagedCatalog!=null)UnityEngine.Object.DestroyImmediate(stagedCatalog);}
     }
     public static class ContentSync
     {
@@ -42,6 +44,7 @@ namespace XiuXianShop.Editor
             if(catalog==null || target==null){plan.Error("配置","","Catalog","需要现有 ShopCatalog 与其内容资产引用。");return plan;}
             plan.previousJson=EditorJsonUtility.ToJson(target);plan.catalogJson=EditorJsonUtility.ToJson(catalog);
             plan.staged=UnityEngine.Object.Instantiate(target);plan.staged.name=target.name;
+            plan.stagedCatalog=UnityEngine.Object.Instantiate(catalog);plan.stagedCatalog.name=catalog.name;
             string Read(string name)
             {
                 string path=Path.Combine(directory,name);
@@ -56,7 +59,7 @@ namespace XiuXianShop.Editor
                 if(plan.Snapshot==null || plan.Snapshot.formatVersion!=1 || string.IsNullOrWhiteSpace(plan.Snapshot.snapshotId))
                     plan.Error("snapshot.json","","snapshotId / formatVersion","需要非空快照标识与 formatVersion=1。");
             }
-            var adapters=ContentDomainAdapter.CreateDefaults();
+            var adapters=ContentDomainAdapter.CreateFor(plan.Snapshot?.domains,plan);
             foreach(var adapter in adapters)
             {
                 string csv=Read(adapter.FileName);if(csv!=null)adapter.Stage(plan,csv);
@@ -77,19 +80,25 @@ namespace XiuXianShop.Editor
             // One target asset is committed only after every domain passed. Never apply rows piecemeal.
             plan.staged.lastSnapshotId=plan.Snapshot.snapshotId;
             plan.staged.lastImportedAtUtc=plan.target.lastImportedAtUtc;
-            if(EditorJsonUtility.ToJson(plan.staged)==plan.previousJson)return false;
+            bool catalogChanged=EditorJsonUtility.ToJson(plan.stagedCatalog)!=plan.catalogJson;
+            if(catalogChanged && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(plan.catalog)))throw new InvalidOperationException("配置导入目标须为已保存的 Catalog 资产。");
+            if(EditorJsonUtility.ToJson(plan.staged)==plan.previousJson && !catalogChanged)return false;
             plan.staged.lastImportedAtUtc=DateTime.UtcNow.ToString("O");
             Undo.RecordObject(plan.target,"Import authored content");
+            if(catalogChanged)Undo.RecordObject(plan.catalog,"Import gameplay configuration");
             try
             {
                 EditorUtility.CopySerialized(plan.staged,plan.target);EditorUtility.SetDirty(plan.target);AssetDatabase.SaveAssetIfDirty(plan.target);
+                if(catalogChanged){EditorUtility.CopySerialized(plan.stagedCatalog,plan.catalog);EditorUtility.SetDirty(plan.catalog);AssetDatabase.SaveAssetIfDirty(plan.catalog);}
             }
             catch
             {
-                EditorJsonUtility.FromJsonOverwrite(plan.previousJson,plan.target);EditorUtility.SetDirty(plan.target);AssetDatabase.SaveAssetIfDirty(plan.target);throw;
+                EditorJsonUtility.FromJsonOverwrite(plan.previousJson,plan.target);EditorUtility.SetDirty(plan.target);AssetDatabase.SaveAssetIfDirty(plan.target);
+                if(catalogChanged){EditorJsonUtility.FromJsonOverwrite(plan.catalogJson,plan.catalog);EditorUtility.SetDirty(plan.catalog);AssetDatabase.SaveAssetIfDirty(plan.catalog);}throw;
             }
             // Repeated Import of this exact reviewed plan is also a no-op.
             plan.previousJson=EditorJsonUtility.ToJson(plan.target);
+            plan.catalogJson=EditorJsonUtility.ToJson(plan.catalog);
             return true;
         }
     }

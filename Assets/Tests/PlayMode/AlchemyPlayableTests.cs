@@ -94,7 +94,7 @@ namespace XiuXianShop.Tests
 
         IEnumerator PlayAlchemy(string recipeId)
         {
-            yield return RestartWithTestCatalog(c=>{AlchemyVerification.Configure(c);c.alchemy.debugTimeScale=2;},58);
+            yield return RestartWithTestCatalog(c=>{AlchemyVerification.Configure(c);c.alchemy=JsonUtility.FromJson<AlchemySettings>(JsonUtility.ToJson(UnityEditor.AssetDatabase.LoadAssetAtPath<ShopCatalog>("Assets/Data/ShopCatalog.asset").alchemy));c.alchemy.debugTimeScale=2;},58);
             IsolateAlchemyTestMouse();
             var s=shop.Session;var recipe=s.Catalog.alchemy.recipes.Single(r=>r.id==recipeId);
             var pack=s.PortableStorage.Single();yield return CloseBusinessForOuting();Assert.That(s.BeginCarrying(pack.Id));
@@ -120,7 +120,8 @@ namespace XiuXianShop.Tests
                         Assert.That(s.CollectAlchemy(),Is.False);yield return new WaitUntil(()=>!s.Alchemy.Locked);
                     }
                 }
-                yield return new WaitUntil(()=>s.Alchemy.Time>=target.breaths*s.Catalog.alchemy.breathSeconds);
+                double actionTime=target.kind==AlchemyEventKind.Ingredient?recipe.targets.First(t=>t.preloaded).residenceSeconds-target.residenceSeconds:target.breaths*s.Catalog.alchemy.breathSeconds;
+                yield return new WaitUntil(()=>s.Alchemy.Time>=actionTime);
                 if(item!=null)yield return Click("AlchemyAdd");
                 else if(target.kind==AlchemyEventKind.Heat)yield return Click("AlchemyHeat_"+target.heat);
                 else yield return Click("AlchemyCollect");

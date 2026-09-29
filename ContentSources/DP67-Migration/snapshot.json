@@ -1,0 +1,8 @@
+{
+  "snapshotId": "dp67-existing-greybox-20260930",
+  "description": "迁移三张现有灰盒配方；保留现有火候目标炉钟8/24秒，不导入历史候选材料或灵石原料。",
+  "formatVersion": 1,
+  "domains": [
+    "alchemy"
+  ]
+}

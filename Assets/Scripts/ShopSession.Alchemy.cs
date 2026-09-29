@@ -85,7 +85,7 @@ namespace XiuXianShop
             if(!IsAtShopAlchemy || Alchemy==null || (Alchemy.Phase!=AlchemyPhase.Finished && Alchemy.Phase!=AlchemyPhase.Aborted))return Fail("请先完成或中止当前炉次。");
             if(In(ContainerId.AlchemyOutput).Any())return Fail("请先收回上一炉产物。");
             var recipe=Alchemy.Recipe;var ground=Alchemy.groundItems.ToArray();
-            Alchemy=new AlchemyBatch {Recipe=recipe};
+            Alchemy=new AlchemyBatch {Recipe=recipe,Heat=recipe.initialHeat};
             foreach(int id in ground)if(Find(id)!=null)Alchemy.groundItems.Add(id);
             return Success("下一炉备料中；成功开炉时再次扣体力。");
         }
@@ -135,6 +135,7 @@ namespace XiuXianShop
                 throw new ArgumentException("炼丹灰盒时长、窗口与耗能配置无效。");
             if(Alchemy!=null && (Alchemy.Locked || Alchemy.Phase!=AlchemyPhase.Preparing || Alchemy.completedTargets.Count>0))return Fail(IsAtShopAlchemy?"本炉已操作，不能更换丹方；完成或中止后请先准备下一炉。":"本炉已操作，不能更换丹方；完成或中止后本次访问不能再开炉。");
             Alchemy=new AlchemyBatch {Recipe=catalog.alchemy.recipes.Single(r=>r.id==recipeId)};
+            Alchemy.Heat=Alchemy.Recipe.initialHeat;
             return Success("已选择丹方。先备料、安装灵石，并投入第一味材料。");
         }
 
@@ -172,13 +173,11 @@ namespace XiuXianShop
             else
             {
                 var expected=a.Recipe.targets[index];
-                if((expected.breaths==0)!=(a.Phase==AlchemyPhase.Preparing))a.StructuralErrors.Add("投料阶段错误："+item.Definition.title);
+                if(expected.preloaded!=(a.Phase==AlchemyPhase.Preparing))a.StructuralErrors.Add("投料阶段错误："+item.Definition.title);
                 if(expected.itemId!=item.Definition.id)a.StructuralErrors.Add("投料错误：需要"+catalog.Find(expected.itemId).title+"，投入"+item.Definition.title);
-                if(expected.ground && !a.groundItems.Contains(itemId))a.StructuralErrors.Add("应研磨后投入："+item.Definition.title);
-                // The recipe's recommended rhythm defines residence duration, not an insertion-time score.
-                double collectBreaths=a.Recipe.targets.Single(t=>t.kind==AlchemyEventKind.Collect).breaths;
+                if(expected.ground!=a.groundItems.Contains(itemId))a.StructuralErrors.Add((expected.ground?"应研磨后投入：":"应完整投入：")+item.Definition.title);
                 a.Judgements.Add(new AlchemyJudgement {Action=item.Definition.title,EntryTime=a.Time,
-                    TargetTime=(collectBreaths-expected.breaths)*catalog.alchemy.breathSeconds,Result="待收丹"});
+                    TargetTime=expected.residenceSeconds,Result="待收丹"});
                 a.completedTargets.Add(index);
             }
             items.Remove(item);a.groundItems.Remove(itemId);
@@ -188,7 +187,7 @@ namespace XiuXianShop
         public double AlchemyMinimumEnergy()
         {
             var cfg=catalog.alchemy;var recipe=Alchemy.Recipe;
-            double time=0,total=0;var heat=AlchemyHeat.Medium;
+            double time=0,total=0;var heat=recipe.initialHeat;
             foreach(var t in recipe.targets.Where(t=>t.kind==AlchemyEventKind.Heat || t.kind==AlchemyEventKind.Collect).OrderBy(t=>t.breaths))
             {
                 double next=t.breaths*cfg.breathSeconds;
@@ -210,7 +209,7 @@ namespace XiuXianShop
             if(In(ContainerId.AlchemyOutput).Any() || !Fits(output,ContainerId.AlchemyOutput,0,0,0,false))return Fail("收丹位必须为空并能容纳本炉产物。");
             if(IsAtShopAlchemy)Stamina-=catalog.alchemy.shopStaminaCost;
             Alchemy.Phase=AlchemyPhase.Running;Alchemy.fuelId=fuel.Id;
-            return Success("已开炉，中火；炉钟与灵气持续运行。");
+            return Success("已开炉，"+AlchemySettings.HeatName(Alchemy.Heat)+"；炉钟与灵气持续运行。");
         }
 
         public bool GrindAlchemyIngredient(int itemId)
@@ -281,7 +280,7 @@ namespace XiuXianShop
                 if(t.kind==AlchemyEventKind.Collect)continue;
                 if(a.completedTargets.Contains(i))continue;
                 if(t.kind==AlchemyEventKind.Ingredient)a.StructuralErrors.Add("漏投："+catalog.Find(t.itemId).title);
-                a.Judgements.Add(new AlchemyJudgement {Action="遗漏"+(t.kind==AlchemyEventKind.Heat?"换火":t.itemId),TargetTime=t.breaths*cfg.breathSeconds,ActualTime=a.Time,Score=cfg.severeScore,Result="严重偏差"});
+                a.Judgements.Add(new AlchemyJudgement {Action="遗漏"+(t.kind==AlchemyEventKind.Heat?"换火":t.itemId),TargetTime=t.kind==AlchemyEventKind.Ingredient?t.residenceSeconds:t.breaths*cfg.breathSeconds,ActualTime=a.Time,Score=cfg.severeScore,Result="严重偏差"});
             }
             a.Score=a.Judgements.Average(j=>j.Score);
             a.Quality=a.Score>=cfg.superiorThreshold?PillQuality.Superior:a.Score>=cfg.goodThreshold?PillQuality.Good:a.Score>=cfg.ordinaryThreshold?PillQuality.Ordinary:PillQuality.Ruined;

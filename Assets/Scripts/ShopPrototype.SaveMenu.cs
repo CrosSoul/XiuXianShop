@@ -52,6 +52,7 @@ namespace XiuXianShop
                 CarryButton(systemMenu,"LoadSlot_"+slot,1140,y+10,150,"读取",()=>RequestLoadSlot(index)).interactable=exists;
             }
             Label(systemMenu,"SaveMenuMessage",210,710,1150,65,saveMenuMessage??"",20,gold);
+            CarryButton(systemMenu,"SystemNewGame",610,745,280,"新游戏",()=>ShowSaveConfirmation("新游戏会替换当前未保存进度。是否继续？",NewGame));
             CarryButton(systemMenu,"SystemResume",210,825,280,"继续游戏 / Esc",CloseSystemMenu);
             CarryButton(systemMenu,"SystemSettings",610,825,280,"设置",OpenSettings);
             CarryButton(systemMenu,"SystemQuit",1010,825,280,"退出",()=>ShowSaveConfirmation("退出将丢失未保存进度。",()=>{
@@ -118,7 +119,7 @@ namespace XiuXianShop
                 OpenSystemMenu();
                 return;
             }
-            CloseCommissions();CloseTeaNews();CloseTravelConfirmation();CloseCarryPanel();CloseTravelWindow();CloseCarrySelection();CloseStorage();CancelDrag();
+            CloseKnowledgeWindow();CloseCommissions();CloseTeaNews();CloseTravelConfirmation();CloseCarryPanel();CloseTravelWindow();CloseCarrySelection();CloseStorage();CancelDrag();
             CalendarView.Close();NegotiationView.Close();
             if(runtimeCatalog!=null)Destroy(runtimeCatalog);
             runtimeCatalog=restoredCatalog;catalog=runtimeCatalog;Session=restored;
@@ -129,6 +130,18 @@ namespace XiuXianShop
         {
             try{SaveSlots.Write(0,Session);}
             catch(Exception e){localNotice="已进入新月份，但自动存档失败："+e.Message;}
+        }
+        public void NewGame()
+        {
+            ShopCatalog nextCatalog=Instantiate(canonicalCatalog);
+            ShopSession next;
+            try{next=ShopSession.NewGame(nextCatalog,nextCatalog.startProfileId,CustomerSeed<0?(int?)null:CustomerSeed);}
+            catch(Exception e){Destroy(nextCatalog);saveMenuMessage="未创建，当前会话保留："+e.Message;OpenSystemMenu();return;}
+            CloseKnowledgeWindow();CloseCommissions();CloseTeaNews();CloseTravelConfirmation();CloseCarryPanel();CloseTravelWindow();CloseCarrySelection();CloseStorage();CancelDrag();
+            CalendarView.Close();NegotiationView.Close();CloseSystemMenu();
+            if(runtimeCatalog!=null)Destroy(runtimeCatalog);
+            runtimeCatalog=nextCatalog;catalog=nextCatalog;Session=next;
+            selectedId=0;localNotice=null;CalendarMessage=null;saveMenuMessage=null;Refresh();
         }
     }
 }

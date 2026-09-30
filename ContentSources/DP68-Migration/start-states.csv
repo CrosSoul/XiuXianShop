@@ -1,0 +1,15 @@
+field_name,type,configuration
+条目ID,text,
+ProfileID,text,
+状态类型,tag,
+状态ID,text,
+状态值,text,
+数据状态,tag,
+备注,text,
+
+view_name,layout,filters,sorts,hidden_fields,is_default,is_current
+全部初始状态,table,,,,true,true
+
+_id,条目ID,ProfileID,状态类型,状态ID,状态值,数据状态,备注
+1,start_baishitang,prototype_campaign_v1,Location,baishitang,true,待同步,DP-68核对当前公共地点；不授予炼丹主线结果
+2,start_teahouse,prototype_campaign_v1,Location,tingfeng-teahouse,true,待同步,DP-68核对当前公共地点；不授予炼丹主线结果

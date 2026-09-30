@@ -1,0 +1,83 @@
+{
+  "status": "completed",
+  "duration": 0.31,
+  "summary": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.ClosedSnapshotKeepsItemRelationshipsQualityResourceAndProgress",
+      "Status": "Passed",
+      "Duration": 0.0096438,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.FailedSlotWritePreservesPreviouslySavedFile",
+      "Status": "Passed",
+      "Duration": 0.0189303,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.GeneratedTeaCommissionAndCalendarRestoreWithoutDrawingAgain",
+      "Status": "Passed",
+      "Duration": 0.0068467,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.InvalidSnapshotCannotChangeSourceSession(\"schema\")",
+      "Status": "Passed",
+      "Duration": 0.0010688,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.InvalidSnapshotCannotChangeSourceSession(\"duplicate\")",
+      "Status": "Passed",
+      "Duration": 0.0004098,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.InvalidSnapshotCannotChangeSourceSession(\"unknown\")",
+      "Status": "Passed",
+      "Duration": 0.0004008,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.InvalidSnapshotCannotChangeSourceSession(\"capacity\")",
+      "Status": "Passed",
+      "Duration": 0.0004193,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.InvalidSnapshotCannotChangeSourceSession(\"quality\")",
+      "Status": "Passed",
+      "Duration": 0.0003427,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.RestoringNextMonthDoesNotReapplyRecoveryOrOverflow",
+      "Status": "Passed",
+      "Duration": 0.001164,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.PersistenceTests.SaveGateRejectsBusinessCarryAndOpenFurnace",
+      "Status": "Passed",
+      "Duration": 0.0006279,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

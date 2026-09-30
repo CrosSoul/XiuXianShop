@@ -10,7 +10,7 @@ namespace XiuXianShop.Tests
 {
     public sealed partial class ShopPlayableTests
     {
-        [UnityTest,Category("DP52")]
+        [UnityTest,Category("DP52"),Category("DP68")]
         public IEnumerator DefaultStoryTrainingRunsThroughRealBusinessTravelAndChoiceButtons()
         {
             IsolateAlchemyTestMouse();var session=shop.Session;

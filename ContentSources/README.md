@@ -83,3 +83,30 @@
 - 所有改动行标为待同步，未知引用、重复 ID/顺序、材料主表不一致、无合法产物等会阻止整个导入。缺行不表示删除；状态与稳定 ID 沿用统一同步契约。
 
 正常 Play 读取同步后的 Catalog；原三张硬编码配方已收拢到显式测试夹具 AlchemyRecipeVerification，不作为正常运行备用数据。灰盒物品定义沿用原实现，不给仓库自动加测试材料。仍通过已有开发菜单领取炉子/材料包。炉息标尺、体力消耗、品质分值/阈值、外出一访一炉和店内逐炉操作没有重做。
+
+## DP-68：Canonical New Game 开局配置
+
+默认 Play 与系统菜单「新游戏」使用 `ShopCatalog.startProfileId` 指向的同一 Profile，当前为 `prototype_campaign_v1`。启动基线迁自实际默认 Play：1 年 1 月、卡内余额 120、体力 100；9 件初始物品顺序为收购牌、凝气草、灵露、回气丹、朱砂、玉石、法器、原型储物匣和原型随身储物。百事堂、听风茶肆开局解锁，没有职业或剧情 Flag。储物物品沿用现有原型 ID，未新增开局经济内容。
+
+选择 `DP68-Migration`，在「XiuXianShop → 内容同步」执行 Validate → Preview Diff → Import。04.16—04.18 的原始导出保留在 `Confluence-DP68`；原始未填余额和体力没有猜测，迁移快照使用读取到的真实基线。已回写三张正式数据库并独立回读，DP68-Migration 直接采用回读的 Confluence CSV；数据状态保留待同步，不因本地未提交而声称已生效。快照 domains 为 `new-game`。
+
+- `start-profiles.csv`（04.16）：ProfileID、开始年份/月、余额与体力。改余额后标待同步、导入、再点新游戏即可验证；已有运行会话和存档不随导入更新。
+- `start-items.csv`（04.17）：每行稳定条目ID、ProfileID、已有物品ID、正数量、目标区域 Storage / Display / Counter。X/Y/旋转全部为空时按行顺序、从上到下从左到右确定性摆放。强制摆位须三列完整，旋转为0–3；强制位置重叠或越界、数量放不下都会失败，不静默丢物。多件强制同一位置无法成立；需要指定摆位的多件物品请逐行填写。
+- `start-states.csv`（04.18）：Location / Profession / Flag / Recipe，状态值 true / false。当前职业仅 alchemy，配方引用已有配方ID；Flag沿用剧情的非空稳定键。false 表示新游戏不拥有该状态。Knowledge尚无当前正式实现，引用会报错，不创建未来知识系统。
+- 移除某个初始条目请显式标停用；遗漏行会按统一管线保留，草稿不导入。未知引用、重复状态、非法数量和摆位会阻止整个导入。
+
+新游戏确认后全新会话进入营业前准备；失败保留当前会话并显示原因。读档完全恢复快照，不再次套用开局 Profile，不重新发物品或锁回炼丹进度。新游戏从原始配置资产重新克隆，当前会话的开发注入不会被继承。
+
+既有 Validation / Current Play Session 的补发炼丹房、材料包、微缩炉和剧情验证入口仍是显式操作。正常开局通过线索来访与炼丹求学 Scene 获得职业及长期访问。旧 startingItems / startingMoney / initiallyUnlocked 只保留给显式验证夹具，不用于 Canonical Play。
+
+## DP-41 玉简阅读与学习内容
+
+统一 Content Sync 新增 `knowledge` 域；选择 `DP41-Graybox`，Validate → Preview Diff → Import。`knowledge.csv` 对应 04.19，`jade-slips.csv` 对应 04.20。`Confluence-DP41` 保留原始导出：两条测试内容及空映射。任务明确授权最小灰盒，故本地可导入快照标待同步，不把远端“测试”自动当作正式已批准内容。
+
+- 新增 Text：04.19 填唯一 KnowledgeID、知识名称、类型 Text、正文，学习三列留空；数据状态待同步。
+- 新增 Technique：类型 Technique，填写非负单次体力、正整数单次进度与掌握阈值；灰盒基础功法目前 20 / 25 / 100，不是最终平衡。
+- 04.20 每行唯一条目ID，填写已存在的 JadeSlip 物品ID及有效 KnowledgeID；同一个物品ID不能同时映射两条知识。不同玉简可引用同一知识，玩家进度共享。新的物理玉简先在已有 ShopCatalog 的 Items 中用 Inspector 定义稳定ID、JadeSlip类别、形状、基础价值与颜色，不需要改 C#。它是普通物品，不是储存容器；不要直接编辑资产 YAML。
+- 导出两表到快照目录，保留列名；snapshot.json 的 domains 包含 knowledge。草稿跳过，遗漏保留，停用显式关闭；未知物品/知识、重复ID、非玉简物品映射和非法学习参数阻止导入。Validate/Preview 不写资产，重复 Import 不写入。
+- 内容修改在退出 Play 导入后、下次进入 Play 使用；已存学习进度和掌握状态保留，不把正文写入存档。阈值修改不在读档时自动改变已得状态；下一次合法学习按新阈值封顶并判断掌握，已经掌握不会遗忘。
+- 最小测试物品 `test-jade-text` / `test-jade-technique` 均为 1×2、基础价值1、不可随机供货；JadeSlip普通交易三档预算20/60/150明确标为灰盒原型，防止新增类别缺预算令开业失败。未改默认开局，不自动赠送玉简，也未实现刻录/抹除/知识经济。
+- 人工入口：Play → XiuXianShop / Current Play Session / Grant Jade Slip，领取普通文本或基础功法。仓库点击打开店铺内浮窗；Text阅读/关闭不扣体力。营业前和营业中不能学习；结束剧情并闭店后学习四次，体力100→80→60→40→20，进度25→50→75→100。第二枚同内容玉简显示同一进度；Esc或×关闭。Esc存档/新游戏/读档可核对保留状态。

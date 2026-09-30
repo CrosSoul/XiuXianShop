@@ -1,0 +1,16 @@
+field_name,type,configuration
+条目ID,text,
+ProfileID,text,
+物品ID,text,
+数量,number,number_format:number
+目标区域,tag,
+X,number,number_format:number
+Y,number,number_format:number
+旋转,number,number_format:number
+数据状态,tag,
+备注,text,
+
+view_name,layout,filters,sorts,hidden_fields,is_default,is_current
+全部初始物品,table,,,,true,true
+
+

@@ -18,6 +18,7 @@ namespace XiuXianShop.Tests
         Mouse mouse;
         Keyboard keyboard;
         ShopCatalog testCatalog;
+        AuthoredContent testStartContent;
         InputSettings.BackgroundBehavior originalBackgroundBehavior;
         InputSettings.EditorInputBehaviorInPlayMode originalEditorInputBehavior;
         bool inputSettingsCaptured;
@@ -50,6 +51,7 @@ namespace XiuXianShop.Tests
                 inputSettingsCaptured=false;
             }
             if(testCatalog!=null) {Object.Destroy(shop.gameObject);Object.Destroy(testCatalog);}
+            if(testStartContent!=null)Object.Destroy(testStartContent);
             yield return null;
         }
         IEnumerator MouseAt(Vector2 position,bool held)
@@ -404,6 +406,11 @@ namespace XiuXianShop.Tests
         {
             // Isolated gameplay scenarios configure their own visitors; the default-session story has its own integration test.
             testCatalog=Object.Instantiate(shop.Catalog);testCatalog.authoredContent=null;testCatalog.marketEvents=System.Array.Empty<MarketEventDefinition>();configure(testCatalog);
+            // Explicit isolated fixtures now express their starter data through the same NewGame path.
+            testStartContent=ScriptableObject.CreateInstance<AuthoredContent>();testCatalog.authoredContent=testStartContent;
+            testStartContent.startProfiles=new[]{new StartProfile{id=testCatalog.startProfileId,year=1,month=1,money=testCatalog.startingMoney,stamina=testCatalog.maximumStamina}};
+            testStartContent.startItems=testCatalog.startingItems.Select((id,n)=>new StartItem{id="fixture_"+n,profileId=testCatalog.startProfileId,itemId=id,quantity=1,area=ContainerId.Storage}).ToArray();
+            testStartContent.startStates=testCatalog.travelLocations.Where(l=>l.initiallyUnlocked).Select(l=>new StartState{id=l.id,profileId=testCatalog.startProfileId,type="Location",stateId=l.id,value=true}).ToArray();
             Object.Destroy(shop.gameObject);yield return null;
             shop=new GameObject("Test Shop Prototype").AddComponent<ShopPrototype>();shop.Catalog=testCatalog;shop.CustomerSeed=seed;
             yield return null;yield return null;Canvas.ForceUpdateCanvases();

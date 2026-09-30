@@ -12,8 +12,191 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6eb0a38c4f117c4dbcb422cee010f48, type: 3}
   m_Name: AuthoredContent
   m_EditorClassIdentifier: XiuXianShop.Runtime::XiuXianShop.AuthoredContent
-  lastSnapshotId: dp67-existing-greybox-20260930
-  lastImportedAtUtc: 2026-09-29T19:41:12.5935694Z
+  knowledge:
+  - id: text_test_market_notice
+    enabled: 1
+    title: "\u574A\u5E02\u987B\u77E5\uFF5C\u7070\u76D2"
+    text: "\u8FD9\u662F\u4E00\u6761\u7528\u4E8E\u9A8C\u8BC1\u666E\u901A\u7389\u7B80\u9605\u8BFB\u7A97\u53E3\u4E0E\u5185\u5BB9\u7BA1\u7EBF\u7684\u7070\u76D2\u6587\u672C\u3002"
+    type: 0
+    studyStamina: 0
+    progressPerStudy: 0
+    masteryThreshold: 0
+  - id: knowledge_test_basic
+    enabled: 1
+    title: "\u57FA\u7840\u529F\u6CD5\uFF5C\u7070\u76D2"
+    text: "\u8FD9\u662F\u4E00\u6761\u7528\u4E8E\u9A8C\u8BC1\u529F\u6CD5\u5B66\u4E60\u8FDB\u5EA6\u7684\u7070\u76D2\u5185\u5BB9\u3002"
+    type: 1
+    studyStamina: 20
+    progressPerStudy: 25
+    masteryThreshold: 100
+  jadeSlips:
+  - id: jade_text_test
+    enabled: 1
+    itemId: test-jade-text
+    knowledgeId: text_test_market_notice
+  - id: jade_technique_test
+    enabled: 1
+    itemId: test-jade-technique
+    knowledgeId: knowledge_test_basic
+  startProfiles:
+  - id: prototype_campaign_v1
+    enabled: 1
+    title: "\u539F\u578B\u4E3B\u7EBF\u5F00\u5C40"
+    year: 1
+    month: 1
+    money: 120
+    stamina: 100
+  startItems:
+  - id: start_sign
+    enabled: 1
+    profileId: prototype_campaign_v1
+    itemId: sign
+    quantity: 1
+    area: 0
+    x:
+      hasValue: 0
+      value: 0
+    y:
+      hasValue: 0
+      value: 0
+    rotation:
+      hasValue: 0
+      value: 0
+  - id: start_herb
+    enabled: 1
+    profileId: prototype_campaign_v1
+    itemId: herb
+    quantity: 1
+    area: 0
+    x:
+      hasValue: 0
+      value: 0
+    y:
+      hasValue: 0
+      value: 0
+    rotation:
+      hasValue: 0
+      value: 0
+  - id: start_dew
+    enabled: 1
+    profileId: prototype_campaign_v1
+    itemId: dew
+    quantity: 1
+    area: 0
+    x:
+      hasValue: 0
+      value: 0
+    y:
+      hasValue: 0
+      value: 0
+    rotation:
+      hasValue: 0
+      value: 0
+  - id: start_pill
+    enabled: 1
+    profileId: prototype_campaign_v1
+    itemId: pill
+    quantity: 1
+    area: 0
+    x:
+      hasValue: 0
+      value: 0
+    y:
+      hasValue: 0
+      value: 0
+    rotation:
+      hasValue: 0
+      value: 0
+  - id: start_cinnabar
+    enabled: 1
+    profileId: prototype_campaign_v1
+    itemId: cinnabar
+    quantity: 1
+    area: 0
+    x:
+      hasValue: 0
+      value: 0
+    y:
+      hasValue: 0
+      value: 0
+    rotation:
+      hasValue: 0
+      value: 0
+  - id: start_jade
+    enabled: 1
+    profileId: prototype_campaign_v1
+    itemId: jade
+    quantity: 1
+    area: 0
+    x:
+      hasValue: 0
+      value: 0
+    y:
+      hasValue: 0
+      value: 0
+    rotation:
+      hasValue: 0
+      value: 0
+  - id: start_sword
+    enabled: 1
+    profileId: prototype_campaign_v1
+    itemId: sword
+    quantity: 1
+    area: 0
+    x:
+      hasValue: 0
+      value: 0
+    y:
+      hasValue: 0
+      value: 0
+    rotation:
+      hasValue: 0
+      value: 0
+  - id: start_storage
+    enabled: 1
+    profileId: prototype_campaign_v1
+    itemId: test-storage-case
+    quantity: 1
+    area: 0
+    x:
+      hasValue: 0
+      value: 0
+    y:
+      hasValue: 0
+      value: 0
+    rotation:
+      hasValue: 0
+      value: 0
+  - id: start_portable
+    enabled: 1
+    profileId: prototype_campaign_v1
+    itemId: test-portable
+    quantity: 1
+    area: 0
+    x:
+      hasValue: 0
+      value: 0
+    y:
+      hasValue: 0
+      value: 0
+    rotation:
+      hasValue: 0
+      value: 0
+  startStates:
+  - id: start_baishitang
+    enabled: 1
+    profileId: prototype_campaign_v1
+    type: Location
+    stateId: baishitang
+    value: 1
+  - id: start_teahouse
+    enabled: 1
+    profileId: prototype_campaign_v1
+    type: Location
+    stateId: tingfeng-teahouse
+    value: 1
+  lastSnapshotId: dp41-knowledge-graybox-20260930
+  lastImportedAtUtc: 2026-09-30T10:01:15.6125331Z
   visits:
   - id: visit_alchemy_hint_01
     enabled: 1

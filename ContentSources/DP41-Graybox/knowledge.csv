@@ -1,0 +1,17 @@
+field_name,type,configuration
+知识名称,text,
+KnowledgeID,text,
+类型,tag,
+正文,text,
+单次学习体力,number,number_format:number
+单次进度,number,number_format:number
+掌握阈值,number,number_format:number
+数据状态,tag,
+备注,text,
+
+view_name,layout,filters,sorts,hidden_fields,is_default,is_current
+全部知识,table,,,,true,true
+
+_id,知识名称,KnowledgeID,类型,正文,单次学习体力,单次进度,掌握阈值,数据状态,备注
+1,坊市须知｜灰盒,text_test_market_notice,Text,这是一条用于验证普通玉简阅读窗口与内容管线的灰盒文本。,,,,待同步,不是最终教学文案。
+2,基础功法｜灰盒,knowledge_test_basic,Technique,这是一条用于验证功法学习进度的灰盒内容。,20,25,100,待同步,20体力／25进度仅为隔离测试配置。

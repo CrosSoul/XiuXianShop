@@ -519,3 +519,30 @@ DP-58 最终状态补充：Unity Pipeline CLI 检查 Console Error0/Warning0（�
 - 编译通过。Edit Mode 炼丹相关 41/41；新增用例验证双入口改研磨/在炉/上品倍率及引用、顺序、动作校验。初次失败来自测试准备缺设备/未结束剧情及夹具重置覆盖配置，修正测试准备后通过。证据：Evidence/DP67/editmode-alchemy.json。
 - 实际场景 Play Mode 11/11，包括三张配方、双入口、连续两炉及共享悬停；外出测试同样读取已导入 Catalog 配方。证据：Evidence/DP67/playmode-alchemy.json。最终重复导入不写入，研磨8秒/上品倍率1.5基线保持，Console Error0/Warning0、Editor stopped且未编译/更新、scriptCompilationFailed=false、ShopPrototype 场景无未保存修改。未清日志。
 - 作者操作见 ContentSources/README.md；全部数值仍为原型。04.2/04.3历史候选与当前灰盒存在差异，按DP-67明确范围只迁移现有三张输入输出，不批量批准候选，也未回写远端数据状态。未做 Player 构建或新的人工验收；仅本地未提交/推送，交付 Ready for Review。
+
+## 2026-09-30 — DP-68 Canonical New Game
+
+- 核对连接恢复后的真实默认基线：1年1月、卡余额120、体力100；9件仓库物品 sign/herb/dew/pill/cinnabar/jade/sword/test-storage-case/test-portable；公共地点 baishitang/tingfeng-teahouse，初始Flags为空。原默认Play并无炼丹职业、长期炼丹房或微缩炉注入，因此没有虚构删除内容。
+- 新增 StartProfile/StartItem/StartState 与 new-game 内容域，复用统一 Validate/Preview/Import。04.16填入核对值、04.17填入9行、04.18填入2行，并独立回读确认；正式数据库保持待同步及原型说明。原始空/待迁移导出保留 Confluence-DP68，DP68-Migration采用回读正式CSV。通过Unity API更新AuthoredContent与Catalog默认Profile引用。
+- 默认Play与系统菜单新游戏共用 ShopSession.NewGame；完整构建成功才替换旧会话。物品为普通真实实例，复用现有区域约束和摆位；强制X/Y/旋转须完整合法，无坐标确定性摆放，失败明确报错。New Game从原始配置资产克隆，不继承当前运行时开发注入。Load继续从快照恢复，不应用Profile。旧构造开局值仅留给显式Validation夹具。
+- Location/Profession/Flag/Recipe复用既有地点/命名空间进度状态；Knowledge尚无当前正式系统，明确拒绝未知/未实现引用。正常求学Scene继续授予职业与长期访问，未添加丹方奖励。既有炼丹房/测试材料/微缩炉/剧情Validation入口保留。
+- Edit Mode DP68专项13/13，共有会话构造与存档集成262/262；实际场景DP68 3/3（新游戏确认/取消/重复创建与Load、两回合交易/外出/自动槽、真实求学链路），存读档Play回归5/5。证据见Evidence/DP68。首次两回合测试遗漏关闭外出UI导致月份点击被遮挡，改为完整界面返回路径后通过；没有改游戏规则来迁就测试。
+- 最终Console Error0/Warning0、scriptCompilationFailed=false、Editor stopped/未编译未更新，ShopPrototype场景dirty=false。正式回读CSV验证零差异，重复导入无写入。Unity MCP当前未暴露，使用现有Unity CLI/Pipeline连接。未清日志、未做Player构建或人工手感验收。
+- 作者操作见ContentSources/README.md。人工复验：Play→Esc→新游戏，取消保留当前会话，确认恢复基线；保存已有进度→新游戏→读取旧槽核对物品/解锁不重发；编辑快照余额或物品，统一窗口导入后新游戏采用新值，旧槽仍保留旧值，再导入基线还原。无正式规则冲突；经济、体力与开局物品仍为原型。仅本地未提交/推送，交付Ready for Review。
+
+## 2026-09-30 — 当前 compiler error 复查
+
+- 通过现有 Unity CLI/Pipeline 检查当前 XiuXianShop（Unity 6000.6.0f1），并通过 Unity API 请求 CleanBuildCache 脚本重编译；Editor.log 记录 Tundra build success（33.59 秒）。本轮未复现编译 Error，未修改游戏脚本、资产、场景或配置，保留已有未提交工作。
+- 最终原生 Console Error 0 / Warning 21：20 条 CS0618（PrototypeBuilder 17 条及三个 Play Mode 测试中 FindFirstObjectByType 已弃用），1 条 UAC0005（IntegrationPlayableTests 中 AppDomain.GetAssemblies 的分析器提示）。未扩展范围清理既有 Warning，未清空 Console。Pipeline get_console_logs 未返回这些编译 Warning，因此以原生 Console 计数和条目为准。
+- scriptCompilationFailed=false，Editor ready，未编译/未更新，ShopPrototype 场景 dirty=false。本次仅验证编译，不重复日历或其他玩法测试；未做 Player 构建或人工试玩。Unity MCP 本轮未暴露。用户已明确反馈 DP-60 人工验收，本次未以编译检查替代该验收或推进新任务。
+
+## 2026-09-30 — DP-41 玉简阅读与功法学习 v1
+
+- 核对 Jira 最新描述、G13 v4、G03营业外门禁、G04 v22 AC111–116、04.19/04.20及04.1 v22：没有可用玉简定义，04.19仅两条明确测试内容、04.20为空。保留原始导出，按任务授权新增两件最小测试玉简，通过Unity API更新Catalog，通过统一Content Sync knowledge域导入本地待同步灰盒快照；未把原始测试自动批准为正式内容，未回写远端数据库。
+- 新增 KnowledgeDefinition、ShopSession.Knowledge、ShopPrototype.Knowledge、KnowledgeContentAdapter、KnowledgeVerification 及 Edit/Play Mode专项。共享Grid点击打开店铺内600×460可拖动阅读浮窗，正文可滚动；Text阅读/关闭无消耗。Technique仅闭店后持有来源、体力足够才能学习；进度按KnowledgeID共享，封顶后永久掌握，出售最后来源保留进度，真实重新购入恢复可学习。不消耗玉简或灵气，不新增刻录、抹除、修为、战斗或知识经济。
+- 复用DP61快照，新增knowledgeId/progress/mastered字段，不保存正文；延用schema1与既有扩展方式，之前没有此字段的存档从空进度开始，未知/重复ID及负进度拒绝恢复。配置阈值变动不在读档时重写已得状态；新学习使用新阈值，已掌握不会遗忘。新游戏/读档/验证会话切换关闭旧阅读浮窗。
+- 配置：Text和Technique统一JadeSlip类别；两件测试玉简1×2、基础价值1、不可随机供货。新增JadeSlip普通交易三档20/60/150，明确原型，避免新增真实商品类别缺预算导致开业失败。学习基线20体力/+25/100掌握来自正式测试配置。默认新游戏仍9件、不自动赠送玉简。没有Package、Project Settings、场景或Prefab变更；新增脚本meta由Unity生成。
+- 最终Edit Mode专项18/18，原有格子/交易23/23、存档10/10、体力8/8；真实ShopPrototype场景Play专项3/3、存读档5/5、Tooltip四档及设置2/2。证据见Evidence/DP41。覆盖阶段、19体力失败、重复副本、实际出售和购入、永久掌握、快照校验、内容正文/成本/进度/阈值与映射导入、不消费灵气和真实鼠标阅读/学习/存读档。未重复日历人工验收或无差别全量测试。
+- 过程问题如实记录：新浮窗RectMask2D缺完整命名空间导致一次CS0246，已修正；阅读测试把Text组件当字符串断言，修正为.text后3/3；最终复验首次测试发现返回0用例，不计通过，请求编译刷新后重新执行真实3/3。未清空Console。
+- 最终Unity CLI/Pipeline原生Console Error0/Warning0、Editor ready/stopped、未编译未更新、scriptCompilationFailed=false、ShopPrototype场景dirty=false；统一Validate有效、重复Import无写入、实际配置20/25/100及两映射回读正确。文本diff --check通过。Unity MCP未暴露，未做Player构建或人工手感验收。
+- 作者操作及人工步骤见ContentSources/README.md新增DP41节：Play后用现有Current Play Session/Grant Jade Slip领取；Text点击/关闭，营业前及营业中核对学习锁定，闭店后学习4次，再通过系统菜单保存/新游戏/读取。无正式规则冲突；学习参数、物品形状/价值、预算及浮窗呈现均需后续手感/平衡判断。本地未提交/推送，保留DP68未提交改动，交付停在Ready for Review。

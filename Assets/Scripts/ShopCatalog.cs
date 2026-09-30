@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace XiuXianShop
 {
-    public enum ItemCategory { Unclassified, Medicine, Material, Equipment, Container, BusinessSign, StorageContainer, EquipmentContainer, PortableContainer, ProductionEquipment, StoneLow, StoneMid, StoneHigh }
+    public enum ItemCategory { Unclassified, Medicine, Material, Equipment, Container, BusinessSign, StorageContainer, EquipmentContainer, PortableContainer, ProductionEquipment, StoneLow, StoneMid, StoneHigh, JadeSlip }
 
 
     [Serializable]
@@ -52,6 +52,7 @@ namespace XiuXianShop
     {
         [Tooltip("内容同步工具生成的静态来访与剧情数据；不保存玩家进度。")]
         public AuthoredContent authoredContent;
+        public string startProfileId="prototype_campaign_v1";
         [HideInInspector] public int priceModelVersion;
         public ItemDefinition[] items;
         public string[] startingItems = { "sign", "herb", "dew", "pill", "cinnabar", "jade", "sword" };
@@ -116,6 +117,7 @@ namespace XiuXianShop
                 case ItemCategory.StoneLow: return "下品灵石";
                 case ItemCategory.StoneMid: return "中品灵石";
                 case ItemCategory.StoneHigh: return "上品灵石";
+                case ItemCategory.JadeSlip: return "玉简";
                 default: return "未分类";
             }
         }

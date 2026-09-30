@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: ShopCatalog
   m_EditorClassIdentifier: XiuXianShop.Runtime::XiuXianShop.ShopCatalog
   authoredContent: {fileID: 11400000, guid: 1debda0bbeef6ac4c84143e5eb755161, type: 2}
+  startProfileId: prototype_campaign_v1
   priceModelVersion: 1
   items:
   - id: herb
@@ -329,6 +330,42 @@ MonoBehaviour:
     salePrice: 0
     procurementSign: 0
     advertisedCategory: 2
+  - id: test-jade-text
+    title: "\u574A\u5E02\u987B\u77E5\u7389\u7B80\uFF08\u6D4B\u8BD5\uFF09"
+    category: 13
+    description: "DP41 \u7070\u76D2\u6D4B\u8BD5\u7389\u7B80\uFF1B\u975E\u6B63\u5F0F\u5546\u54C1\u6216\u5E73\u8861\u3002\u70B9\u51FB\u9605\u8BFB\uFF0C\u529F\u6CD5\u4EC5\u95ED\u5E97\u540E\u5B66\u4E60\u3002"
+    color: {r: 0.52, g: 0.78, b: 0.68, a: 1}
+    cells:
+    - {x: 0, y: 0}
+    - {x: 0, y: 1}
+    baseValue: 1
+    spiritResource:
+      rid: -2
+    supplierAvailable: 0
+    storageSize: {x: 0, y: 0}
+    compatibleEquipmentIds: []
+    purchasePrice: 0
+    salePrice: 0
+    procurementSign: 0
+    advertisedCategory: 2
+  - id: test-jade-technique
+    title: "\u57FA\u7840\u529F\u6CD5\u7389\u7B80\uFF08\u6D4B\u8BD5\uFF09"
+    category: 13
+    description: "DP41 \u7070\u76D2\u6D4B\u8BD5\u7389\u7B80\uFF1B\u975E\u6B63\u5F0F\u5546\u54C1\u6216\u5E73\u8861\u3002\u70B9\u51FB\u9605\u8BFB\uFF0C\u529F\u6CD5\u4EC5\u95ED\u5E97\u540E\u5B66\u4E60\u3002"
+    color: {r: 0.52, g: 0.78, b: 0.68, a: 1}
+    cells:
+    - {x: 0, y: 0}
+    - {x: 0, y: 1}
+    baseValue: 1
+    spiritResource:
+      rid: -2
+    supplierAvailable: 0
+    storageSize: {x: 0, y: 0}
+    compatibleEquipmentIds: []
+    purchasePrice: 0
+    salePrice: 0
+    procurementSign: 0
+    advertisedCategory: 2
   startingItems:
   - sign
   - herb
@@ -419,6 +456,11 @@ MonoBehaviour:
       wealthy: 15000
       lavish: 20000
       balanceNote: "\u539F\u578B\u91D1\u989D\uFF0C\u975E\u6700\u7EC8\u5E73\u8861"
+    - category: 13
+      ordinary: 20
+      wealthy: 60
+      lavish: 150
+      balanceNote: "DP41 \u7070\u76D2\u7389\u7B80\u666E\u901A\u7269\u54C1\u4EA4\u6613\u6240\u9700\u7684\u539F\u578B\u9884\u7B97\uFF1B\u975E\u6B63\u5F0F\u5E73\u8861"
     supplyPools:
     - category: 2
       weight: 10

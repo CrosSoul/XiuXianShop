@@ -1,0 +1,15 @@
+field_name,type,configuration
+配置名称,text,
+ProfileID,text,
+开始年份,number,number_format:number
+开始月份,number,number_format:number
+初始卡内余额,number,number_format:number
+初始体力,number,number_format:number
+数据状态,tag,
+备注,text,
+
+view_name,layout,filters,sorts,hidden_fields,is_default,is_current
+全部开局配置,table,,,,true,true
+
+_id,配置名称,ProfileID,开始年份,开始月份,初始卡内余额,初始体力,数据状态,备注
+1,原型主线开局,prototype_campaign_v1,1,1,120,100,待同步,DP-68核对默认Play实际基线并迁入；1年1月／120余额／100体力仍为原型。仅本地未提交，不标已生效。

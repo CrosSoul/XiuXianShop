@@ -6,6 +6,11 @@ namespace XiuXianShop
     // Static imported definitions only. DP-62 / DP-52 consume these; no runtime network or progress lives here.
     public sealed class AuthoredContent : ScriptableObject
     {
+        public KnowledgeDefinition[] knowledge = Array.Empty<KnowledgeDefinition>();
+        public JadeSlipMapping[] jadeSlips = Array.Empty<JadeSlipMapping>();
+        public StartProfile[] startProfiles=Array.Empty<StartProfile>();
+        public StartItem[] startItems=Array.Empty<StartItem>();
+        public StartState[] startStates=Array.Empty<StartState>();
         public string lastSnapshotId, lastImportedAtUtc;
         public AuthoredVisit[] visits = Array.Empty<AuthoredVisit>();
         public AuthoredVisitItem[] visitItems = Array.Empty<AuthoredVisitItem>();

@@ -132,18 +132,19 @@ namespace XiuXianShop
         public bool HasFurnace => true;
         public string Message { get; private set; } = "先整理物品，再把收购牌和商品放入展示柜。丹炉已备好。";
 
-        public ShopSession(ShopCatalog catalog, bool seed = true, int? customerSeed = null, MarketCalendar calendar = null)
+        // Legacy seeded construction is reserved for explicit validation fixtures. Canonical starts use NewGame.
+        public ShopSession(ShopCatalog catalog, bool seed = true, int? customerSeed = null, MarketCalendar calendar = null,bool initializeDefaults=true)
         {
             this.catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             if(catalog.maximumStamina<1 || catalog.staminaRecoveryPerTurn<0)throw new ArgumentException("体力配置无效。");
-            Stamina=catalog.maximumStamina;
-            InitializeTravel();
+            Stamina=initializeDefaults?catalog.maximumStamina:0;
+            InitializeTravel(initializeDefaults);
             ValidateTeaSettings();
             customerSeedValue=customerSeed??Guid.NewGuid().GetHashCode();
             customerRandom = new System.Random(customerSeedValue);
             Calendar=calendar??new MarketCalendar(catalog.marketEvents,customerSeed??Guid.NewGuid().GetHashCode());
             Calendar.Between(1,12);
-            Money = catalog.startingMoney;
+            Money = initializeDefaults?catalog.startingMoney:0;
             OpeningMoney = Money;
             foreach(var tag in catalog.priceTags ?? Array.Empty<PriceTag>()) SetPriceTag(tag);
             Rent = catalog.firstRent;
@@ -186,6 +187,7 @@ namespace XiuXianShop
                 hasStaminaState=true,stamina=Stamina,staminaOverflowCustomer=HasStaminaOverflowCustomer,
                 hasTravelledThisTurn=HasTravelledThisTurn,unlockedLocationIds=unlockedLocations.ToArray(),
                 visitedLocationIds=visitedLocations.ToArray(),progressFlags=progressFlags.ToArray(),
+                knowledge=knowledgeProgress.Select(k=>new SavedKnowledgeProgress{knowledgeId=k.Key,progress=k.Value.Progress,mastered=k.Value.Mastered}).ToArray(),
                 visits=visitProgress.Values.ToArray(),specialVisitsThisTurn=SpecialVisitsThisTurn,
                 latestTeaVisit=LatestTeaVisit,activeTeaEffect=ActiveTeaEffect,
                 hasLatestTeaVisit=LatestTeaVisit!=null,hasActiveTeaEffect=ActiveTeaEffect!=null,
@@ -207,9 +209,10 @@ namespace XiuXianShop
                 save.progressFlags.Any(string.IsNullOrWhiteSpace) || save.progressFlags.Distinct().Count()!=save.progressFlags.Length ||
                 save.openingMoney<0 || save.incomeToday<0 || save.expensesToday<0 || save.servedToday<0 || save.crafted<0 || save.purchases<0 || save.sales<0 ||
                 save.customerDraws<0 || save.customerDraws>10000000)throw new ArgumentException("存档数据不完整或无效。");
-            var session=new ShopSession(catalog,false,save.customerSeed,new MarketCalendar(save.calendar));
+            var session=new ShopSession(catalog,false,save.customerSeed,new MarketCalendar(save.calendar),initializeDefaults:false);
             if(!save.hasStaminaState || save.stamina<0 || save.stamina>catalog.maximumStamina)throw new ArgumentException("存档体力状态缺失或无效，当前会话未改变。");
             session.Stamina=save.stamina;session.HasStaminaOverflowCustomer=save.staminaOverflowCustomer;
+            session.RestoreKnowledgeProgress(save.knowledge);
             if(save.unlockedLocationIds==null || save.unlockedLocationIds.Any(id=>!catalog.travelLocations.Any(l=>l.id==id)))
                 throw new ArgumentException("存档地点状态缺失或无效，当前会话未改变。");
             session.HasTravelledThisTurn=save.hasTravelledThisTurn;

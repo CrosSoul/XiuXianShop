@@ -1,0 +1,27 @@
+{
+  "status": "completed",
+  "duration": 8.77,
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.PreferenceSurvivesFreshSessionAndLoadingADifferentProgressSlot",
+      "Status": "Passed",
+      "Duration": 1.5600262,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.SettingsDropdownChangesAllHoverDelaysAndBlocksUnderlyingInput",
+      "Status": "Passed",
+      "Duration": 7.176327,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

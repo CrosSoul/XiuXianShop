@@ -1,0 +1,139 @@
+{
+  "status": "completed",
+  "duration": 3.27,
+  "summary": {
+    "total": 18,
+    "passed": 18,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.ClosedLearningCostsOncePerKnowledgeAndCapsAtMastery",
+      "Status": "Passed",
+      "Duration": 0.1867377,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.InvalidContentBlocksAtomicImport(\"knowledge\",\"KnowledgeID\",\"KnowledgeID\",\"duplicate\")",
+      "Status": "Passed",
+      "Duration": 0.1818038,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.InvalidContentBlocksAtomicImport(\"knowledge\",\"KnowledgeID\",\"单次学习体力\",\"-1\")",
+      "Status": "Passed",
+      "Duration": 0.161271,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.InvalidContentBlocksAtomicImport(\"knowledge\",\"KnowledgeID\",\"单次进度\",\"0\")",
+      "Status": "Passed",
+      "Duration": 0.155246,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.InvalidContentBlocksAtomicImport(\"knowledge\",\"KnowledgeID\",\"掌握阈值\",\"0\")",
+      "Status": "Passed",
+      "Duration": 0.1701973,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.InvalidContentBlocksAtomicImport(\"jade-slips\",\"条目ID\",\"物品ID\",\"unknown\")",
+      "Status": "Passed",
+      "Duration": 0.1568872,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.InvalidContentBlocksAtomicImport(\"jade-slips\",\"条目ID\",\"KnowledgeID\",\"unknown\")",
+      "Status": "Passed",
+      "Duration": 0.169023,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.InvalidContentBlocksAtomicImport(\"jade-slips\",\"条目ID\",\"物品ID\",\"herb\")",
+      "Status": "Passed",
+      "Duration": 0.1768874,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.InvalidSavedKnowledgeCannotReplaceSourceSession(\"unknown\")",
+      "Status": "Passed",
+      "Duration": 0.1592906,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.InvalidSavedKnowledgeCannotReplaceSourceSession(\"duplicate\")",
+      "Status": "Passed",
+      "Duration": 0.1448103,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.InvalidSavedKnowledgeCannotReplaceSourceSession(\"negative\")",
+      "Status": "Passed",
+      "Duration": 0.1480606,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.MasteredSurvivesSellingAndSavingWithoutSource",
+      "Status": "Passed",
+      "Duration": 0.1547715,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.PartialProgressSaveAndChangedThresholdPreserveEarnedState",
+      "Status": "Passed",
+      "Duration": 0.1504477,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.PreparationBusinessTextAndInsufficientStaminaDoNotSpend",
+      "Status": "Passed",
+      "Duration": 0.1476877,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.PriorSchemaOneSaveHasNoKnowledgeAndStillLoads",
+      "Status": "Passed",
+      "Duration": 0.1542713,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.SoldLastSourceKeepsProgressAndRealPurchaseResumes",
+      "Status": "Passed",
+      "Duration": 0.1532628,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.StudyingDoesNotConsumeJadeSlipOrSpiritResource",
+      "Status": "Passed",
+      "Duration": 0.1535253,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.KnowledgeTests.UnifiedImportChangesTextLearningParametersAndMappingWithoutCode",
+      "Status": "Passed",
+      "Duration": 0.1943767,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "status": "completed",
+  "duration": 2.46,
+  "summary": {
+    "total": 13,
+    "passed": 13,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.NewGameTests.CanonicalBaselineAndRestartAreDeterministic",
+      "Status": "Passed",
+      "Duration": 0.1786003,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NewGameTests.CanonicalStoryUnlocksAlchemyAndLoadKeepsResults",
+      "Status": "Passed",
+      "Duration": 0.1511337,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NewGameTests.ContainerCannotStartOnDisplayAndPartialCoordinatesFail",
+      "Status": "Passed",
+      "Duration": 0.1762528,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NewGameTests.ForcedPositionIsHonoredAndOverlapsRejectCreation",
+      "Status": "Passed",
+      "Duration": 0.2001984,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NewGameTests.ImportedBalanceDateItemsAndStateAffectOnlyNewSessions",
+      "Status": "Passed",
+      "Duration": 0.2055107,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NewGameTests.InvalidContentCannotPartiallyImport(\"start-items\",\"条目ID\",\"物品ID\",\"unknown\")",
+      "Status": "Passed",
+      "Duration": 0.1588711,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NewGameTests.InvalidContentCannotPartiallyImport(\"start-items\",\"条目ID\",\"数量\",\"0\")",
+      "Status": "Passed",
+      "Duration": 0.1593637,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NewGameTests.InvalidContentCannotPartiallyImport(\"start-items\",\"条目ID\",\"目标区域\",\"Location\")",
+      "Status": "Passed",
+      "Duration": 0.1824049,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NewGameTests.InvalidContentCannotPartiallyImport(\"start-states\",\"条目ID\",\"状态ID\",\"unknown-location\")",
+      "Status": "Passed",
+      "Duration": 0.1636375,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NewGameTests.InvalidContentCannotPartiallyImport(\"start-profiles\",\"ProfileID\",\"开始月份\",\"13\")",
+      "Status": "Passed",
+      "Duration": 0.163501,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NewGameTests.UnknownStateTargetsAreRejected(\"Profession\")",
+      "Status": "Passed",
+      "Duration": 0.1605177,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NewGameTests.UnknownStateTargetsAreRejected(\"Recipe\")",
+      "Status": "Passed",
+      "Duration": 0.1638603,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.NewGameTests.UnknownStateTargetsAreRejected(\"Knowledge\")",
+      "Status": "Passed",
+      "Duration": 0.1608859,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

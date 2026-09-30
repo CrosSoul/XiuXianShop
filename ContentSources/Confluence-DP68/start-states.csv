@@ -1,0 +1,13 @@
+field_name,type,configuration
+条目ID,text,
+ProfileID,text,
+状态类型,tag,
+状态ID,text,
+状态值,text,
+数据状态,tag,
+备注,text,
+
+view_name,layout,filters,sorts,hidden_fields,is_default,is_current
+全部初始状态,table,,,,true,true
+
+

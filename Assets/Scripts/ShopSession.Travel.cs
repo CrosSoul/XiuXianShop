@@ -31,13 +31,13 @@ namespace XiuXianShop
         public bool IsLocationUnlocked(string id) => unlockedLocations.Contains(id);
         public bool CanReturnWithoutConfirmation => !UnlockedLocations.Any(l=>CanEnterLocation(l.id,out _));
 
-        void InitializeTravel()
+        void InitializeTravel(bool initialUnlocks)
         {
             if(catalog.firstLocationStaminaCost<0 || catalog.extraLocationStaminaCost<0 ||
                 catalog.travelLocations.Any(l=>string.IsNullOrWhiteSpace(l.id) || l.itemGridSize.x<1 || l.itemGridSize.y<1) ||
                 catalog.travelLocations.Select(l=>l.id).Distinct().Count()!=catalog.travelLocations.Length)
                 throw new ArgumentException("外出地点配置无效。");
-            foreach(var location in catalog.travelLocations.Where(l=>l.initiallyUnlocked))unlockedLocations.Add(location.id);
+            if(initialUnlocks)foreach(var location in catalog.travelLocations.Where(l=>l.initiallyUnlocked))unlockedLocations.Add(location.id);
         }
 
         public bool UnlockLocation(string id)

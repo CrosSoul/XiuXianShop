@@ -1,0 +1,48 @@
+{
+  "status": "completed",
+  "duration": 36.69,
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.LoadingSafeSlotExitsTravelAndRunningFurnaceWithoutLeavingOldViews",
+      "Status": "Passed",
+      "Duration": 4.4498631,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.SavedAlchemyItemsLoadIntoFreshDefaultSessionWithStableIds",
+      "Status": "Passed",
+      "Duration": 25.2400394,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.SaveMenuRequiresOverwriteAndLoadConfirmationAtSafeStages",
+      "Status": "Passed",
+      "Duration": 2.7659305,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.StorageWindowDragsContentsAndBoxThenRestoresActualSave",
+      "Status": "Passed",
+      "Duration": 2.1821346,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "XiuXianShop.Tests.ShopPlayableTests.SystemSaveLoadButtonsRestoreActualFileAndDoNotRepeatRent",
+      "Status": "Passed",
+      "Duration": 2.0425546,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

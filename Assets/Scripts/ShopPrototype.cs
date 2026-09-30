@@ -14,6 +14,7 @@ namespace XiuXianShop
     {
         [SerializeField] ShopCatalog catalog;
         ShopCatalog runtimeCatalog;
+        ShopCatalog canonicalCatalog;
         public ShopSession Session { get; private set; }
         public ShopCatalog Catalog { get=>catalog; set=>catalog=value; }
         public bool IsDragging => dragId!=0;
@@ -56,8 +57,9 @@ namespace XiuXianShop
             Application.targetFrameRate=60;
             LoadTooltipPreference();
             // Development unlocks extend only this Play session, never the saved catalog asset.
-            runtimeCatalog=Instantiate(catalog);catalog=runtimeCatalog;
-            Session=new ShopSession(catalog, customerSeed: CustomerSeed < 0 ? (int?)null : CustomerSeed);
+            canonicalCatalog=catalog;
+            runtimeCatalog=Instantiate(canonicalCatalog);catalog=runtimeCatalog;
+            Session=ShopSession.NewGame(catalog,catalog.startProfileId,CustomerSeed < 0 ? (int?)null : CustomerSeed);
             font=Font.CreateDynamicFontFromOSFont(new[]{"Microsoft YaHei","SimHei","Noto Sans CJK SC","Arial"},24);
             BuildScreen(); Refresh();
         }
@@ -67,6 +69,7 @@ namespace XiuXianShop
             TickVisitScene();
             if(Session?.PendingVisitScene!=null)return;
             TickAlchemyPanel();
+            RefreshKnowledgeWindow();
             // Fuel use changes value continuously. Alchemy updates its own labels; keep grid views
             // stable during the batch so a stationary pointer can retain its hover target.
             bool alchemyRunning=Session!=null && Session.IsUsingAlchemy && Session.Alchemy?.Phase==AlchemyPhase.Running;
@@ -76,6 +79,7 @@ namespace XiuXianShop
             if(keyboard.escapeKey.wasPressedThisFrame)
             {
                 if(IsSystemMenuOpen)CloseSystemMenu();
+                else if(IsKnowledgeWindowOpen)CloseKnowledgeWindow();
                 else if(IsDragging)CancelDrag();
                 else OpenSystemMenu();
                 return;
@@ -335,6 +339,7 @@ namespace XiuXianShop
             if(IsDragging)return;selectedId=id;localNotice=null;
             if(Session.Find(id).Definition.IsStorage && !Session.IsAtShopAlchemy)OpenStorage(id);
             if(Session.Find(id).Definition.id==ShopSession.ShopFurnaceDefinitionId && !IsShopAlchemyWindowOpen)OpenShopAlchemyPage(id);
+            if(Session.Find(id).Definition.category==ItemCategory.JadeSlip)OpenKnowledgeWindow(Session.Find(id));
             Refresh();
             Canvas.ForceUpdateCanvases();selection.GetComponentInParent<ScrollRect>().verticalNormalizedPosition=1;
         }
@@ -342,6 +347,7 @@ namespace XiuXianShop
         // Explicit developer/test entry. The Editor menu supplies a temporary catalog clone.
         public void StartVerificationSession(ShopCatalog configuration,int seed,MarketCalendar calendar=null)
         {
+            CloseKnowledgeWindow();
             CloseSystemMenu();
             CloseCommissions();CloseTeaNews();CloseTravelConfirmation();CloseCarryPanel();CloseTravelWindow();CloseCarrySelection();CloseStorage();CancelDrag();catalog=configuration;Session=new ShopSession(catalog,customerSeed:seed,calendar:calendar);
             CalendarMessage=null;CalendarView.Close();NegotiationView.Close();

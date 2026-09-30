@@ -65,6 +65,8 @@ namespace XiuXianShop.Editor
                 else if(domain=="commissions")result.AddRange(CommissionContentAdapter.Create());
                 else if(domain=="market")result.Add(new MarketContentAdapter());
                 else if(domain=="alchemy")result.AddRange(AlchemyContentAdapter.Create());
+                else if(domain=="new-game")result.AddRange(StartProfileContentAdapter.Create());
+                else if(domain=="knowledge")result.AddRange(KnowledgeContentAdapter.Create());
                 else plan.Error("snapshot.json",domain,"domains","未知内容域。");
             }
             return result.ToArray();
